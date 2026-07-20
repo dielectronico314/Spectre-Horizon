@@ -11,18 +11,16 @@ Basado en los criterios formales de aceptación del Día 5, el siguiente documen
 - **Funcionalidad:** El bucle `while` está anclado a la duración real (`time.time()`). Se ha demostrado que puede capturar ráfagas sin corromper memoria, lo que permite capturas de 60 segundos o más enviando `--duration 60`.
 
 ## 3. Guardar IQ + metadata en una carpeta de sesión
-- **Estado:** ⚠️ Parcialmente Completado (Brecha detectada)
-- **Funcionalidad Actual:** Los archivos se guardan correctamente (`.iq` y `.sigmf-meta`) en `rf-spectrum/data/samples/`.
-- **Qué falta:** El plan exige que se guarden dentro de una *carpeta de sesión individual* (por ejemplo, `rf-spectrum/data/samples/session_20260720_1535/`). Actualmente se guardan todos sueltos en el directorio raíz de `samples/`.
+- **Estado:** ✅ Completado
+- **Funcionalidad:** El script ahora crea dinámicamente subcarpetas únicas por captura usando la sintaxis `session_YYYYMMDD_HHMMSS_FREQMHz/`. Tanto el archivo binario `.iq` como el contrato `.sigmf-meta` se depositan juntos y acoplados dentro de esta sesión aislada.
 
 ## 4. Calcular tamaño, duración y muestras
 - **Estado:** ✅ Completado
 - **Funcionalidad:** Al finalizar la captura o al interrumpirse, el script calcula e imprime con precisión el tamaño en MB, el tiempo real transcurrido y la sumatoria exacta de muestras obtenidas usando el bloque `sr.ret`.
 
 ## 5. Registrar overflows o pérdidas
-- **Estado:** ⚠️ Parcialmente Completado (Brecha detectada)
-- **Funcionalidad Actual:** El script intercepta el código de hardware `SOAPY_SDR_OVERFLOW` y lanza una alerta visual en la terminal.
-- **Qué falta:** Actualmente no se están sumando cuántas veces ocurrió un overflow, ni se está registrando este número dentro del archivo JSON de Metadata final. Para cumplir la planificación, el metadata debe incluir un campo `overflows_count`.
+- **Estado:** ✅ Completado
+- **Funcionalidad:** El script intercepta activamente los códigos de error del hardware (como `SOAPY_SDR_OVERFLOW`). Mantiene un conteo continuo de las ráfagas perdidas por saturación de RAM, emite alertas en pantalla, y lo más importante: inyecta el total final en el parámetro `"core:overflows"` del contrato SigMF de la captura.
 
 ## 6. Comando de detención segura
 - **Estado:** ✅ Completado
@@ -30,8 +28,9 @@ Basado en los criterios formales de aceptación del Día 5, el siguiente documen
 
 ---
 
-### Resumen de Trabajo Pendiente para Cerrar el Día 5
-Para cumplir con el criterio de cierre exacto, debemos hacer **3 ajustes menores**:
-1. Modificar el script para que genere una subcarpeta (ej. `session_106MHz_hhmmss`) y guarde ahí los dos archivos.
-2. Crear un contador de `overflows = 0`, incrementarlo en la alerta, e insertarlo en el JSON de Metadata.
-3. Hacer la corrida final de demostración de 60 segundos (ejecutar `--duration 60`).
+### Resumen Final de Cumplimiento (Día 5)
+🎉 **ESTADO: 100% COMPLETADO Y CERRADO**
+
+Todos los criterios formales dictados para la obtención y empaquetado de la primera captura IQ binaria han sido satisfechos. Como prueba de aceptación final, se ejecutó una corrida ininterrumpida de 60 segundos sobre la frecuencia de *107.3 MHz*, la cual arrojó cero (0) overflows y demostró una estabilidad absoluta en la tubería `CF32` generando un archivo íntegro de casi 1 Gigabyte de información de espectro, acompañado de su respectivo contrato SigMF. 
+
+El repositorio ha sido enlazado a GitHub con éxito, dotándolo además de una portada técnica robusta. Estamos listos para avanzar al Día 6 (Escaneo en Banda Wi-Fi).
