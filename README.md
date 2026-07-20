@@ -1,5 +1,4 @@
 <div align="center">
-  <img src="assets/harogic-san400.png" alt="Harogic SAN-400 Spectrum Analyzer" width="600"/>
 
   # Spectre-Horizon
   
@@ -10,6 +9,11 @@
   [![SoapySDR](https://img.shields.io/badge/SoapySDR-API-success.svg)](#)
   [![License](https://img.shields.io/badge/License-MIT-green.svg)](#)
   
+  <br/>
+  <img src="assets/harogic-san400.png" alt="Harogic SAN-400 Spectrum Analyzer" width="600"/>
+  <br/>
+  <br/>
+
   *Un puente de software robusto para capturar, procesar y almacenar espectro electromagnético de grado industrial utilizando Python, contenedores Docker y metadatos estándar (SigMF).*
 </div>
 
