@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="assets/harogic-san400.jpg" alt="Harogic SAN-400 Spectrum Analyzer" width="600"/>
+  <img src="assets/harogic-san400.png" alt="Harogic SAN-400 Spectrum Analyzer" width="600"/>
 
   # Spectre-Horizon
   
