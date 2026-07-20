@@ -1,0 +1,72 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<Settings>
+    <SA>
+        <DefaultTrace>
+            <Trace name="T1" type="ClearWrite_Sample" color="#ffff00" color2="#000000" memorycolor="#00ffff" show="true" />
+            <Trace name="T2" type="ClearWrite_Sample" color="#ff8100" color2="#0037C8" memorycolor="#00ff00" show="false" />
+            <Trace name="T3" type="ClearWrite_Sample" color="#ff00ff" color2="#FF0000" memorycolor="#0096ff" show="false" />
+            <Trace name="T4" type="ClearWrite_Sample" color="#2a9595" color2="#00C8C8" memorycolor="#ba6f53" show="false" />
+        </DefaultTrace>
+        <TopLabel>
+            <Label key="RefLevel" text="Ref(GraphLabel)" type="dbm" filter="Device" profile="SAStudio.Profile.Device.RefLevel" />
+            <Label key="RBW" text="RBW(GraphLabel)" type="frequency" filter="Device" profile="SAStudio.Profile.Device.RBW" />
+            <Label key="VBW" text="VBW(GraphLabel)" type="frequency" filter="Device" profile="SAStudio.Profile.Device.VBW" />
+            <Label key="SWT" text="SWT(GraphLabel)" />
+            <Label key="Amp" text="Amp(GraphLabel)" type="enum" filter="Device" profile="SAStudio.Profile.Device.Preamplifier" list="0=Auto(GraphLabel),1=Off(GraphLabel)" />
+            <Label key="SpurRejection" text="" type="enum" filter="Device" profile="SAStudio.Profile.Device.SpurRejection2" list="0= ,1=S,2=E" />
+            <Label key="Detector" text="Detector" type="enum" filter="Device" profile="SAStudio.Profile.Device.SweepFrameDetector" list="0=Detector_TypeDef.Detector_Sample,1=Detector_TypeDef.Detector_PosPeak,2=Detector_TypeDef.Detector_Average,3=Detector_TypeDef.Detector_NegPeak,4=Detector_TypeDef.Detector_MaxPower,5=Detector_TypeDef.Detector_RawFrames,6=Detector_TypeDef.Detector_RMS" />
+        </TopLabel>
+        <BottomLabel>
+            <Label key="Start" text="Start(GraphLabel)" type="frequency" filter="Graph" profile="SAStudio.Profile.Device.StartFrequency" />
+            <Label key="Span" text="Frequency Span(GraphLabel)" type="frequency" filter="Graph" profile="SAStudio.Profile.Device.Span" />
+            <Label key="Center" text="Center(GraphLabel)" type="frequency" filter="Graph" profile="SAStudio.Profile.Device.CenterFrequency" />
+            <Label key="Speed" text="Speed(GraphLabel)" />
+            <Label key="Stop" text="Stop(GraphLabel)" type="frequency" filter="Graph" profile="SAStudio.Profile.Device.StopFrequency" />
+        </BottomLabel>
+    </SA>
+    <IQS>
+        <!-- <TopLabel-WaveformIQ> -->
+            <!-- <Label key="SampleRate" text="SampleRate" type="frequency" filter="Device" profile="SAStudio.Profile.Device.SampleRate" /> -->
+            <!-- <Label key="Center" text="Center Frequency" type="frequency" filter="Device" profile="SAStudio.Profile.Device.CenterFrequency" /> -->
+        <!-- </TopLabel-WaveformIQ> -->
+		     
+        <DefaultTrace>
+            <Trace name="T1" type="ClearWrite_Sample" color="#ffff00" color2="#000000" memorycolor="#00ffff" show="true" />
+            <Trace name="T2" type="ClearWrite_Sample" color="#ff8100" color2="#0037C8" memorycolor="#00ff00" show="false" />
+            <Trace name="T3" type="ClearWrite_Sample" color="#ff00ff" color2="#FF0000" memorycolor="#0096ff" show="false" />
+            <Trace name="T4" type="ClearWrite_Sample" color="#2a9595" color2="#00C8C8" memorycolor="#ba6f53" show="false" />
+        </DefaultTrace>
+		<TopLabel-Spectrum>
+            <Label key="RefLevel" text="Ref(GraphLabel)" type="dbm" filter="Device" profile="SAStudio.Profile.Device.RefLevel" />
+			<Label key="rbw" text="RBW(GraphLabel)" type="frequency" filter="Device" profile="SAStudio.Profile.Device.RBW" />
+			<Label key="detector" text="TraceDetector" type="enum" filter="Device" profile="SAStudio.Profile.Device.TraceDetector" list="0=TraceDetector_TypeDef.TraceDetector_AutoSample,1=TraceDetector_TypeDef.TraceDetector_Sample,2=TraceDetector_TypeDef.TraceDetector_PosPeak,3=TraceDetector_TypeDef.TraceDetector_NegPeak,4=TraceDetector_TypeDef.TraceDetector_RMS,5=TraceDetector_TypeDef.TraceDetector_Bypass"/>
+		</TopLabel-Spectrum>
+		<BottomLabel-Spectrum>
+			<Label key="Start" text="Start(GraphLabel)" type="frequency" filter="Device" profile="SAStudio.Profile.Device.StartFrequency"/>
+			<Label key="Span" text="Frequency Span(GraphLabel)" type="frequency" filter="Device" profile="SAStudio.Profile.Device.Span" />
+			<Label key="Center" text="Center(GraphLabel)" type="frequency" filter="Device" profile="SAStudio.Profile.Device.CenterFrequency" />
+			<Label key="Stop" text="Stop(GraphLabel)" type="frequency" filter="Device" profile="SAStudio.Profile.Device.StopFrequency" />
+		</BottomLabel-Spectrum>
+		<TopLabel-WaveformIQ>			
+			<Label key="samplerate" text="SampleRate(GraphLabel)" type="frequency" filter="Device" profile="SAStudio.Profile.Device.StreamSamples" />
+			<Label key="center" text="Center(GraphLabel)" type="frequency" filter="Device" profile="SAStudio.Profile.Device.CenterFrequency" />
+			<Label key="reflevel" text="RefLevel_dBm" type="dBm" filter="Device" profile="SAStudio.Profile.Device.RefLevel" />
+		</TopLabel-WaveformIQ>		
+		<TopLabel-WaveformPower>
+			<Label key="center" text="Center(GraphLabel)" type="frequency" filter="Device" profile="SAStudio.Profile.Device.CenterFrequency" />
+			<Label key="span" text="AnalysisBW(GraphLabel)" type="frequency" filter="Device" profile="SAStudio.Profile.Device.IQSampleRate" />
+		</TopLabel-WaveformPower>
+		<TopLabel-Demod>
+			<Label key="center" text="Center(GraphLabel)" type="frequency" filter="Device" profile="SAStudio.Profile.Device.CenterFrequency" />
+		</TopLabel-Demod>
+		
+    </IQS>
+	<RTA>
+	    <DefaultTrace>
+        <Trace name="T1" type="ClearWrite_Sample" color="#ffff00" color2="#000000" memorycolor="#00ffff" show="true" />
+        <Trace name="T2" type="ClearWrite_Sample" color="#ff8100" color2="#BB00BB" memorycolor="#00ff00" show="false" />
+        <Trace name="T3" type="ClearWrite_Sample" color="#ff00ff" color2="#FF0000" memorycolor="#0096ff" show="false" />
+        <Trace name="T4" type="ClearWrite_Sample" color="#2a9595" color2="#00C8C8" memorycolor="#ba6f53" show="false" />
+    </DefaultTrace>
+	</RTA>
+</Settings>

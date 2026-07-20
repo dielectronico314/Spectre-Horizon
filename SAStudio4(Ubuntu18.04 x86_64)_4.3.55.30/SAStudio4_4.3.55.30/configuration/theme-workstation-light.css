@@ -1,0 +1,1121 @@
+/*----------------------------------------------------------工作站右侧面板*/
+/*设置面板整体宽度*/
+QDockWidget {
+    min-width: 385px;/*需要将min-width和max-widht设置成相同值*/
+    max-width: 385px;
+}
+
+/*设置面板背景色*/
+QDockWidget QWidget {
+    background-color: #e2dcd6;
+}
+
+/*边距相关*/
+Profile--GroupBox {
+    qproperty-MarginBottom: 9px;           /*标题栏与内容栏间的下间距*/
+    qproperty-ContentMarginTop: 6px;       /*标题栏与内容栏间的上间距*/
+    qproperty-TitleMarginLeft: 6px;        /*标题栏文字左侧边距*/
+    qproperty-TitleMarginRight: 3px;       /*标题栏收缩按钮右侧边距*/
+    qproperty-ContentMarginLeftRight: 6px; /*内容栏左右边距*/
+    qproperty-ContentSpace: 3px;           /*内容栏控件间距*/
+}
+
+/*标题栏-Frequency、Span等*/
+Profile--GroupBox #titleBar {
+    background-color: #c3b9b3; /*背景色*/
+    min-height: 25px;            /*高度， 需要将min-heigh和max-height设置成相同值*/
+    max-height: 25px;
+    font-size: 12pt;             /*字体大小*/
+}
+
+/*参数名称(中心、起始、终止频率....)*/
+Profile--GroupBox QLabel {
+    min-width: 133px;  /*最小宽度, 需要将min-width,max-width设置为相同值*/
+    max-width: 133px;
+    font-size: 12pt;   /*字体大小*/
+}
+
+/*数值编辑框*/
+Profile--GroupBox QLineEdit {
+    border: 1px solid #cbc7c3; /*边框*/
+    padding-left: 5px;           /*文字的左边距*/
+    background-color: #fffdff; /*背景色*/
+    min-height: 30px;            /*高度*/
+    max-height: 30px;
+    font-size: 12pt;
+}
+Profile--GroupBox QLineEdit:hover {
+    border: 1px solid #ef884a; /*鼠标悬浮在上面时的边框*/
+}
+Profile--GroupBox Profile--NumEdit QPushButton {/*工作站右侧面板：数值编辑框---加减号按钮*/
+    font-size: 20pt;      /*字体大小*/
+    font-weight: normal;  /*bold 加粗, normal 常规*/
+    background-color: transparent;/*点击时的背景色*/
+    text-align: center;
+}
+Profile--GroupBox Profile--NumEdit QPushButton:pressed {/*工作站右侧面板：数值编辑框---加减号按钮*/
+    color: rgb(99,172,246); /*点击时的加减号颜色*/
+    background-color: transparent;/*点击时的背景色*/
+}
+Profile--GroupBox Profile--NumEdit #downBtn {/*工作站右侧面板：数值编辑框---减号按钮*/
+    padding-top: -2px; /*减号文字，位置往上偏移的距离，为了和加号对齐*/
+}
+
+/*按钮样式(扫宽加,扫宽减,上一帧等)*/
+Profile--GroupBox QPushButton {
+    min-height: 30px;  /*高度，需要将min-height,max-height设置成相同值*/
+    max-height: 30px;
+    font-size: 12pt;   /*字体大小*/
+    background-color: #c4bdb3; /*背景色*/
+    border: none;
+}
+Profile--GroupBox QPushButton:checked,
+Profile--GroupBox QPushButton:pressed {
+    background-color: #63ACF6;
+}
+
+/*On,Off切换按钮*/
+Profile--GroupBox Profile--SwitchButton #leftBtn,/*On，Off按钮默认背景色*/
+Profile--GroupBox Profile--SwitchButton #rightBtn,
+Profile--GroupBox Profile--SwitchButton2 #leftBtn,
+Profile--GroupBox Profile--SwitchButton2 #rightBtn,
+Profile--GroupBox Profile--SwitchButton2 #leftBtn:pressed,
+Profile--GroupBox Profile--SwitchButton2 #rightBtn:pressed {
+    background-color: #e9e7e3;
+}
+Profile--GroupBox Profile--SwitchButton #leftBtn:checked,/*On按钮,使能时的背景色*/
+Profile--GroupBox Profile--SwitchButton #leftBtn:pressed,
+Profile--GroupBox Profile--SwitchButton2 #leftBtn[Sts=true] {
+    background-color: rgba(99,172,246,100); /*选中、点击时的背景色*/
+}
+Profile--GroupBox Profile--SwitchButton #rightBtn:checked,/*Off 按钮,使能时的背景色*/
+Profile--GroupBox Profile--SwitchButton #rightBtn:pressed,
+Profile--GroupBox Profile--SwitchButton2 #rightBtn[Sts=true] {
+    background-color: #c4bdb3; /*选中、点击时的背景色*/
+}
+
+/*布局选择按钮*/
+Profile--GroupBox Profile--ComboBox2 QPushButton {/*按钮默认颜色*/
+    background-color: #e9e7e3;
+}
+Profile--GroupBox Profile--ComboBox2 QPushButton:checked,/*选中、按下时的颜色*/
+Profile--GroupBox Profile--ComboBox2 QPushButton:pressed {
+    background-color: rgba(99,172,246,100);
+}
+
+/*下拉菜单控件*/
+Profile--GroupBox QComboBox {
+    border: 1px solid #cbc7c3; /*边框*/
+    padding-left: 5px;           /*文字的左边距*/
+    background-color: #fffdff; /*背景色*/
+    min-height: 30px;            /*高度*/
+    max-height: 30px;
+    font-size: 12pt;             /*字体大小*/
+}
+Profile--GroupBox QComboBox:hover {
+    border: 1px solid #ef884a; /*鼠标悬浮在上面时的边框*/
+}
+Profile--GroupBox QComboBox QAbstractItemView { /*下拉菜单弹出的界面的样式*/
+    border: 1px solid #ef884a;/*边框*/
+    padding-left: 5px;          /*文字的左边距*/
+    background-color: #fffdff;/*背景色*/
+    font-size: 12pt;            /*枚举字体大小*/
+}
+Profile--GroupBox QComboBox QAbstractItemView:Item {/*下拉菜单中各枚举*/
+    min-height: 30px;  /*高度*/
+    max-height: 30px;
+}
+
+/*---按钮disabled样式***/
+Profile--GroupBox QLineEdit:disabled {
+    color:#a8a8a8;
+}
+/*----------------------------------------------------------间隔：右侧面板与图设置菜单间隔*/
+LinuxMainWindow  QWidget#graphToolRightSpaceWidget {
+    background-color: rgb(255,255,255);/*间隔背景色*/
+    min-width: 5px;/*间隔宽度，min、max设置同值*/
+    max-width: 5px;
+}
+
+/*----------------------------------------------------------图表侧边栏菜单*/
+/*---背景以及宽度*/
+Graph--GraphRightPanel {
+    min-width:81px;/*图表侧边栏菜单设置区模块整体宽度（Graph、Trace那一整列），min、max同值*/
+    max-width:81px;
+    background-color: #ece9e4;/*图表侧边栏菜单设置区背景色*/
+}
+/*---按钮默认样式*/
+Graph--GraphRightPanel QPushButton {
+    font-size: 13pt;/*图表侧边栏菜单中按钮字体大小*/
+    font-weight: normal; /*normal:不加粗; bold:加粗*/
+    min-width: 75px;/*图表侧边栏菜单中按钮宽度，min、max同值*/
+    max-width: 75px;
+    min-height: 64px;/*图表侧边栏菜单中按钮高度，min、max同值*/
+    max-height: 64px;
+    color: #523b2f;/*图表侧边栏菜单中按钮字体颜色*/
+    background-color: #e2ddd7;/*图表侧边栏菜单中按钮背景颜色*/
+    border: none;/*边框*/
+}
+Graph--GraphRightPanel QPushButton:hover {
+    background-color: #e2ddd7;/*图表侧边栏菜单中按钮鼠标悬浮时颜色，设置和按钮背景色同色*/
+}
+/*---按钮选中或按下的样式*/
+Graph--GraphRightPanel QPushButton:checked,
+Graph--GraphRightPanel QPushButton:pressed {
+    border: none;/*边框*/
+    color: #323332;/*图表侧边栏菜单中按钮选中时字体颜色*/
+    background-color: #63ACF6;/*图表侧边栏菜单中按钮选中时背景色*/
+}
+Graph--GraphRightPanel Profile--ToolButton QLabel{
+    font-size: 13pt;/**/
+    font-weight: normal; /**/
+    color:#523b2f;/**/
+}
+/*---图表-时间样式*/
+Graph--GraphRightPanel QLabel#time1Label{
+    font-size: 13pt;/*时间值文字大小*/
+    font-weight: normal; /*normal:不加粗; bold:加粗*/
+    color:#523b2f;/*时间值文字颜色*/
+}
+/*---图表-日期样式*/
+Graph--GraphRightPanel QLabel#time2Label{
+    font-size: 13pt;/*日期值文字大小*/
+    font-weight: normal; /*normal:不加粗; bold:加粗*/
+    color:#523b2f;/*日期值文字颜色*/
+}
+/*----------------------------------------------------------标题栏*/
+/*---背景、高度*/
+Core--Internal--CustomTitleMenuBar{
+    min-height:40px;/*顶部标题栏背景高度（文件、模式、系统一整行）min、max同值*/
+    max-height:40px;
+    background-color:#ece9e4;/*顶部标题栏背景颜色*/
+}
+/*---LOGO*/
+/* margin-top + margin-bottom + 图片高度(30px) = 标题栏高度。若条件不满足logo会被拉伸或压缩。*/
+/* 用户自定义的logo：将其放到SAS4的bin/configuration/customized/logo.png目录下,图片的尺寸是170*30像素的PNG。*/
+Core--Internal--CustomTitleMenuBar QLabel#iconLabel {
+    margin-top: 8px;
+    margin-bottom: 8px;
+    margin-left: 11px;
+    margin-right: 0px;
+    max-width: 137px;
+    min-width: 137px;
+}
+
+/*---按钮默认样式*/
+Core--Internal--CustomTitleMenuBar  QPushButton {
+    font-family: "HarmonyOS Sans SC";
+    font-size: 13pt;/*顶部菜单栏按钮中字体大小*/
+    font-weight: normal;/*normal:不加粗; bold:加粗*/
+    color: #523b2f;/*按钮字体默认颜色*/
+    padding-left: 15px;
+    padding-right: 15px;
+    min-height: 40px;/*顶部菜单栏按钮高度，min、max同值*/
+    max-height: 40px;
+    border: none;/*按钮边框*/
+    background-color: transparent;/*按钮背默认背景色，当前不提供选中、按下时的背景色设置；transparent：透明*/
+}
+/* 为工具按钮区域内的所有按钮设置特殊样式*/
+/* 为特定的工具按钮设置不同的最小宽度 */
+Core--Internal--CustomTitleMenuBar QWidget#toolButtonsArea QPushButton[objectName="SAStudio.Action.QuickRecord"][lang="en"] {
+    min-width: 65px; /* 录制按钮可能文本较长 */
+}
+
+Core--Internal--CustomTitleMenuBar QWidget#toolButtonsArea QPushButton[objectName="SAStudio.Action.QuickReplay"][lang="en"]  {
+    min-width: 75px; /* 回放按钮可能文本更长 */
+}
+
+Core--Internal--CustomTitleMenuBar QWidget#toolButtonsArea QPushButton[objectName="SAStudio.Action.QuickRecord"][lang="ru"] {
+    min-width: 88px; /* 录制按钮可能文本较长 */
+}
+
+Core--Internal--CustomTitleMenuBar QWidget#toolButtonsArea QPushButton[objectName="SAStudio.Action.QuickReplay"][lang="ru"]  {
+    min-width: 78px; /* 回放按钮可能文本更长 */
+}
+
+/* 第一个按钮的左边距 */
+Core--Internal--CustomTitleMenuBar QWidget#toolButtonsArea QPushButton[isFirstToolButton="true"] {
+}
+/*---仅显示图标的按钮样式（如：截图、隐藏）的特殊*/
+Core--Internal--CustomTitleMenuBar QWidget#toolButtonsArea QPushButton[toolButtonType="iconOnly"]{
+}
+
+QMenuBar#titleMenuBar {
+    background: transparent;
+    font-family: "HarmonyOS Sans SC";
+    font-size: 13pt;/*顶部菜单栏按钮中字体大小*/
+    font-weight: normal; /*字体加粗*/
+    color: #523b2f; /*按钮字体默认颜色*/ 
+    min-height: 40px;/*顶部菜单栏按钮高度，min、max同值*/
+    max-height: 40px;
+}
+
+QMenuBar#titleMenuBar::item {
+    color: #523b2f;/*按钮字体默认颜色*/
+    padding-left: 15px;  /*文字距左边边框的距离*/
+    padding-right: 15px; /*文字距右边边框的距离*/
+    border: none;/*按钮边框*/
+}
+
+/*---按钮按下去样式*/
+Core--Internal--CustomTitleMenuBar QPushButton:checked,
+Core--Internal--CustomTitleMenuBar QPushButton:pressed {
+    color: #00b200;
+}
+
+QMenuBar#titleMenuBar::item:pressed {
+	background-color: transparent;
+	color: #00b200; /*点击时绿色字体*/
+}
+QMenuBar#titleMenuBar::item:open {
+	background-color: transparent;
+	color: #00b200; /* 菜单打开时保持绿色*/
+}
+
+Core--Internal--CustomTitleMenuBar QPushButton[toolButtonType="iconOnly"] {
+
+}
+/*---分割线*/
+Core--Internal--CustomTitleMenuBar .QFrame {
+    border: none;
+    min-height:20px;/*顶部菜单栏中竖状分割线高度设置，min、max同值，宽度当前使用默认值不支持设置*/
+    max-height:20px;
+    background-color: #dcdcdc;/*顶部菜单栏中竖状分割线颜色设置*/
+}
+
+/*----------------------------------------------------------标题栏菜单*/
+/*---菜单背景样式*/
+QMenu {
+    border: none;/*顶部菜单栏的下拉框（例：点击文件弹出的下拉框）整体边框，当前不提供单个枚举值按钮边框设置*/
+    background-color: #dad1ca;/*下拉框整体背景色*/
+}
+/*---菜单项默认样式*/
+QMenu::item {
+    font: 14pt;/*下拉框中字体默认大小*/
+    color: #3e322c;/*下拉框中字体默认颜色*/
+    padding-left: 15px;  /*文字距左边边框的距离*/
+    padding-right: 50px; /*文字距右边边框的距离*/
+    min-height: 42px;    /*菜单最小高度：当字体很小，保持设置的高度，当字体太大，高度由字的高度决定*/
+    min-width: 140px;    /*菜单最小宽度：当字符串宽度很小，保持设置的宽度，当字数太多，宽度由文字长度决定*/
+}
+/*---菜单项选中样式*/
+QMenu::item:selected {
+    background-color: #e5ded9;/*下拉框中枚举值被按住时的背景色*/
+}
+QMenu::item:disabled {
+    color: #505050;/*菜单项选中不可以用时的文字颜色*/
+}
+
+/*---窗口控制按钮样式*/
+Core--Internal--CustomTitleMenuBar QPushButton#expandShrinkBtn,
+Core--Internal--CustomTitleMenuBar QPushButton#minimizeButton,
+Core--Internal--CustomTitleMenuBar QPushButton#maximizeButton,
+Core--Internal--CustomTitleMenuBar QPushButton#closeButton {
+    min-width: 45px;/*窗口控制按钮宽度*/
+    max-width: 45px;
+    min-height: 40px;/*窗口控制按钮高度*/
+    max-height: 40px;
+    border: none;/*按钮边框*/
+    background-color: transparent;/*按钮默认背景色*/
+}
+
+Core--Internal--CustomTitleMenuBar QPushButton#expandShrinkBtn:hover,
+Core--Internal--CustomTitleMenuBar QPushButton#minimizeButton:hover,
+Core--Internal--CustomTitleMenuBar QPushButton#maximizeButton:hover {
+    background-color: rgb(183,183,183);/*最小化和最大化按钮悬浮时背景色*/
+}
+
+Core--Internal--CustomTitleMenuBar QPushButton#closeButton:hover {
+    background-color: red;/*关闭按钮悬浮时保持背景透明*/
+}
+
+/*---expandShrinkBtn*/
+Core--Internal--CustomTitleMenuBar QPushButton#expandShrinkBtn {
+    qproperty-iconSize: 24px;
+}
+
+/*---窗口控制按钮图标设置*/
+Core--Internal--CustomTitleMenuBar QPushButton#minimizeButton {
+    qproperty-icon: url(:/Utils/Image/min_light);
+    qproperty-iconSize: 16px;
+}
+
+/* 最大化按钮默认状态（窗口未最大化时） */
+Core--Internal--CustomTitleMenuBar QPushButton#maximizeButton {
+    qproperty-icon: url(:/Utils/Image/max_light);
+    qproperty-iconSize: 16px;
+}
+
+/* 最大化按钮在窗口最大化时的状态 - 使用自定义属性名 */
+Core--Internal--CustomTitleMenuBar QPushButton#maximizeButton[windowMaximized="true"] {
+    qproperty-icon: url(:/Utils/Image/recover_light);
+    qproperty-iconSize: 16px;
+}
+
+/* 最大化按钮在窗口未最大化时的状态 - 显式设置 */
+Core--Internal--CustomTitleMenuBar QPushButton#maximizeButton[windowMaximized="false"] {
+    qproperty-icon: url(:/Utils/Image/max_light);
+    qproperty-iconSize: 16px;
+}
+
+Core--Internal--CustomTitleMenuBar QPushButton#closeButton {
+    qproperty-icon: url(:/Utils/Image/close_light);
+    qproperty-iconSize: 16px;
+}
+
+/*---自定义toolbuttons 样式设置*/
+/*----------------------------------------------------------数字键盘*/
+/*---背景*/
+Profile--NumKeyboard {
+    background-color: #eceae4;/*数字键盘整体背景色*/
+}
+/* 标题上边距*/
+Profile--NumKeyboard QLabel#nameLabel{
+    margin-top: 15px;
+}
+/*标题与编辑框的间距*/
+Profile--NumKeyboard QLineEdit#edit {
+    margin-top: 9px;
+}
+/*编辑框与数字按钮的间距*/
+Profile--NumKeyboard QLineEdit#edit {
+    margin-bottom: 9px;
+}
+/*---按钮默认样式*/
+Profile--NumKeyboard .QPushButton, Profile--NumKeyboard .QPushButton:hover{
+    min-width: 75px;               /*数字键宽度*/
+    min-height: 75px;              /*数字键高度*/
+    border: 2px solid transparent; /*数字键盘按钮边框：像素，实线，颜色*/
+    border-radius: 5px;
+    color: #323332;              /*数字键盘按钮中的文字颜色*/
+    font-size: 14pt;               /*数字键盘按钮中的文字大小*/
+    background-color: #ded7d0;   /*数字键盘按钮默认背景色*/
+}
+Profile--NumKeyboard .QPushButton:pressed{
+    background-color: #c5b9aa;   /*键盘按钮被按下时的颜色*/
+}
+/*---标题*/
+Profile--NumKeyboard QLabel#nameLabel{
+    color: #323332;             /*键盘顶部标题文字颜色*/
+    font-weight: normal;          /*标题文字是否加粗，bold：加粗；normal：不加粗*/
+    font-size: 12pt;              /*键盘顶部标题文字大小*/
+}
+/*---编辑框*/
+Profile--NumKeyboard QLineEdit#edit {
+    min-height:60px;                       /*编辑框高度*/
+    font-size: 18pt;                       /*键盘编辑框里文字大小*/
+    color: #3838F9;                      /*键盘编辑框里文字颜色*/
+    background-color: #eceae4;           /*键盘编辑框背景色*/
+    selection-background-color: #c5b9aa; /* 文本选中时背景颜色 */
+    selection-color: #3838F9;            /* 文本选中时的颜色 */
+    border: 1px solid #9d968c;           /*键盘编辑框的外边框：像素，实线，颜色*/
+    padding-right: 8px;                    /*文本距离左侧边框的距离*/
+    padding-bottom: 8px;                   /*文本距离底部边框的距离*/
+}
+/*----------------------------------------------------------键盘*/
+/*---背景*/
+Controls--Keyboard {
+    background-color: #e8e8e8;
+}
+/*---按钮*/
+Controls--Keyboard .QPushButton, Controls--Keyboard .QPushButton:hover{
+    border: 2px solid #bdbdbd;/*键盘按钮边框：像素，实线，颜色*/
+    color: #323332;/*键盘按钮中的文字颜色*/
+    font-weight: bold;
+    font-size: 12pt;/*键盘按钮中的文字大小*/
+    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(215,215,215), stop:1 rgb(229,229,229));/*键盘按钮默认背景色（从上到下渐变）*/
+}
+Controls--Keyboard .QPushButton:pressed{
+    background-color: rgba(99,172,246,100);/*键盘按钮被按下时的颜色，最后参数100，代表透明度，范围（0-255；0代表完全透明，255代表不透明）*/
+}
+Controls--Keyboard .QPushButton:disabled{
+    color:#505050;
+}
+/*----------------------------------------------------------图表设置区（图表侧边栏按钮Graph和Trace点击后的弹窗）*/
+/*---背景*/
+Graph--TabletSettingsWidget{
+    min-width: 410px;/*图表功能弹窗最小宽度：当弹窗中按钮宽度设置很小，次宽度保持不变，当弹窗中按钮宽度设置很大，此宽度自适应延展*/
+    border: none;/*弹窗边框*/
+    background-color: rgba(226,221,215,240);/*弹窗背景色。240表示透明度。255：不透明；0：完全透明*/
+    qproperty-ButtonVSpace: 15px;/*按钮垂直间隔*/
+}
+/*---文字默认颜色*/
+Graph--TabletSettingsWidget QWidget{
+    color:#3c2a22;
+}
+/*---标题样式*/
+Graph--TabletSettingsWidget QLabel#headerLabel{
+    font-weight: bold;/*弹窗中标题的字体是否加粗*/
+    font-size: 14pt;/*弹窗中标题的字体大小*/
+}
+/*---按钮默认样式*/
+Graph--TabletSettingsWidget QPushButton, Graph--TabletSettingsWidget QPushButton:hover{
+    font-size: 12pt;/*弹窗里按钮中的字体大小*/
+    min-height:55px;/*弹窗中按钮高度，min、max同值*/
+    max-height:55px;
+    min-width:110px;/*弹窗中按钮宽度，min、max同值*/
+    max-width:110px;
+    border: none;/*弹窗中按钮边框*/
+    background-color:#d2cbc5;/*弹窗中按钮默认背景色*/
+}
+/*---按钮按下时样式*/
+Graph--TabletSettingsWidget QPushButton:checked,
+Graph--TabletSettingsWidget QPushButton:pressed {
+    background-color: rgba(99, 172, 246, 100);/*弹窗中按钮选中后的背景色，100代表透明度*/
+}
+/*---按钮中第一排Label样式***/
+Graph--TabletSettingsWidget QLabel#nameLabel{
+    font-weight: normal; /*弹窗按钮第一排字体是否加粗*/
+    font-size: 12pt;/*弹窗按钮第一排字体默认大小*/
+}
+/*---按钮中第二排Label样式***/
+Graph--TabletSettingsWidget QLabel#valueLabel{
+    font-weight: normal;/*弹窗按钮第二排字体是否加粗*/
+    color: #323332;/*弹窗按钮第二排字体默认颜色*/
+    font-size: 12pt;/*弹窗按钮第二排字体默认大小*/
+}
+/*---按钮disabled样式***/
+Graph--TabletSettingsWidget QPushButton:disabled,
+Graph--TabletSettingsWidget QLabel#nameLabel:disabled,
+Graph--TabletSettingsWidget QLabel#valueLabel:disabled{
+    color:#505050;
+}
+
+/*---枚举菜单背景样式*/
+Profile--TabletComboBox QMenu, Profile--TabletMenuButton QMenu {
+    border: none;/*枚举菜单下拉框整体边框样式设置，当前单个枚举值的边框无法设置*/
+    background-color:#e2ddd7;/*下拉框整体背景色*/
+}
+/*---枚举菜单项默认样式*/
+Profile--TabletComboBox QMenu::item, Profile--TabletMenuButton QMenu::item {
+    font: 11.5pt;          /*菜单下拉菜单中字体大小*/
+    color: #3e322c;     /*下拉菜单中字体颜色*/
+    padding-left: 15px;    /*文字距左边边框的距离*/
+    padding-right: 15px;   /*文字距右边边框的距离*/
+    min-height: 50px;      /*最小高度：当字体很小，保持设置的高度，当字体太大，高度由字的高度决定*/
+    min-width: 120px;      /*最小宽度：当字符串宽度很小，保持设置的宽度，当字数太多，宽度由文字长度决定*/
+}
+/*---菜单项选中样式*/
+Profile--TabletComboBox QMenu::item:selected, Profile--TabletMenuButton QMenu::item:selected {
+    background-color: rgba(99, 172, 246, 75);/*下拉菜单枚举被按下（按下不抬起）时的颜色*/
+}
+/*----------------------------------------------------------游标控制面板*/
+/*---背景和边框*/
+Graph--TabletMarkerWidget{
+    border: none;/*游标设置面板（点击图表侧边栏Marker后的弹窗）的背景边框*/
+    background-color: rgba(226,221,215,240);/*弹窗背景色*/
+}
+/*---频率值标签*/
+Graph--TabletMarkerWidget QLabel#markerValueLabel {
+    color:#3c2a22;/*游标面板左上角“频率：”的字体颜色*/
+    font-size: 13pt;/*游标面板左上角“频率：”的字体大小*/
+}
+Graph--TabletMarkerWidget QLabel#markerValueLabel[checked="true"] { /*弹出编辑器时，标签的颜色*/
+    color: #00b200;
+}
+/*---按钮默认样式*/
+Graph--TabletMarkerWidget QPushButton, Graph--TabletMarkerWidget  QPushButton:hover {
+    color:#3c2a22;/*游标面板中按钮的文字颜色*/
+    font-size: 12pt;/*游标面板中按钮的文字大小*/
+    border: 1px solid #9c9c9c;/*游标面板中按钮的边框*/
+    background-color: rgba(172,164,157,0);/*游标面板中按钮的默认背景色*/
+}
+Graph--TabletMarkerWidget QPushButton:checked, Graph--TabletMarkerWidget QPushButton:pressed{
+    background-color: rgba(99, 172, 246, 100);/*游标面板中按钮选中后的默认背景色*/
+}
+/*---按钮尺寸*/
+Graph--TabletMarkerWidget .QPushButton {
+    min-height:48px;/*游标面板中按钮的高度*/
+    min-width:80px;/*游标面板中按钮的宽度*/
+}
+/*---枚举控件样式*/
+Graph--TabletMarkerWidget QComboBox {
+    color:#3c2a22;/*游标面板中菜单按钮（M1R/Trace-1）的字体颜色*/
+    font-size: 12pt;/*游标面板中菜单按钮的字体大小*/
+    border: 1px solid #9c9c9c;/*游标面板中菜单按钮的边框*/
+    padding-left: 12px;/*游标面板中菜单按钮的字体距离左边框像素值*/
+    background-color: transparent;/*游标面板中菜单按钮的背景色：透明*/
+}
+
+Graph--TabletMarkerWidget QComboBox QAbstractItemView {
+    color:#3c2a22;/*下拉菜单中的枚举值字体颜色*/
+    font-size: 12pt;/*下拉菜单中的枚举值字体大小*/
+    border: none;/*下拉菜单中所有枚举整体外边框*/
+    background-color: #c3bdb7;/*下拉菜单中所有枚举整体背景色*/
+    padding-left: 0px;/*枚举名称左边距*/
+}
+/*---滚轮按钮*/
+Graph--TabletMarkerWidget #btn_wheel { 
+    background-image: url(:/Graph/Image/up_down_move_normal_light); 
+    background-repeat: no-repeat;
+    background-position: center;
+}
+Graph--TabletMarkerWidget #btn_wheel:checked { 
+   background-image: url(:/Graph/Image/up_down_move_hover); 
+}
+/*----------------------------------------------------------图*/
+/*---顶部和底部标签样式*/
+Graph--AbstractGraph QLabel {
+    color: #323332;/*图的上下两排标签字体颜色（上：图名称、RBW、VBW...；下：起始、扫宽、中心...）*/
+    font-size: 12pt;/*图的上下两排标签字体大小*/
+}
+Graph--ClickableLable[editable="true"] { /*可编辑的标签的颜色*/
+    color: #323332;
+}
+Graph--ClickableLable[editable="false"] { /*不可编辑的标签的颜色*/
+    color: #707070;
+}
+Graph--ClickableLable[checked="true"] { /*弹出编辑器时，标签的颜色*/
+    color: #00b200;
+}
+
+/*---轴刻度标签字体大小*/
+Graph--AbstractGraph {
+    qproperty-AxisLabelFontSize: 10pt; 
+    qproperty-AxisLabelColor:#323332;
+}
+/*---网格的边距*/
+Graph--AbstractGraph {
+    qproperty-GridMarginsLeft: 58px;    /*左*/
+    qproperty-GridMarginsTop: 30px;     /*上*/
+    qproperty-GridMarginsRight: 10px;   /*右*/
+    qproperty-GridMarginsBottom: 23px;  /*下*/
+}
+
+/*---图例宽度样式*/
+Graph--TabletLegend {
+    min-width: 115px;
+}
+/*---图例标签样式*/
+Graph--TabletLegend QLabel{
+    font: 12pt;
+    min-height:35px;
+    max-height:35px;    
+}
+/*---左上角游标参数*/
+Graph-SpectrumMarkerStatusItem QLabel {
+    font: 12pt;
+}
+ /*---瀑布图游标颜色*/
+Graph--WaterfallGraph {
+    qproperty-MarkerColor:rgb(0,0,0);
+}
+/*瀑布图游标字体大小和上下标签的字体大小一样*/
+/*----------------------------------------------------------状态栏*/
+DeviceInfoWidget{ /* 状态栏背景*/
+    background-color: #ece9e4;
+}
+/*---标签样式*/
+DeviceInfoWidget QLabel {
+    color: #82746B;/*设备状态栏字体颜色*/
+    font-size: 12pt;/*设备状态栏字体大小*/
+}
+DeviceInfoWidget QLabel#noticeLabel{ /* 错误状态标签边框*/
+    border: 2px solid #ece9e4;
+    border-radius: 5px;
+    margin-left: 3px;
+    margin-right: 5px;
+    font-size: 10pt;
+    min-height: 40px;
+}
+DeviceInfoWidget QWidget#battery{/* 电池样式*/
+    min-width: 34px;
+    max-width: 34px;
+    min-height: 18px;
+    max-height: 18px;
+    font-size: 11pt;
+}
+/*----------------------------------------------------------对话框默认样式*/
+/*---背景*/
+Controls--Dialog {
+    qproperty-windowOpacity: 0.98; /*对话框透明度*/
+    background-color: #e2ddd7;/*弹窗背景色*/
+}
+Controls--Dialog QWidget {
+    font-size: 12pt;/*默认文字大小*/
+}
+/*---标题栏背景*/
+Controls--Dialog QWidget#m_pHeaderWidget {
+    background-color: #bab4af;;/*弹窗顶部标题栏范围框背景色*/
+}
+/*---标题栏中标签：弹窗左上角文字（“提示”）*/
+Controls--Dialog QWidget#m_pHeaderWidget QLabel {
+    font:  13pt;/*文字大小*/
+    color: #0f0f0f;/*文字颜色*/
+}
+/*---内容中按钮样式*/
+Controls--Dialog QWidget#contentWidgetContainer QPushButton,
+Controls--Dialog QWidget#contentWidgetContainer QPushButton:hover{
+    color: #0f0f0f;/*文字颜色*/
+    min-width: 100px;
+    min-height: 35px;
+    background-color: #d2cbc5;/*按钮默认背景*/
+    border:none;
+}
+Controls--Dialog QWidget#contentWidgetContainer QPushButton:pressed{
+    background-color:rgba(99,172,246,100); /*按钮按下时的颜色*/
+}
+Controls--Dialog QWidget#contentWidgetContainer QPushButton:checked {
+    background-color: #63ACF6; /*按钮选择后的颜色*/
+}
+
+Controls--Dialog QWidget#contentWidgetContainer QPushButton:disabled{
+    color:#505050;
+}
+/*---内容中标签样式*/
+Controls--Dialog QWidget#contentWidgetContainer QLabel{
+    color: #0f0f0f;/*文字颜色*/
+}
+/*---内容中枚举等控件默认样式*/
+Controls--Dialog QComboBox,QLineEdit,QTimeEdit,QDateEdit, QDateTimeEdit {
+    color:#3c2a22;
+    border: 1px solid #9c9c9c;
+    padding-left: 15px;
+    background-color: transparent;
+}
+/*---内容中枚举下拉菜单默认样式*/
+Controls--Dialog QComboBox QAbstractItemView {
+    color:#3c2a22;/*下拉菜单中的枚举值字体颜色*/
+    border: none;/*下拉菜单中所有枚举整体外边框*/
+    background-color: #c3bdb7;/*下拉菜单中所有枚举整体背景色*/
+    padding-left: 0px;/*枚举名称左边距*/
+}
+Controls--Dialog QComboBox QAbstractItemView:Item {
+    min-height: 40px;
+}
+QFileDialog, QFileDialog QWidget {/*注意:QFileDialog的样式仅在linux下生效*/
+    font-size: 12pt;
+    background-color: #e2dcd6;
+}
+QFileDialog {
+    min-width: 800px;
+    min-height: 600px;
+}
+QFileDialog QListView {
+    min-width: 150px;
+}
+QFileDialog QPushButton,
+QFileDialog QComboBox,
+QFileDialog QLineEdit {
+    min-height: 30px;
+}
+/*----------------------------------------------------------从左侧弹出的消息框（开始记录、数据源来自文件）*/
+/*---背景*/
+QWidget#NotificationMessage{
+    background: rgba(190,185,180,220);
+    min-width: 200px;
+    max-width: 500px;
+}
+/*---标签样式*/
+QWidget#NotificationMessage QLabel{
+    color: #0f0f0f;/*文字颜色*/
+    font-size: 12pt;/*文字大小*/
+    padding-top: 1px;
+}
+/*----------------------------------------------------------测量相关*/
+/*---测量结果图表:高度、背景*/
+MeasureResultWidget, PeakTable {
+    min-height: 200px;
+    max-height: 200px;
+    background-color: rgb(255,255,255);
+}
+PulseDetectTable #stsWidget, PulseDetectTable #tableView { /*det脉冲检测表背景*/
+    background-color: rgb(255,255,255);
+}
+/*---测量结果图表：标签样式*/
+MeasureResultWidget  QLabel {
+    font-size: 12pt;
+    color: #0f0f0f;
+}
+/*----信道功率、OBW 、ACPR在主频谱图上的标签字体大小*/
+Graph--AbstractGraph {
+    qproperty-ItemRectFontSize: 12pt;
+}
+/*----------------------------------------------------------其它弹框*/
+Profile--Slider, Controls--RollingCalendar {
+    background-color: #eceae4;
+}
+Controls--RollingCalendar QPushButton,
+Controls--RollingCalendar QPushButton:hover{
+    color: #0f0f0f;/*文字颜色*/
+    min-width: 100px;
+    min-height: 35px;
+    background-color: #d2cbc5;/*按钮默认背景*/
+}
+Controls--RollingCalendar  QPushButton:pressed{
+    background-color:rgba(99,172,246,100); /*按钮按下时的颜色*/
+}
+Controls--RollingCalendar QLabel{
+   font-size: 14pt;
+}
+/*---------------------------此线以下的样式-------------禁止修改-------------------------------此线以下的样式-------------禁止修改---------------------------------*/
+/*-------------------------------------------------------------------------------------------------------------------------工作站dockwidget*/
+QMainWindow::separator {
+    width: 0px;
+    height: 0px;
+    margin: 0px;
+    padding: 0px;
+}
+QDockWidget QScrollArea {
+    border: none;
+    background: transparent
+}
+
+/*-------------------------------------------------------------------------------------------------------------------------控件默认配置*/
+QWidget {
+    color: #323332;                 /*字体颜色*/
+    font-size: 12pt;
+    font-family: "HarmonyOS Sans SC"; /*字体*/
+}
+
+QWidget:disabled {
+    color:#505050;
+}
+/*-------------------------------------------------------------------------------------------------------------------------最底层的背景色*/
+LinuxMainWindow,
+.QMainWindow {
+    background-color: rgb(255,255,255);
+}
+
+/*----------------------------------------------------------------------------------菜单项其它*/
+QMenu::indicator {
+    width: 10px;
+    height: 10px;
+    margin-left: 10px;
+}
+QMenu::indicator:checked {
+    image: url(:/Custom/Image/menu_checked_light);
+}
+QMenu::right-arrow {
+    width: 13px;
+    height: 13px;
+    image: url(:/Custom/Image/right_arrow_light);
+    margin-right: 10px;
+}
+QMenu::icon{
+    position: absolute;
+    left: 10px;
+}
+
+QCheckBox::indicator
+{
+    Width: 30px;
+    Height: 30px;
+	border-image: url(:/Custom/Image/checkbox_checked_light);
+}
+
+QCheckBox::indicator:unchecked
+{
+	border-image: url(:/Custom/Image/checkbox_unchecked_light);
+}
+
+/***按钮可弹出菜单时，无需显示三角箭头*****/
+QPushButton::menu-indicator{
+    width:0px;
+}
+/***关闭按钮状态*****/
+QPushButton#m_pCloseButton {
+    background:transparent;
+    border-image: url(:/Controls/Image/close_normal_light) 35 35  35  35  stretch stretch;
+}
+QPushButton#m_pCloseButton:hover {
+    background:transparent;
+    border-image: url(:/Controls/Image/close_hover) 35 35  35  35  stretch stretch;
+}
+QPushButton#m_pCloseButton:pressed {
+    background:transparent;
+    border-image: url(:/Controls/Image/close_pressed) 35 35  35  35  stretch stretch;
+}
+QPushButton#m_pCloseButtonNotification {
+    background:transparent;
+    border-image: url(:/Controls/Image/close_normal_light) 35 35  35  35  stretch stretch;
+}
+QPushButton#m_pCloseButtonNotification:hover {
+    background:transparent;
+    border-image: url(:/Controls/Image/close_hover) 35 35  35  35  stretch stretch;
+}
+QPushButton#m_pCloseButtonNotification:pressed {
+    background:transparent;
+    border-image: url(:/Controls/Image/close_pressed) 35 35  35  35  stretch stretch;
+}
+
+
+/***图最外层边框*****/
+QScrollArea#dockWidgetScrollArea {
+    padding: 0px;
+    border: none;
+    background: #c1bcb7;
+}
+/***图右上角关闭按钮*****/
+#dockAreaCloseButton {
+    min-width: 30px;
+    max-width: 30px;
+    min-height: 30px;
+    max-height: 30px;
+    qproperty-iconSize: 0px;
+    background: transparent;
+    border-image: url(:/Custom/Image/close_normal_light) 35 35 35 35 stretch stretch;
+}
+#dockAreaCloseButton:hover {
+    border-image: url(:/Custom/Image/close_hover) 35 35 35 35 stretch stretch;
+}
+#dockAreaCloseButton:pressed {
+    border-image: url(:/Custom/Image/close_pressed) 35 35 35 35 stretch stretch;
+}
+
+/***IQ布局里的分割线*****/
+QSplitter::handle {
+    background: rgb(203,199,195);
+}
+QSplitter::handle:horizontal {
+    width: 3px;
+}
+QSplitter::handle:vertical {
+    height: 3px;
+}
+/***滚动条*****/
+QScrollBar:vertical {
+    width: 15px;
+    background: #bab4af;
+    padding-top: 10px;
+    padding-bottom: 10px;
+}
+QScrollBar:horizontal {
+    height: 15px;
+    background: #bab4af;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+QScrollBar::handle:vertical {
+    width: 10px;
+    background: rgba(172,164,157,255);
+    border-radius: 0px;
+    min-height: 20;
+}
+QScrollBar::handle:horizontal {
+    height: 10px;
+    background: rgba(172,164,157,255);
+    border-radius: 0px;
+    min-height: 20;
+}
+QScrollBar::handle:vertical:hover {
+    width: 10px;
+    background: rgba(105,105,105,150);
+    border-radius: 0px;
+    min-height: 20;
+}
+QScrollBar::handle:vertical:pressed {
+    background: rgba(105,105,105,150);
+}
+QScrollBar::handle:horizontal:hover {
+    height: 10px;
+    background: rgba(105,105,105,150);
+    border-radius: 0px;
+    min-height: 20;
+}
+QScrollBar::handle:horizontal:pressed {
+    background: rgba(105,105,105,150);
+}
+QScrollBar::sub-line:horizontal {
+    height: 10px;
+    width: 10px;
+    subcontrol-position: left;
+    subcontrol-origin: margin;
+    border-image: url(:/Custom/Image/sub-line_horizontal);
+}
+QScrollBar::sub-line:horizontal:hover {
+    height: 10px;
+    width: 10px;
+    subcontrol-position: left;
+    subcontrol-origin: margin;
+    border-image: url(:/Custom/Image/sub-line_horizontal_hover);
+}
+QScrollBar::sub-line:horizontal:pressed {
+    height: 10px;
+    width: 10px;
+    subcontrol-position: left;
+    subcontrol-origin: margin;
+    border-image: url(:/Custom/Image/sub-line_horizontal_pressed);
+}
+QScrollBar::sub-line:vertical {
+    height: 10px;
+    width: 10px;
+    subcontrol-position: top;
+    subcontrol-origin: margin;
+    border-image: url(:/Custom/Image/sub-line_vertical);
+}
+QScrollBar::sub-line:vertical:hover {
+    height: 10px;
+    width: 10px;
+    subcontrol-position: top;
+    subcontrol-origin: margin;
+    border-image: url(:/Custom/Image/sub-line_vertical_hover);
+}
+QScrollBar::sub-line:vertical:pressed {
+    height: 10px;
+    width: 10px;
+    subcontrol-position: top;
+    subcontrol-origin: margin;
+    border-image: url(:/Custom/Image/sub-line_vertical_pressed);
+}
+QScrollBar::add-line:horizontal {
+    height: 10px;
+    width: 10px;
+    subcontrol-position: right;
+    subcontrol-origin: margin;
+    border-image: url(:/Custom/Image/add-line_horizontal);
+}
+QScrollBar::add-line:horizontal:hover {
+    height: 10px;
+    width: 10px;
+    subcontrol-position: right;
+    subcontrol-origin: margin;
+    border-image: url(:/Custom/Image/add-line_horizontal_hover);
+}
+QScrollBar::add-line:horizontal:pressed {
+    height: 10px;
+    width: 10px;
+    subcontrol-position: right;
+    subcontrol-origin: margin;
+    border-image: url(:/Custom/Image/add-line_horizontal_pressed);
+}
+QScrollBar::add-line:vertical {
+    height: 10px;
+    width: 10px;
+    subcontrol-position: bottom;
+    subcontrol-origin: margin;
+    border-image: url(:/Custom/Image/add-line_vertical);
+}
+QScrollBar::add-line:vertical:hover {
+    height: 10px;
+    width: 10px;
+    subcontrol-position: bottom;
+    subcontrol-origin: margin;
+    border-image: url(:/Custom/Image/add-line_vertical_hover);
+}
+QScrollBar::add-line:vertical:pressed {
+    height: 10px;
+    width: 10px;
+    subcontrol-position: bottom;
+    subcontrol-origin: margin;
+    border-image: url(:/Custom/Image/add-line_vertical_pressed);
+}
+
+QScrollBar::add-page:vertical,QScrollBar::sub-page:vertical {
+    width: 10px;
+    background: rgba(255,255,255,25);
+    border-radius: 0px;
+}
+QScrollBar::add-page:horizontal,QScrollBar::sub-page:horizontal {
+    height: 10px;
+    background: rgba(255,255,255,25);
+    border-radius: 0px;
+}
+
+
+Graph--LayoutContainer QLabel#AreaName{
+    font: 50pt;
+    font-weight: bold;
+    color:#e3e3e3;
+}
+
+/*----------------------------------------------------------枚举、BW弹出框*/
+/*---背景*/
+Profile--BWPopup, Profile--EnumPopup{
+    min-width: 300px;
+    background-color: #e8e8e8;
+}
+/*---标题*/
+Profile--BWPopup QLabel#nameLabel, Profile--EnumPopup QLabel#nameLabel{
+    color: #323332;
+    font-weight: bold;
+    font-size: 14pt;
+}
+/*---按钮默认样式*/
+Profile--BWPopup QPushButton, Profile--EnumPopup QPushButton,
+Profile--BWPopup QPushButton:hover, Profile--EnumPopup QPushButton:hover {
+    min-height: 50px;
+    border: 2px solid #bdbdbd;
+    color: #323332;
+    font-size: 12pt;
+    background-color: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 rgb(215,215,215), stop:1 rgb(229,229,229));/*数字键盘按钮默认背景色（从上到下渐变）*/
+}
+Profile--BWPopup QPushButton:pressed, Profile--EnumPopup QPushButton:pressed{
+    background-color: rgba(99,172,246,100);
+}
+
+Profile--EnumPopup QPushButton:checked {
+    background-color: #63ACF6;
+}
+
+Controls--CustomPlot {
+    qproperty-backgroundColor: #ffffff;
+    qproperty-tickLabelColor: #ff0000;
+    qproperty-axisColor: #0fffff;
+    qproperty-gridColor: #ffff0f;
+}
+
+QHeaderView {
+   border: none;
+   background-color: rgb(255,255,255);
+   min-height:35px;
+}
+QHeaderView::section {
+    background-color:#c3b9b3;
+    padding-left: 0px;
+    padding-right: 0px;
+    border-top: 1px solid transparent;
+    border-bottom: 1px solid #c7c2bd;
+    border-left: 1px solid transparent;
+    border-right: 1px solid #c7c2bd;
+}
+QTableView {
+   border: none;
+   background-color: transparent;
+   gridline-color: #c7c2bd;
+}
+QTableView::item:selected {
+    background: rgba(99, 172, 246, 100);      /* 选中背景色 */
+}
+QComboBox QAbstractItemView {
+    background-color: #c3bdb7;/*下拉菜单中所有枚举整体背景色*/
+}
+
+/*---对话框中Profile按钮样式*/
+Controls--Dialog QWidget#contentWidgetContainer Profile--TabletOnOffButton,
+Controls--Dialog QWidget#contentWidgetContainer Profile--TabletOnOffButton:hover,
+Controls--Dialog QWidget#contentWidgetContainer Profile--CheckButton,
+Controls--Dialog QWidget#contentWidgetContainer Profile--CheckButton:hover{
+    font-size: 12pt;/*弹窗里按钮中的字体大小*/
+    min-height:55px;/*弹窗中按钮高度，min、max同值*/
+    max-height:55px;
+    min-width:110px;/*弹窗中按钮宽度，min、max同值*/
+    max-width:110px;
+    border: none;/*弹窗中按钮边框*/
+    background-color:#d2cbc5;/*弹窗中按钮默认背景色*/
+}
+Controls--Dialog QWidget#contentWidgetContainer Profile--TabletOnOffButton:checked,
+Controls--Dialog QWidget#contentWidgetContainer Profile--TabletOnOffButton:pressed,
+Controls--Dialog QWidget#contentWidgetContainer Profile--CheckButton:checked,
+Controls--Dialog QWidget#contentWidgetContainer Profile--CheckButton:pressed {
+    background-color: rgba(99, 172, 246, 100);/*弹窗中按钮选中后的背景色，100代表透明度*/
+}
+Controls--Dialog QWidget#contentWidgetContainer Profile--TabletOnOffButton QLabel#nameLabel{
+    font-weight: normal; /*弹窗按钮第一排字体是否加粗*/
+    font-size: 12pt;/*弹窗按钮第一排字体默认大小*/
+}
+Controls--Dialog QWidget#contentWidgetContainer Profile--TabletOnOffButton QLabel#valueLabel{
+    font-weight: normal;/*弹窗按钮第二排字体是否加粗*/
+    color: #323332;/*弹窗按钮第二排字体默认颜色*/
+    font-size: 12pt;/*弹窗按钮第二排字体默认大小*/
+}
+Controls--Dialog QWidget#contentWidgetContainer Profile--TabletOnOffButton:disabled,
+Controls--Dialog QWidget#contentWidgetContainer Profile--TabletOnOffButton QLabel#nameLabel:disabled,
+Controls--Dialog QWidget#contentWidgetContainer Profile--TabletOnOffButton QLabel#valueLabel:disabled,
+Controls--Dialog QWidget#contentWidgetContainer Profile--CheckButton:disabled{
+    color:#505050;
+}
+Controls--Dialog #line{
+    border: none;
+    background-color:#d2cbc5;
+}

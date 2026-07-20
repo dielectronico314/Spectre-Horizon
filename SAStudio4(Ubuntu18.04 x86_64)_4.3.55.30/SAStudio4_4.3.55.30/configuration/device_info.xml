@@ -1,0 +1,108 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<HTRA>
+    <Device name="E90 R0" code="10" ref-clock-out="true">
+        <if-grade name = "80MHz" value = "0" />
+        <if-grade name = "40MHz" value = "1" />
+    </Device>
+    <Device name="E90 R1" code="11" ref-clock-out="true">
+        <if-grade name = "80MHz" value = "0" />
+        <if-grade name = "40MHz" value = "1" />
+    </Device>
+    <Device name="E90 R2" code="12" ref-clock-out="true">
+        <if-grade name = "100MHz" value = "0" />
+        <if-grade name = "40MHz" value = "1" />
+    </Device>
+    <Device name="E90 R3" code="13" ref-clock-out="true">
+        <if-grade name = "100MHz" value = "0" />
+        <if-grade name = "40MHz" value = "1" />
+    </Device>  
+    <Device name="E90 R4" code="14" ref-clock-out="true">
+        <if-grade name = "100MHz" value = "0" />
+        <if-grade name = "40MHz" value = "1" />
+    </Device>   
+    <Device name="E200 R0" code="20" ref-clock-out="true">
+        <if-grade name = "80MHz" value = "0" />
+        <if-grade name = "40MHz" value = "1" />
+    </Device>
+    <Device name="E200 R1" code="21" ref-clock-out="true">
+        <if-grade name = "80MHz" value = "0" />
+        <if-grade name = "40MHz" value = "1" />
+    </Device>
+    <Device name="E200 R2" code="22" ref-clock-out="true">
+        <if-grade name = "100MHz" value = "0" />
+        <if-grade name = "40MHz" value = "1" />
+    </Device>
+    <Device name="E200 R3" code="23" ref-clock-out="true">
+        <if-grade name = "100MHz" value = "0" />
+        <if-grade name = "40MHz" value = "1" />
+    </Device>   
+    <Device name="E200 R4" code="24" ref-clock-out="true">
+        <if-grade name = "100MHz" value = "0" />
+        <if-grade name = "40MHz" value = "1" />
+    </Device>  
+    <Device name="TRX60 R3" code="33" ref-clock-out="true">
+        <if-grade name = "80MHz" value = "0" />
+        <if-grade name = "40MHz" value = "1" />
+    </Device>   
+    <Device name="N60 R4" code="53" ref-clock-out="true">
+        <if-grade name = "100MHz" value = "0" />
+    </Device>
+    <Device name="M60 R4" code="54" ref-clock-out="true">
+        <if-grade name = "100MHz" value = "0" />
+    </Device>  
+    <Device name="N45 R4" code="55" ref-clock-out="false">
+        <if-grade name = "100MHz" value = "0" />
+    </Device>
+    <Device name="M80 R5" code="56" ref-clock-out="false">
+        <if-grade name = "100MHz" value = "0" />
+    </Device>   
+    <Device name="M60 R5" code="57" ref-clock-out="false">
+        <if-grade name = "100MHz" value = "0" />
+    </Device>
+    <Device name="N60 R5" code="58" ref-clock-out="false">
+        <if-grade name = "100MHz" value = "0" />
+    </Device>  
+    <Device name="N45 R5" code="59" ref-clock-out="false">
+        <if-grade name = "100MHz" value = "0" />
+    </Device>    
+    <Device name="E310 R0" code="60" ref-clock-out="true">
+        <if-grade name = "80MHz" value = "0" />
+        <if-grade name = "40MHz" value = "1" />
+    </Device>
+    <Device name="E310 R1" code="61" ref-clock-out="true">
+        <if-grade name = "80MHz" value = "0" />
+        <if-grade name = "40MHz" value = "1" />
+    </Device>    
+    <Device name="E330 R0" code="70" ref-clock-out="true">
+        <if-grade name = "80MHz" value = "0" />
+        <if-grade name = "40MHz" value = "1" />
+    </Device>
+    <Device name="TX90 R0" code="80" ref-clock-out="true">
+        <if-grade name = "80MHz" value = "0" />
+        <if-grade name = "40MHz" value = "1" />
+    </Device>    
+    <Device name="N400 R0" code="90" ref-clock-out="true">
+        <if-grade name = "100MHz" value = "0" />
+        <if-grade name = "40MHz" value = "1" />
+    </Device>
+    <Device name="N400 R1" code="91" ref-clock-out="true">
+        <if-grade name = "100MHz" value = "0" />
+        <if-grade name = "40MHz" value = "1" />
+    </Device>
+    <Device name="N400 R2" code="92" ref-clock-out="true">
+        <if-grade name = "100MHz" value = "0" />
+        <if-grade name = "40MHz" value = "1" />
+    </Device>
+    <Device name="N150 R1" code="93" ref-clock-out="true">
+        <if-grade name = "100MHz" value = "0" />
+        <if-grade name = "40MHz" value = "1" />
+    </Device>
+    <Device name="N400 R2" code="94" ref-clock-out="true">
+        <if-grade name = "100MHz" value = "0" />
+        <if-grade name = "40MHz" value = "1" />
+    </Device>
+    <Device name="N400 R3" code="95" ref-clock-out="true">
+        <if-grade name = "100MHz" value = "0" />
+        <if-grade name = "40MHz" value = "1" />
+    </Device>
+</HTRA>

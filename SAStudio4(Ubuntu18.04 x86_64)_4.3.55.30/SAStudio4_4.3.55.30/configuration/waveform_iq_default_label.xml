@@ -1,0 +1,9 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- 这个是iq时域图的label -->
+<label>
+    <top>
+        <item key="center" text="Center Frequency" type="frequency" trigger="center-frequency" value="center-frequency" />
+        <item key="samplerate" text="SampleRate" type="frequency" trigger="bandwidth" value="bandwidth" />
+        <item key="reflevel" text="Ref.Level" type="dBm" trigger="ref-level" value="ref-level" />
+    </top>
+</label>

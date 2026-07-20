@@ -1,0 +1,14 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<label>
+    <top>
+        <item key="RefLevel" text="Ref(GraphLabel)" type="dBm" trigger="ref-level" value="ref-level" />
+        <item key="rbw" text="RBW(GraphLabel)" type="frequency" trigger="rbw" value="rbw" />
+        <item key="poi" text="POI(GraphLabel)" type="time" trigger="poi" value="poi" />
+    </top>
+    <bottom>
+        <item key="start" text="Start(GraphLabel)" type="frequency" trigger="start-frequency" value="start-frequency" />
+        <item key="span" text="Frequency Span(GraphLabel)" type="frequency" trigger="span" value="span"/>
+        <item key="center" text="Center(GraphLabel)" type="frequency" trigger="center" value="center" />
+        <item key="stop" text="Stop(GraphLabel)" type="frequency" trigger="stop-frequency" value="stop-frequency" />
+    </bottom>
+</label>

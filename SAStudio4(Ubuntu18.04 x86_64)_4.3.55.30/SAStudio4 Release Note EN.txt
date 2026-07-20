@@ -1,0 +1,137 @@
+*Note: This software version is a baseline update. Firmware must be upgraded simultaneously. Specific version requirements: MCU 0.55.62, FGPA 0.55.28, BUS(FX3) 0.55.6, EIO(GNSS) 1.6
+- SAStudio4_4.3.55.30（11/6/2025）
+* Fixed: Crash caused by dragging thumbnail range box(IQvT-P/Spectrum-P) during single preview in IQS mode.
+* Fixed: Delete data directory, unable to record files.
+* Fixed: The time/date setting window does not recognize gestures when the DET trace is frozen.
+* Fixed: The label bar at the top of the chart intersects with the recognized area of the movable control on the chart, resulting in an operation anomaly.
+
+*Note: This software version is a baseline update. Firmware must be upgraded simultaneously. Specific version requirements: MCU 0.55.61, FGPA 0.55.28, BUS(FX3) 0.55.6, EIO(GNSS) 1.6
+- SAStudio4_3.55.29 (10/17/2025)
+* Added: IQS level-triggered mode, add level-triggered line to thumbnail, support gesture dragging
+* Added: IQS supports large bandwidth analog demodulation
+* Added: Adaptive Antenna Factor Function
+* Added: Adaptive reference level function
+* Added: New averaging option for analog demodulation results
+* Fixed: IQS, DET on pulse measurement at the same time, switching modes with each other will crash
+* Fixed: IQS Mode 2 extracts log files, error file exists
+* Fixed: Spectrogram export data immediately after opening, data table is empty
+* Fixed: Analog AM demodulation, data in % units of measurement results are not multiplied by 100 for display
+
+- SAStudio4_3.55.28 (9/5/2025)
+* Added: IQS mode new AM/FM demodulation function
+* Added: Support mouse wheel operation to change Span when gesture is enabled.
+* Added: Antenna Factor Function (SWP-Amplitude)
+* Fixed: Neutral version font inconsistency issue
+* Fixed: Conflict between input state and write-back state of level threshold under level triggering
+
+- SAStudio4_3.55.27 (8/25/2025)
+* Added: Peak tracking function (Marker)
+* Added: Function to automatically calculate peak determination parameters (Marker-Advanced)
+* Added: SWP mode X-axis display ratio and logarithmic display function (Graph)
+* Added: Data export function for harmonic measurement mode (Graph)
+* Fixed: Compatible with configuration files saved by older versions of SAStudio4.
+* Fixed: Fix the problem of device error in digital demodulation mode with specific sample rate
+* Fixed: Fix the problem of incorrect display of battery level
+* Fixed: Fix the problem that IQS mode 50MHz bandwidth continuous stream long time recording will report -10
+* Optimized: add "Bus" version number to the parameter display in "System" > "About".
+
+- SAStudio4_3.55.26 (8/4/2025)
+* Added: Right-click menu functionality in the drawing area
+* Added: Functionality to modify the trace name in the standard spectrum (Trace)
+* Added: Line functionality in the standard spectrum (Graph)
+* Added: "Spurious Suppression" mode displayed in the SWP mode label bar (S-Standard; E-Enhanced)
+* Fixed: IQS mode configuration loading failure issue when starting with the most recent configuration
+* Fixed: Incorrect battery reading issue in PXR devices
+* Fixed: External keyboard input not supported by the numeric keypad
+* Fixed: Occasional configuration loading failure when starting with the most recent configuration in SWP mode
+* Fixed: Issue where the software window minimized after double-clicking the blank area in the top menu bar of PX series
+* Fixed: Issue where peak value markers on the trace were not inverted in the "Bright" theme after enabling the peak value table, making them invisible
+* Optimized: Marker peak search functionality, added parameter for peak value offset (Excursion/Peak Offset) in Marker-Advanced
+
+- SAStudio4_3.55.24 (7/10/2025)
+* Added: Harmonic analysis mode
+* Added: SEM measurement function
+* Added: "Amplitude correction" function
+* Added: "Data export" function for Spectrogram plot
+* Added: "Bright" mode for theme settings
+* Added: "Reduce idle screen brightness" function
+* Added: Enable switch for "Numeric detection" function
+* Fixed: GNSS function when external devices are connected, there was a message parsing failure
+* Fixed: IQS: When playing back DET files, clicking the next frame sometimes doesn't work
+* Fixed: DET: Playback of the first part of the file was too fast, and the speed was inconsistent with the later part
+
+- SAStudio4_3.55.22 (6/19/2025)
+* Updated: API version upgraded from 0.55.60 to 0.55.61
+* Added: Support for external GPS using the NMEA protocol
+* Added: Pulse measurement in IQS mode
+* Added: Digital demodulation modes: QAM128, QAM256
+* Fixed: Marker values did not match actual positions when taking screenshots
+* Fixed: Could not play back recorded files when the device was disconnected
+* Fixed: Compatibility issues when running on Windows 7
+* Fixed: Probability of configuration failure when editing preview time after enabling pulse measurement in DET
+* Fixed: Incorrect center frequency when selecting IQS mode in cursor mode
+
+- SAStudio4_3.55.21 (5/30/2025)
+* Fixed: Marker state was abnormal when clicking the marker from the chart label area
+* Fixed: Display mode switch, error response when selecting the current mode
+* Fixed: No sound in AM demodulation in IQS mode
+
+- SAStudio4_3.55.20 (5/23/2025)
+* Added: Amplitude offset function
+* Added: Unit switch function
+* Added: Delta marker floating function
+* Fixed: Marker pair name overlap issue
+* Fixed: Display anomaly when loading markers from configuration file
+* Fixed: Unreasonable "record mode" restrictions in IQS and DET
+* Fixed: Unreasonable vertical pinch zoom mechanism
+* Fixed: Thumbnail display range issue when playing back files
+
+- SAStudio4_3.55.18 (5/14/2025)
+* Updated: API version upgraded from 0.55.59 to 0.55.60
+* Fixed: Unreasonable parameter setting range for "OBW(occupied bandwidth measurement)" in SWP mode
+
+- SAStudio4_3.55.17 (5/6/2025)
+* Updated: API version upgraded from 0.55.58 to 0.55.59
+
+- SAStudio4_3.55.16 (4/21/2025)
+* Fixed: Unreasonable minimum RBW limit in SWP mode
+
+- SAStudio4_3.55.15 (4/11/2025)
+* Added: Screen lock function, supported opening and closing from the system menu
+* Fixed: Missing "to phase noise" option in the Switch to menu in SWP mode marker panel
+* Fixed: Phase noise compatibility issue in SWP mode Meas
+* Fixed: Thumbnail range box display strategy and chart name overlap issue in IQS mode
+
+- SAStudio4_3.55.14 (4/2/2025)
+* Added: Chart zoom function in DET mode
+* Added: Reset function for trace type in phase noise mode
+* Fixed: Unreasonable restrictions for data recording mode in IQS and DET
+* Fixed: Incomplete configuration items in phase noise measurement mode
+* Fixed: Device and configuration file compatibility issue when loading configuration
+* Fixed: Incorrect order of spectrogram plot color bar and label layer
+* Fixed: Incorrect state of "Continuous" button in the menu bar during file playback
+* Fixed: Incorrect marker value precision in time-domain marker settings panel
+
+- SAStudio4_3.55.13 (3/26/2025)
+* Fixed: RBW calculation algorithm error in IQS mode
+
+- SAStudio4_3.55.12 (3/25/2025)
+* Updated: API upgraded to 0.55.58
+* Added: Phase noise function
+* Added: Magnifier function
+* Added: Full Chinese language support
+* Added: "Pause" and "Clear" buttons added to the Spectrogram plot sidebar
+* Fixed: Non-realtime pulse measurement data
+* Fixed: Full-screen display issue for 2880x1620 resolution screen
+* Deleted: Removed "Phase Noise" from SWP mode measurement
+* Optimized: Chart label and marker value overlap issue in IQS mode
+
+- SAStudio4_3.55.10 (2/28/2025)
+* Updated: API upgraded to 0.55.56
+* Fixed: Signal source settings area did not display when opening software before connecting to the source device
+* Fixed: Networked device interface occasionally did not refresh properly after quickly reopening software
+* Optimized: IQS frequency spectrum label "AnalysisBW" changed to "Span" but value remains the same, and the BW value in the settings panel changed to 0.8*Span
+
+- SAStudio4_3.55.9 (1/24/2025)
+* Fixed: Demodulation library update to avoid errors caused by data types
+* Fixed: Solved the issue of UI lag when changing symbol rate

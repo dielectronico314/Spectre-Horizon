@@ -1,0 +1,10 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<!-- 按照代码来看，似乎是iqsfft子图的东西 目前似乎没用上-->
+<label>
+<bottom>
+    <item key="start" text="Start Frequency(Graph Bottom)" type="frequency" trigger="start-frequency" value="start-frequency" />
+    <item key="span" text="AnalysisBW" type="frequency" trigger="span" value="span"/>
+    <item key="center" text="Center Frequency(Graph Bottom)" type="frequency" trigger="center" value="center" />
+    <item key="stop" text="Stop Frequency(Graph Bottom)" type="frequency" trigger="stop-frequency" value="stop-frequency" />
+</bottom>
+</label>
