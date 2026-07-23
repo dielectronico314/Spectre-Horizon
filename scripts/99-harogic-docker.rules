@@ -1,0 +1,4 @@
+# Regla UDEV para reiniciar el contenedor Docker cuando se conecta el Harogic SDR
+# Vendor ID: 367f
+# Product ID: 0001
+ACTION=="add", SUBSYSTEM=="usb", ATTR{idVendor}=="367f", ATTR{idProduct}=="0001", RUN+="/usr/bin/docker restart mysdr"

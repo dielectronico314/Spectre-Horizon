@@ -216,3 +216,8 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Ignorar datos IQ masivos
+rf-spectrum/data/samples/
+*.iq
+*.sigmf-meta

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<SAStudio4 version="4.3.55.30" currentmode="1">
+<SAStudio4 version="4.3.55.30" currentmode="0">
     <SWP DeviceUID="6288801976501665795" AmpOffset="0" AutoRefLevel="false">
         <SWP_Profile_TypeDef>
             <StartFreq_Hz value="8000"/>
@@ -53,51 +53,51 @@
             <Trace3 Name="T4" Enable="false" Type="0" AvgCount="0"/>
             <Grid Div="10" Offset="0" PowerDispalyUnit="1"/>
         </SwpGraph>
-        <Mesure MeasureType="0" IM3AutoRefLevel="false" ChannelPowerCenter="-4.044809980369421e+307" ChannelPowerBW="2e+06" ACPRCenter="-4.044809980369421e+307" ACPRBW="2e+06" ACPRAdjChSpace="4e+06" ACPRPairCount="1" OBWType="0" OBWxdB="-3" OBWPercent="0.99" PhaseNoiseCarrier="0" PhaseNoiseDiv="0" PhaseNoiseOffset="0" PhaseNoiseStartOffset="0" PhaseNoiseStopOffset="0" PhaseNoiseCarrierTracing="false" PhaseNoiseSmoothEnable="true" PhaseNoiseSmoothMethod="0" PhaseNoiseSmoothWindowLength="0" PhaseNoiseSmoothPolynomialOrder="0">
+        <Mesure MeasureType="0" IM3AutoRefLevel="false" ChannelPowerCenter="7.291118556459266e-304" ChannelPowerBW="2e+06" ACPRCenter="7.291118556459266e-304" ACPRBW="2e+06" ACPRAdjChSpace="4e+06" ACPRPairCount="1" OBWType="0" OBWxdB="-3" OBWPercent="0.99" PhaseNoiseCarrier="0" PhaseNoiseDiv="0" PhaseNoiseOffset="0" PhaseNoiseStartOffset="0" PhaseNoiseStopOffset="0" PhaseNoiseCarrierTracing="false" PhaseNoiseSmoothEnable="true" PhaseNoiseSmoothMethod="0" PhaseNoiseSmoothWindowLength="0" PhaseNoiseSmoothPolynomialOrder="0">
             <SWP_Profile_TypeDef>
-                <StartFreq_Hz value="-0"/>
-                <StopFreq_Hz value="-0"/>
-                <CenterFreq_Hz value="-0"/>
-                <Span_Hz value="-0"/>
-                <RefLevel_dBm value="-8.20251e-305"/>
-                <RBW_Hz value="-0"/>
-                <VBW_Hz value="-0"/>
-                <SweepTime value="-8.20251e-305"/>
-                <TraceBinSize_Hz value="-0"/>
-                <FreqAssignment value="2160905420"/>
-                <Window value="2160905420"/>
-                <RBWMode value="2160905420"/>
-                <VBWMode value="2160905420"/>
-                <SweepTimeMode value="2160905420"/>
-                <Detector value="2160905420"/>
-                <TraceFormat value="2160905420"/>
-                <TraceDetectMode value="2160905420"/>
-                <TraceDetector value="2160905420"/>
-                <TracePoints value="2160905420"/>
-                <TracePointsStrategy value="2160905420"/>
-                <TraceAlign value="2160905420"/>
-                <FFTExecutionStrategy value="2160905420"/>
-                <RxPort value="2160905420"/>
-                <SpurRejection value="2160905420"/>
-                <ReferenceClockSource value="2160905420"/>
-                <ReferenceClockFrequency value="-8.20251e-305"/>
-                <EnableReferenceClockOut value="204"/>
-                <SystemClockSource value="2160905420"/>
-                <ExternalSystemClockFrequency value="-8.20251e-305"/>
-                <TriggerSource value="2160905420"/>
-                <TriggerEdge value="2160905420"/>
-                <TriggerOutMode value="2160905420"/>
-                <TriggerOutPulsePolarity value="2160905420"/>
-                <PowerBalance value="2160905420"/>
-                <GainStrategy value="2160905420"/>
-                <Preamplifier value="2160905420"/>
-                <AnalogIFBWGrade value="204"/>
-                <IFGainGrade value="204"/>
-                <EnableDebugMode value="204"/>
-                <CalibrationSettings value="128"/>
-                <Atten value="-52"/>
-                <TraceType value="2160905420"/>
-                <LOOptimization value="2160905420"/>
+                <StartFreq_Hz value="-40448099803694210690012604627194488042103769908122062390854714548267722714260701156352986718450854628624279364834686232664153391203285249796328462569299483925617577893611241328686186761818431096340002617490521384286325290710135885399205988984966766599123083032404698667977961511848363932963493843926563946496"/>
+                <StopFreq_Hz value="-40448099803694210690012604627194488042103769908122062390854714548267722714260701156352986718450854628624279364834686232664153391203285249796328462569299483925617577893611241328686186761818431096340002617490521384286325290710135885399205988984966766599123083032404698667977961511848363932963493843926563946496"/>
+                <CenterFreq_Hz value="-40448099803694210690012604627194488042103769908122062390854714548267722714260701156352986718450854628624279364834686232664153391203285249796328462569299483925617577893611241328686186761818431096340002617490521384286325290710135885399205988984966766599123083032404698667977961511848363932963493843926563946496"/>
+                <Span_Hz value="-40448099803694210690012604627194488042103769908122062390854714548267722714260701156352986718450854628624279364834686232664153391203285249796328462569299483925617577893611241328686186761818431096340002617490521384286325290710135885399205988984966766599123083032404698667977961511848363932963493843926563946496"/>
+                <RefLevel_dBm value="-4.04481e+307"/>
+                <RBW_Hz value="-40448099803694210690012604627194488042103769908122062390854714548267722714260701156352986718450854628624279364834686232664153391203285249796328462569299483925617577893611241328686186761818431096340002617490521384286325290710135885399205988984966766599123083032404698667977961511848363932963493843926563946496"/>
+                <VBW_Hz value="-40448099803694210690012604627194488042103769908122062390854714548267722714260701156352986718450854628624279364834686232664153391203285249796328462569299483925617577893611241328686186761818431096340002617490521384286325290710135885399205988984966766599123083032404698667977961511848363932963493843926563946496"/>
+                <SweepTime value="-1.70742e+81"/>
+                <TraceBinSize_Hz value="0"/>
+                <FreqAssignment value="16777215"/>
+                <Window value="16777215"/>
+                <RBWMode value="16777215"/>
+                <VBWMode value="16777215"/>
+                <SweepTimeMode value="16777215"/>
+                <Detector value="16777215"/>
+                <TraceFormat value="16777215"/>
+                <TraceDetectMode value="16777215"/>
+                <TraceDetector value="16777215"/>
+                <TracePoints value="16777215"/>
+                <TracePointsStrategy value="16777215"/>
+                <TraceAlign value="16777215"/>
+                <FFTExecutionStrategy value="16777215"/>
+                <RxPort value="16777215"/>
+                <SpurRejection value="16777215"/>
+                <ReferenceClockSource value="16777215"/>
+                <ReferenceClockFrequency value="7.29112e-304"/>
+                <EnableReferenceClockOut value="255"/>
+                <SystemClockSource value="16777215"/>
+                <ExternalSystemClockFrequency value="7.29112e-304"/>
+                <TriggerSource value="16777215"/>
+                <TriggerEdge value="16777215"/>
+                <TriggerOutMode value="16777215"/>
+                <TriggerOutPulsePolarity value="16777215"/>
+                <PowerBalance value="16777215"/>
+                <GainStrategy value="16777215"/>
+                <Preamplifier value="16777215"/>
+                <AnalogIFBWGrade value="255"/>
+                <IFGainGrade value="255"/>
+                <EnableDebugMode value="255"/>
+                <CalibrationSettings value="0"/>
+                <Atten value="-1"/>
+                <TraceType value="16777215"/>
+                <LOOptimization value="16777215"/>
             </SWP_Profile_TypeDef>
             <SwpGraph ZoomGraphEnable="false" WaterGraphEnable="false" PowerDispalyUnit="1" XScaleType="0">
                 <Trace0 Name="T1" Enable="false" Type="0" AvgCount="10"/>
@@ -153,15 +153,15 @@
     </SWP>
     <IQS DeviceUID="6288801976501665795" AmpOffset="0">
         <IQS_Profile_TypeDef>
-            <CenterFreq_Hz value="103300000"/>
+            <CenterFreq_Hz value="1000000000"/>
             <RefLevel_dBm value="0"/>
-            <DecimateFactor value="2"/>
+            <DecimateFactor value="1"/>
             <RxPort value="0"/>
             <BusTimeout_ms value="2000"/>
             <TriggerSource value="2"/>
             <TriggerEdge value="0"/>
             <TriggerMode value="0"/>
-            <TriggerLength value="62500"/>
+            <TriggerLength value="4096"/>
             <TriggerOutMode value="0"/>
             <TriggerOutPulsePolarity value="0"/>
             <TriggerLevel_dBm value="-10"/>
@@ -173,11 +173,11 @@
             <EnableReTrigger value="0"/>
             <ReTrigger_Period value="0.2"/>
             <ReTrigger_Count value="4"/>
-            <DataFormat value="1"/>
+            <DataFormat value="0"/>
             <GainStrategy value="0"/>
             <Preamplifier value="0"/>
             <AnalogIFBWGrade value="0"/>
-            <IFGainGrade value="3"/>
+            <IFGainGrade value="4"/>
             <EnableDebugMode value="0"/>
             <ReferenceClockSource value="0"/>
             <ReferenceClockFrequency value="1e+07"/>
@@ -196,8 +196,8 @@
             <DCCQOffset value="0"/>
             <LOOptimization value="0"/>
         </IQS_Profile_TypeDef>
-        <IqsGraph LayoutType="4" PreviewTime="0.001" Channel0Enable="true" Channel1Enable="false" Channel2Enable="false" Channel3Enable="false">
-            <Channel0 IqvtEnable="true" PvtEnable="true" FftEnable="true" DemodEnable="true">
+        <IqsGraph LayoutType="0" PreviewTime="0.001" Channel0Enable="true" Channel1Enable="false" Channel2Enable="false" Channel3Enable="false">
+            <Channel0 IqvtEnable="true" PvtEnable="false" FftEnable="true" DemodEnable="false">
                 <IqvtGraph ZoomGraphEnable="false">
                     <TimeRange TimeStart="0" TimeLength="9.999999747378752e-05"/>
                     <Grid Div="0.045" Offset="0" PowerDispalyUnit="1"/>
@@ -211,7 +211,7 @@
                     <Trace3 Name="T4" Enable="false" Type="0" AvgCount="0"/>
                     <DSP_FFT_TypeDef>
                         <FFTSize value="2048"/>
-                        <SamplePts value="6249"/>
+                        <SamplePts value="2048"/>
                         <WindowType value="1"/>
                         <TraceDetector value="2"/>
                         <DetectionRatio value="1"/>
@@ -219,21 +219,6 @@
                         <Calibration value="0"/>
                     </DSP_FFT_TypeDef>
                 </FftGraph>
-                <PvtGraph ZoomGraphEnable="true" PowerDispalyUnit="1">
-                    <TimeRange TimeStart="0.000421152030217186" TimeLength="9.999999747378752e-05"/>
-                    <Grid Div="10" Offset="0" PowerDispalyUnit="1"/>
-                </PvtGraph>
-                <DemodGraph DemodType="2">
-                    <TimeRange TimeStart="0" TimeLength="9.999999747378752e-05"/>
-                    <Grid Div="10" Offset="0" PowerDispalyUnit="1"/>
-                    <Filter_TypeDef>
-                        <n value="90"/>
-                        <fc value="0.25"/>
-                        <As value="120"/>
-                        <mu value="0"/>
-                        <Samples value="16242"/>
-                    </Filter_TypeDef>
-                </DemodGraph>
             </Channel0>
         </IqsGraph>
         <MarkerContainer SignalTrackEnable="false" SignalTrackShakeRange="0.006" SignalTrackThreshold="-70" PeakTableEnable="false" SignalExcursion="10" AutoParams="true">

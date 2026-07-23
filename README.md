@@ -10,7 +10,7 @@
   [![License](https://img.shields.io/badge/License-MIT-green.svg)](#)
   
   <br/>
-  <img src="assets/harogic-san400.png" alt="Harogic SAN-400 Spectrum Analyzer" width="600"/>
+  <img src="assets/san-400_01-1.png" alt="Harogic SAN-400 Spectrum Analyzer" width="600"/>
   <br/>
   <br/>
 
@@ -22,7 +22,7 @@
 ## 📖 Índice
 
 - [Resumen del Proyecto](#-resumen-del-proyecto)
-- [Arquitectura del Sistema](#-arquitectura-del-sistema)
+- [Arquitectura Inmune a Fallos](#-arquitectura-inmune-a-fallos)
 - [Requisitos de Hardware](#-requisitos-de-hardware)
 - [Instalación y Despliegue](#-instalación-y-despliegue)
 - [Uso y Comandos](#-uso-y-comandos)
@@ -39,23 +39,27 @@ Utilizando el entorno contenedorizado **RF-Swift**, este proyecto se comunica di
 
 ---
 
-## 🏗 Arquitectura del Sistema
+## 🏗 Arquitectura Inmune a Fallos
 
-La solución opera bajo un modelo de capas altamente aislado para garantizar reproducibilidad y rendimiento:
+A partir del **Día 7**, Spectre-Horizon integra un sistema de captura resiliente, diseñado para operar en zonas hostiles y soportar desconexiones de hardware en caliente sin intervención humana:
+
+1. **Chunking (Archivos por Bloques):** Los datos no se escriben en un archivo monolítico. Se dividen en bloques temporales (por defecto cada 60s) con su propio archivo `.sigmf-meta`. Si el sistema colapsa, solo se pierde el bloque actual.
+2. **Watchdog de Espacio de Usuario:** Un demonio `bash` corre en segundo plano detectando los eventos del Kernel mediante `lsusb`.
+3. **Auto-Reconexión USB:** Si el cable de la antena se desconecta y se vuelve a conectar, el Watchdog reinicia el contenedor Docker automáticamente para refrescar el bus USB, mientras que el script envoltorio (`capture.sh`) retoma el hilo de captura sin que el proceso principal muera.
 
 ```mermaid
 graph TD
-    A[Hardware: Harogic SAN-400] <-->|USB 3.0| B(Driver OS Local)
-    B <-->|Bind Mount| C{Contenedor Docker: RF-Swift}
+    A[Harogic SAN-400] <-->|USB 3.0 / Desconexión en Caliente| B(Host Linux)
+    B <-->|Bind Mount| C{Docker: RF-Swift}
     
-    subgraph Entorno Aislado
-        C --> D[SoapySDR C++ Layer]
-        D --> E[API Python3]
-        E --> F(scripts/capture_iq.py)
+    subgraph Tolerancia a Fallos
+        W[watchdog_usb.sh] -->|Vigila lsusb| B
+        W -->|Reinicia Contenedor| C
+        C -->|Backoff & Retry| F(capture_iq.py)
     end
     
-    F -->|Salida IQ Binaria| G[(Volumen: /rf-spectrum/data/samples)]
-    F -->|Contrato JSON| G
+    F -->|Chunk 1 (.iq)| G[(Volumen: /rf-spectrum/data/samples)]
+    F -->|Chunk 2 (.iq)| G
 ```
 
 ---
@@ -94,45 +98,26 @@ cd Spectre-Horizon
 
 ## 🛠 Uso y Comandos
 
-El repositorio incluye "Wrappers" inteligentes en Bash (`scripts/capture.sh`) que inyectan tu comando local directamente al contenedor sin que tengas que entrar a él manualmente.
+El repositorio incluye un Wrapper inteligente en Bash (`scripts/capture.sh`) que no solo inyecta el comando al contenedor, sino que invoca al Watchdog de reconexión.
 
-### Captura Rápida Parametrizable
-Puedes especificar la Frecuencia (Hz), Sample Rate (SPS), Ganancia (dB) y Duración (Segundos).
+### Captura Rápida Resiliente
+Puedes especificar la Frecuencia (Hz), Sample Rate (SPS), Ganancia (dB), Duración Total y Tamaño del Bloque (Chunking).
 
-**Ejemplo: Capturando 60 segundos de una Radio FM local (107.3 MHz):**
+**Ejemplo: Capturando 3 minutos de FM, divididos en bloques de 30 segundos:**
 ```bash
-./scripts/capture.sh --freq 107.3e6 --rate 1.953125e6 --gain 0 --duration 60
+./scripts/capture.sh --freq 106.5e6 --rate 1.953125e6 --gain 0 --duration 180 --chunk-duration 30
 ```
 
-**Salida en consola esperada:**
-```text
-==================================================
- 📡 INICIANDO CAPTURA IQ PARAMETRIZADA (Paso 1)
-==================================================
-🔌 [Paso 2] Conectando al Harogic SDR y aplicando configuración...
-✅ Hardware configurado exitosamente. Sample Rate real: 1.9531 MSPS
-🌊 [Paso 3] Abriendo la tubería de datos bidireccional (Stream)...
-💾 [Paso 4] Iniciando captura de 60.0 segundos...
-==================================================
-✅ CAPTURA FINALIZADA
-Muestras  : 117,276,672
-Overflows : 0
-Tamaño IQ : 894.75 MB
-Tiempo real: 60.03 segundos
-==================================================
-📝 [Paso 5] Generando contrato de metadatos (SigMF)...
-```
-
-*Al finalizar, los datos gigantescos se copian automáticamente del contenedor a tu escritorio local (en `rf-spectrum/data/samples/`).*
+*Al finalizar (o al presionar `Ctrl+C`), los bloques se copian automáticamente del contenedor a tu escritorio local (en `rf-spectrum/data/samples/`).*
 
 ---
 
 ## 📦 Estructura de Datos (SigMF)
 
-Para garantizar la investigación científica, los datos no se guardan sueltos. Por cada captura se generan dos archivos acoplados:
+Para garantizar la investigación científica, por cada bloque se generan dos archivos acoplados:
 
 1. **El archivo Binario (.iq):** Un volcado crudo de memoria con los flotantes complejos (`CF32`).
-2. **El archivo de Metadatos (.sigmf-meta):** Un JSON universal.
+2. **El archivo de Metadatos (.sigmf-meta):** Un JSON universal con telemetría.
 
 ```json
 {
@@ -145,9 +130,11 @@ Para garantizar la investigación científica, los datos no se guardan sueltos. 
     "captures": [
         {
             "core:sample_start": 0,
-            "core:frequency": 107300000.0,
-            "core:datetime": "2026-07-20T15:50:56.12345Z",
-            "core:overflows": 0
+            "core:frequency": 106500000.0,
+            "core:datetime": "2026-07-23T09:30:56-04:00",
+            "core:overflows": 0,
+            "telemetry:duration_sec": 30.0,
+            "telemetry:throughput_mbps": 14.8
         }
     ]
 }
@@ -161,9 +148,11 @@ Actualmente nos encontramos en la **Fase 1** de automatización. El avance es el
 
 - [x] **Día 1-3:** Baseline de Hardware y Entorno Contenedorizado (RF-Swift).
 - [x] **Día 4:** Detección programática de hardware con JSON API (`probe_device.py`).
-- [x] **Día 5:** Bucle robusto en CF32 para capturas ininterrumpidas de espectro con Metadatos SigMF.
-- [ ] **Día 6:** Primer escaneo en banda Wi-Fi (2.4 GHz).
-- [ ] **Día 7+:** Automatización de eventos y Replay de espectro.
+- [x] **Día 5:** Bucle robusto en CF32 para capturas ininterrumpidas de espectro.
+- [x] **Día 6:** Pruebas de estrés y telemetría de hardware (PSUtil).
+- [x] **Día 7:** Arquitectura Inmune (Reconexión Hotplug, USB Watchdog y Chunking).
+- [ ] **Día 8:** Contrato Oficial de Metadata y Validador.
+- [ ] **Día 9+:** Extracción de Eventos y Construcción del Dashboard API.
 
 ---
 *Diseñado con el máximo rigor para investigación RF.*
