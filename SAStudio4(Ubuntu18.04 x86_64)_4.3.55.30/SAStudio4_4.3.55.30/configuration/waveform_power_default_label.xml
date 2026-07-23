@@ -1,8 +1,0 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<label>
-    <top>
-        <item key="RefLevel" text="Ref(GraphLabel)" type="dBm" trigger="ref-level" value="ref-level" />
-        <item key="center" text="Center(GraphLabel)" type="frequency" trigger="center-frequency" value="center-frequency" />
-        <item key="span" text="AnalysisBW(GraphLabel)" type="frequency" trigger="span" value="span" />
-    </top>
-</label>

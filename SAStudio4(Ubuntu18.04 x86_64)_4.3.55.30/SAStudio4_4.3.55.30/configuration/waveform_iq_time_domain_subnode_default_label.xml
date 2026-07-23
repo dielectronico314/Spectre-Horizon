@@ -1,6 +1,0 @@
-﻿<?xml version="1.0" encoding="UTF-8"?>
-<label>
-    <top>
-        <item key="center" text="Center Frequency" type="frequency" trigger="center-frequency" value="center-frequency" />
-    </top>
-</label>
