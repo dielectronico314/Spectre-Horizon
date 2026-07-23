@@ -39,27 +39,33 @@ Utilizando el entorno contenedorizado **RF-Swift**, este proyecto se comunica di
 
 ---
 
-## 🏗 Arquitectura Inmune a Fallos
+## 🏗 Arquitectura del Sistema (Con Tolerancia a Fallos)
 
-A partir del **Día 7**, Spectre-Horizon integra un sistema de captura resiliente, diseñado para operar en zonas hostiles y soportar desconexiones de hardware en caliente sin intervención humana:
+La solución opera bajo un modelo de capas altamente aislado para garantizar reproducibilidad y rendimiento. A partir del Día 7, se incorpora un sistema de **Hotplugging y Watchdog** en el espacio de usuario para inmunizar la ingesta de datos frente a desconexiones de hardware en caliente.
 
-1. **Chunking (Archivos por Bloques):** Los datos no se escriben en un archivo monolítico. Se dividen en bloques temporales (por defecto cada 60s) con su propio archivo `.sigmf-meta`. Si el sistema colapsa, solo se pierde el bloque actual.
-2. **Watchdog de Espacio de Usuario:** Un demonio `bash` corre en segundo plano detectando los eventos del Kernel mediante `lsusb`.
-3. **Auto-Reconexión USB:** Si el cable de la antena se desconecta y se vuelve a conectar, el Watchdog reinicia el contenedor Docker automáticamente para refrescar el bus USB, mientras que el script envoltorio (`capture.sh`) retoma el hilo de captura sin que el proceso principal muera.
+1. **Chunking (Archivos por Bloques):** Los datos se dividen en bloques temporales con su propio archivo `.sigmf-meta`. Si el sistema colapsa, solo se pierde el bloque actual.
+2. **Watchdog de Espacio de Usuario:** Un demonio `bash` corre en segundo plano detectando eventos del bus mediante `lsusb`.
+3. **Auto-Reconexión USB:** Si el cable se desconecta y se vuelve a conectar, el Watchdog reinicia el contenedor automáticamente para refrescar el bus USB, mientras que el script envoltorio retoma la captura sin que el proceso principal muera.
 
 ```mermaid
 graph TD
-    A[Harogic SAN-400] <-->|USB 3.0 / Desconexión en Caliente| B(Host Linux)
-    B <-->|Bind Mount| C{Docker: RF-Swift}
+    A["Hardware: Harogic SAN-400"] <-->|"USB 3.0 (Hotplug)"| B("Host OS (Linux)")
+    B <-->|"Bind Mount (/dev/bus/usb)"| C{"Contenedor Docker: RF-Swift"}
     
-    subgraph Tolerancia a Fallos
-        W[watchdog_usb.sh] -->|Vigila lsusb| B
-        W -->|Reinicia Contenedor| C
-        C -->|Backoff & Retry| F(capture_iq.py)
+    subgraph "Tolerancia a Fallos (Día 7)"
+        W["scripts/watchdog_usb.sh"] -->|"Monitorea lsusb"| B
+        W -->|"docker restart"| C
     end
     
-    F -->|Chunk 1 (.iq)| G[("Volumen: /rf-spectrum/data/samples")]
-    F -->|Chunk 2 (.iq)| G
+    subgraph "Entorno Aislado (RF-Swift)"
+        C --> D["SoapySDR C++ Layer"]
+        D --> E["API Python3"]
+        E --> F("scripts/capture_iq.py")
+        C -.->|"Backoff & Retry Loop"| F
+    end
+    
+    F -->|"Chunk (.iq)"| G[("Volumen: /rf-spectrum/data/samples")]
+    F -->|"Contrato JSON (.sigmf-meta)"| G
 ```
 
 ---
