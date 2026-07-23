@@ -48,24 +48,46 @@ La solución opera bajo un modelo de capas altamente aislado para garantizar rep
 3. **Auto-Reconexión USB:** Si el cable se desconecta y se vuelve a conectar, el Watchdog reinicia el contenedor automáticamente para refrescar el bus USB, mientras que el script envoltorio retoma la captura sin que el proceso principal muera.
 
 ```mermaid
-graph TD
-    A["Hardware: Harogic SAN-400"] <-->|"USB 3.0 (Hotplug)"| B("Host OS (Linux)")
-    B <-->|"Bind Mount (/dev/bus/usb)"| C{"Contenedor Docker: RF-Swift"}
+flowchart TB
+    %% Definición de paleta de colores profesional
+    classDef hardware fill:#1e1e1e,stroke:#00ffcc,stroke-width:2px,color:#fff,rx:5px,ry:5px
+    classDef docker fill:#2496ed,stroke:#ffffff,stroke-width:2px,color:#fff,rx:5px,ry:5px
+    classDef python fill:#306998,stroke:#ffd43b,stroke-width:2px,color:#fff,rx:5px,ry:5px
+    classDef storage fill:#ff5722,stroke:#ffffff,stroke-width:2px,color:#fff,rx:5px,ry:5px
+    classDef bash fill:#4eaa25,stroke:#ffffff,stroke-width:2px,color:#fff,rx:5px,ry:5px
+
+    A["📡 Sensor Harogic SAN-400"]:::hardware <-->|"USB 3.0"| B
     
-    subgraph "Tolerancia a Fallos (Día 7)"
-        W["scripts/watchdog_usb.sh"] -->|"Monitorea lsusb"| B
-        W -->|"docker restart"| C
+    subgraph HOST["🖥️ Host OS (Capa Física)"]
+        direction TB
+        B("⚙️ Kernel USB Driver")
+        W["🛡️ watchdog_usb.sh (Demonio)"]:::bash
+        W -.->|"1. Escucha eventos lsusb"| B
     end
     
-    subgraph "Entorno Aislado (RF-Swift)"
-        C --> D["SoapySDR C++ Layer"]
-        D --> E["API Python3"]
-        E --> F("scripts/capture_iq.py")
-        C -.->|"Backoff & Retry Loop"| F
+    subgraph DOCKER["🐳 Entorno Aislado (RF-Swift)"]
+        direction TB
+        C{"📦 Motor Docker"}:::docker
+        D["⚙️ SoapySDR API (C++)"]
+        E["🐍 Python3 Libs"]:::python
+        F("🧠 capture_iq.py (Tubería Principal)"):::python
+        
+        C -->|"Inyección Hardware"| D
+        D -->|"Interfáz"| E
+        E -->|"Lógica"| F
+    end
+
+    B <-->|"Bind Mount (/dev/bus/usb)"| C
+    W -.->|"2. Hotplug: docker restart"| C
+    
+    subgraph STORAGE["💾 Capa de Persistencia"]
+        direction LR
+        G[("📁 Muestras Crudas (.iq)")]:::storage
+        H[("📄 Contrato JSON (.sigmf-meta)")]:::storage
     end
     
-    F -->|"Chunk (.iq)"| G[("Volumen: /rf-spectrum/data/samples")]
-    F -->|"Contrato JSON (.sigmf-meta)"| G
+    F ==>|"Bloques temporales (Chunking)"| G
+    F ==>|"Telemetría de la sesión"| H
 ```
 
 ---
