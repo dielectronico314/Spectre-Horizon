@@ -58,7 +58,7 @@ graph TD
         C -->|Backoff & Retry| F(capture_iq.py)
     end
     
-    F -->|Chunk 1 (.iq)| G[(Volumen: /rf-spectrum/data/samples)]
+    F -->|Chunk 1 (.iq)| G[("Volumen: /rf-spectrum/data/samples")]
     F -->|Chunk 2 (.iq)| G
 ```
 
