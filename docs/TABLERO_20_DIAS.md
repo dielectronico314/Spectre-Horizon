@@ -30,7 +30,7 @@ Este tablero permite registrar el progreso diario durante las 4 semanas de ejecu
 
 | Día | Fecha | Objetivo Ejecutivo | Entregable Clave | Estado |
 |---|---|---|---|---|
-| **Día 9** | Lun 27 Jul | Replay offline determinista de capturas IQ. | Script de reproducción offline que emula flujo en vivo con hashes de seguridad. | *Pendiente* |
+| **Día 9** | Lun 27 Jul | Replay offline determinista de capturas IQ. | Script de reproducción offline que emula flujo en vivo con hashes de seguridad. | **COMPLETADO** |
 | **Día 10** | Mar 28 Jul | Ensayo y prueba de estabilidad de adquisición. | Archivo de aceptación `ACEPTACION_ADQUISICION_V01.md` de 60 min. | *Pendiente* |
 | **Día 11** | Mié 29 Jul | Generación offline de espectrograma (Waterfall). | Algoritmo FFT/espectrograma de referencia reproducible. | *Pendiente* |
 | **Día 12** | Jue 30 Jul | Pipeline de procesamiento espectral continuo (Streaming). | Procesamiento en tiempo real por bloques (Vivo y Replay). | *Pendiente* |
