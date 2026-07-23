@@ -106,6 +106,21 @@ Para replicar este entorno de forma exacta, se utiliza el siguiente hardware val
 
 ---
 
+## 📥 Dependencias Externas y Descargas
+
+Dado que este repositorio está altamente optimizado, **no** contiene binarios de terceros ni software pesado del fabricante. Debes descargar las dependencias necesarias desde sus fuentes oficiales:
+
+1. **Contenedor RF-Swift (PentHertz):**
+   - El entorno contenedorizado principal para SDRs.
+   - **Descarga/Pull:** `docker pull penthertz/rfswift_noble:sdr_full`
+   - **Documentación:** [PentHertz GitHub / RF-Swift](#) *(Reemplazar con URL real si existe)*
+2. **SAStudio4 y SDK de Harogic:**
+   - Software oficial y SDK C-API del analizador SAN-400.
+   - **Descarga:** [Página Oficial de Descargas de Harogic](http://www.harogic.eu/download/)
+   - *Nota: Solo es necesario si deseas usar la interfaz gráfica original o compilar tus propios drivers en C. Spectre-Horizon utiliza el driver SoapySDR ya embebido dentro del contenedor RF-Swift.*
+
+---
+
 ## 🚀 Instalación y Despliegue
 
 La principal ventaja de Spectre-Horizon es que no "ensucia" tu máquina local con librerías cruzadas de C++ o drivers de radio rotos. Todo funciona dentro del contenedor oficial de Penthertz.

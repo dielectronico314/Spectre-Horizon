@@ -27,6 +27,21 @@ It acts as a robust software bridge to capture, process, and store industrial-gr
 
 ---
 
+## 📥 External Dependencies & Downloads
+
+Since this repository is highly optimized, it does **not** contain heavy third-party binaries or manufacturer software. You must download the required dependencies from their official sources:
+
+1. **RF-Swift Container (PentHertz):**
+   - The core containerized environment for SDRs.
+   - **Download/Pull:** `docker pull penthertz/rfswift_noble:sdr_full`
+   - **Documentation:** [PentHertz GitHub / RF-Swift](#) *(Replace with actual URL if available)*
+2. **SAStudio4 & Harogic SDK:**
+   - Harogic's official software and C-API SDK for the SAN-400 spectrum analyzer.
+   - **Download:** [Harogic Official Downloads Page](http://www.harogic.eu/download/)
+   - *Note: Only required if you wish to use the graphical interface or compile your own C drivers. Spectre-Horizon uses the embedded SoapySDR drivers inside the RF-Swift container.*
+
+---
+
 ## ⚡ Quick Start
 
 ### 1. Launch the Environment
