@@ -17,6 +17,7 @@ import logging
 import threading
 import psutil
 import json
+import hashlib
 
 # Forzar zona horaria a Caracas para los logs locales dentro del contenedor
 os.environ['TZ'] = 'America/Caracas'
@@ -75,6 +76,10 @@ def parse_args():
                         help="Duración de cada archivo individual en segundos (por defecto 60s)")
     parser.add_argument("--outdir", type=str, default="/workspace/rf-spectrum/data/samples",
                         help="Directorio de salida")
+    parser.add_argument("--antenna", type=str, default="Dipolo_Bigotes",
+                        help="Nombre/Tipo de antena conectada")
+    parser.add_argument("--location", type=str, default="Laboratorio Local",
+                        help="Ubicación o coordenadas de la sesión")
     
     return parser.parse_args()
 
@@ -83,13 +88,28 @@ def save_sigmf_meta(filepath, args, samples_read, overflows_count, duration_real
     megabytes = (samples_read * 8) / (1024 * 1024)
     throughput_mbps = megabytes / duration_real if duration_real > 0 else 0
     
+    # Calcular el Hash SHA256 del binario IQ (Para core:dataset_hash)
+    file_hash = ""
+    if os.path.exists(filepath):
+        sha256 = hashlib.sha256()
+        with open(filepath, 'rb') as f_iq:
+            while True:
+                data = f_iq.read(65536)
+                if not data:
+                    break
+                sha256.update(data)
+        file_hash = sha256.hexdigest()
+    
     metadata = {
         "global": {
             "core:datatype": "cf32_le",
             "core:sample_rate": args.rate,
-            "core:hw": "Harogic SDR",
-            "core:author": "RF-Swift Automator (Day 7 Chunking)",
-            "core:version": "0.2.0"
+            "core:hw": "Harogic SAN-400 (CalFile: Interno)",
+            "core:author": "RF-Swift Automator",
+            "core:version": "0.2.1",
+            "core:recorder": "Spectre-Horizon Core v0.2.1",
+            "core:geolocation": args.location,
+            "core:dataset_hash": file_hash
         },
         "captures": [
             {
@@ -97,6 +117,8 @@ def save_sigmf_meta(filepath, args, samples_read, overflows_count, duration_real
                 "core:frequency": args.freq,
                 "core:datetime": datetime.now(timezone.utc).isoformat(),
                 "core:overflows": overflows_count,
+                "core:antenna": args.antenna,
+                "core:gain": args.gain,
                 "telemetry:duration_sec": round(duration_real, 2),
                 "telemetry:throughput_mbps": round(throughput_mbps, 2),
                 "telemetry:size_mb": round(megabytes, 2)

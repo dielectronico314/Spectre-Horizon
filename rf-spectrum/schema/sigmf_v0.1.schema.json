@@ -7,7 +7,7 @@
     "properties": {
         "global": {
             "type": "object",
-            "required": ["core:datatype", "core:sample_rate", "core:hw", "core:author", "core:version"],
+            "required": ["core:datatype", "core:sample_rate", "core:hw", "core:author", "core:version", "core:recorder", "core:geolocation", "core:dataset_hash"],
             "properties": {
                 "core:datatype": {
                     "type": "string",
@@ -25,6 +25,15 @@
                 },
                 "core:version": {
                     "type": "string"
+                },
+                "core:recorder": {
+                    "type": "string"
+                },
+                "core:geolocation": {
+                    "type": "string"
+                },
+                "core:dataset_hash": {
+                    "type": "string"
                 }
             }
         },
@@ -38,6 +47,8 @@
                     "core:frequency",
                     "core:datetime",
                     "core:overflows",
+                    "core:antenna",
+                    "core:gain",
                     "telemetry:duration_sec",
                     "telemetry:throughput_mbps",
                     "telemetry:size_mb"
@@ -58,6 +69,12 @@
                     "core:overflows": {
                         "type": "integer",
                         "minimum": 0
+                    },
+                    "core:antenna": {
+                        "type": "string"
+                    },
+                    "core:gain": {
+                        "type": "number"
                     },
                     "telemetry:duration_sec": {
                         "type": "number",
