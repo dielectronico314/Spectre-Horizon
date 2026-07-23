@@ -71,6 +71,7 @@ flowchart TB
         D["⚙️ SoapySDR API (C++)"]
         E["🐍 Python3 Libs"]:::python
         F("🧠 capture_iq.py (Tubería Principal)"):::python
+        V("🛡️ validate_meta.py (Auditor SigMF)"):::python
         
         C -->|"Inyección Hardware"| D
         D -->|"Interfáz"| E
@@ -87,7 +88,8 @@ flowchart TB
     end
     
     F ==>|"Bloques temporales (Chunking)"| G
-    F ==>|"Telemetría de la sesión"| H
+    F ==>|"Telemetría y SHA256"| H
+    V -.->|"Auditoría Estricta v0.1"| H
 ```
 
 ---
@@ -152,8 +154,12 @@ Para garantizar la investigación científica, por cada bloque se generan dos ar
     "global": {
         "core:datatype": "cf32_le",
         "core:sample_rate": 1953125.0,
-        "core:hw": "Harogic SDR",
-        "core:author": "RF-Swift Automator"
+        "core:hw": "Harogic SAN-400 (CalFile: Interno)",
+        "core:author": "RF-Swift Automator",
+        "core:version": "0.2.1",
+        "core:recorder": "Spectre-Horizon Core v0.2.1",
+        "core:geolocation": "Laboratorio Local",
+        "core:dataset_hash": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
     },
     "captures": [
         {
@@ -161,8 +167,11 @@ Para garantizar la investigación científica, por cada bloque se generan dos ar
             "core:frequency": 106500000.0,
             "core:datetime": "2026-07-23T09:30:56-04:00",
             "core:overflows": 0,
+            "core:antenna": "Dipolo_Bigotes",
+            "core:gain": 0.0,
             "telemetry:duration_sec": 30.0,
-            "telemetry:throughput_mbps": 14.8
+            "telemetry:throughput_mbps": 14.8,
+            "telemetry:size_mb": 58.59
         }
     ]
 }
@@ -179,7 +188,7 @@ Actualmente nos encontramos en la **Fase 1** de automatización. El avance es el
 - [x] **Día 5:** Bucle robusto en CF32 para capturas ininterrumpidas de espectro.
 - [x] **Día 6:** Pruebas de estrés y telemetría de hardware (PSUtil).
 - [x] **Día 7:** Arquitectura Inmune (Reconexión Hotplug, USB Watchdog y Chunking).
-- [ ] **Día 8:** Contrato Oficial de Metadata y Validador.
+- [x] **Día 8:** Contrato Oficial de Metadata (SigMF v0.1) y Validador SHA256.
 - [ ] **Día 9+:** Extracción de Eventos y Construcción del Dashboard API.
 
 ---
