@@ -221,3 +221,9 @@ __marimo__/
 rf-spectrum/data/samples/
 *.iq
 *.sigmf-meta
+
+# Software de terceros (Fabricante)
+SAStudio4*
+Install_HTRA_SDK/
+*.zip
+*.tar.xz
