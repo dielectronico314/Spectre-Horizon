@@ -20,9 +20,9 @@ Este tablero permite registrar el progreso diario durante las 4 semanas de ejecu
 
 | Día | Fecha | Objetivo Ejecutivo | Entregable Clave | Estado |
 |---|---|---|---|---|
-| **Día 6** | Mié 22 Jul | Captura prolongada y métricas de observabilidad. | Reporte de estabilidad de 30 minutos (throughput/overflows). | *Pendiente* |
-| **Día 7** | Jue 23 Jul | Control de pérdida de conexión y grabación segmentada. | Captura por bloques de tiempo con autorecuperación comprobada. | *Pendiente* |
-| **Día 8** | Vie 24 Jul | Esquema definitivo de metadata y validación de hash. | Schema JSON de sesión compatible con SigMF y validador de integridad. | *Pendiente* |
+| **Día 6** | Mié 22 Jul | Captura prolongada y métricas de observabilidad. | Reporte de estabilidad de 30 minutos (throughput/overflows). | **COMPLETADO** |
+| **Día 7** | Jue 23 Jul | Control de pérdida de conexión y grabación segmentada. | Captura por bloques de tiempo con autorecuperación comprobada. | **COMPLETADO** |
+| **Día 8** | Vie 24 Jul | Esquema definitivo de metadata y validación de hash. | Schema JSON de sesión compatible con SigMF y validador de integridad. | **COMPLETADO** |
 
 ---
 
@@ -31,7 +31,7 @@ Este tablero permite registrar el progreso diario durante las 4 semanas de ejecu
 | Día | Fecha | Objetivo Ejecutivo | Entregable Clave | Estado |
 |---|---|---|---|---|
 | **Día 9** | Lun 27 Jul | Replay offline determinista de capturas IQ. | Script de reproducción offline que emula flujo en vivo con hashes de seguridad. | **COMPLETADO** |
-| **Día 10** | Mar 28 Jul | Ensayo y prueba de estabilidad de adquisición. | Archivo de aceptación `ACEPTACION_ADQUISICION_V01.md` de 60 min. | *Pendiente* |
+| **Día 10** | Mar 28 Jul | Ensayo y prueba de estabilidad de adquisición. | Archivo de aceptación `ACEPTACION_ADQUISICION_V01.md` de 60 min. | **COMPLETADO** |
 | **Día 11** | Mié 29 Jul | Generación offline de espectrograma (Waterfall). | Algoritmo FFT/espectrograma de referencia reproducible. | *Pendiente* |
 | **Día 12** | Jue 30 Jul | Pipeline de procesamiento espectral continuo (Streaming). | Procesamiento en tiempo real por bloques (Vivo y Replay). | *Pendiente* |
 | **Día 13** | Vie 31 Jul | Extracción de features de espectro (Potencia, SNR, etc.). | Extractor de características espectrales y resumen JSON de sesión. | *Pendiente* |
