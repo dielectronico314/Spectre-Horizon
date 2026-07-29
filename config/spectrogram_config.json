@@ -31,5 +31,11 @@
     "png_cmap": "viridis",
     "png_dpi": 110,
     "_doc": "png_time_reduction=maxhold es deliberado: si hay mas tramas que pixeles, matplotlib submuestrea por vecino mas cercano y descarta los transitorios que el overlap del 50% pago. maxhold conserva el pico de cada grupo. Usa 'mean' solo para estimar piso de ruido."
+  },
+
+  "streaming": {
+    "ring_capacity_batches": 128,
+    "batch_frames": 256,
+    "_doc": "Tamaño del SPSC ring buffer: ring_capacity_batches * batch_frames * (nfft*(1-overlap)) * 4 bytes. Con 128x256x512 son ~67MB en memoria compartida."
   }
 }
