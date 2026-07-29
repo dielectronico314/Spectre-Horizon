@@ -227,3 +227,4 @@ SAStudio4*
 Install_HTRA_SDK/
 *.zip
 *.tar.xz
+*.npz
