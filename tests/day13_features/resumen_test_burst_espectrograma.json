@@ -1,0 +1,22 @@
+[
+    {
+        "band_name": "CW_Tone",
+        "duracion_activa_s": 4.999168,
+        "pico_max_dbfs": -14.160346984863281,
+        "potencia_media_dbfs": -13.96208870819881,
+        "snr_media_db": 32.99426005183277,
+        "bw_media_hz": 1953.125,
+        "n_tramas": 19530,
+        "capture_sha256": "ce383037c37a3e608302f61db1a14ed811ea76fad31d33a8b4e08c212e665892"
+    },
+    {
+        "band_name": "Synth_Burst",
+        "duracion_activa_s": 2.000384,
+        "pico_max_dbfs": -6.648487091064453,
+        "potencia_media_dbfs": -20.459351157507285,
+        "snr_media_db": 9.797883415856974,
+        "bw_media_hz": 2051.9313236047105,
+        "n_tramas": 19530,
+        "capture_sha256": "ce383037c37a3e608302f61db1a14ed811ea76fad31d33a8b4e08c212e665892"
+    }
+]
