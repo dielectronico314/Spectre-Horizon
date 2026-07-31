@@ -34,7 +34,7 @@ Este tablero permite registrar el progreso diario durante las 4 semanas de ejecu
 | **Día 10** | Mar 28 Jul | Ensayo y prueba de estabilidad de adquisición. | Archivo de aceptación `ACEPTACION_ADQUISICION_V01.md` de 60 min. | **COMPLETADO** |
 | **Día 11** | Mié 29 Jul | Generación offline de espectrograma (Waterfall). | Algoritmo FFT/espectrograma de referencia reproducible. | **COMPLETADO** |
 | **Día 12** | Jue 30 Jul | Pipeline de procesamiento espectral continuo (Streaming). | Procesamiento en tiempo real por bloques (Vivo y Replay). | **COMPLETADO** |
-| **Día 13** | Vie 31 Jul | Extracción de features de espectro (Potencia, SNR, etc.). | Extractor de características espectrales y resumen JSON de sesión. | *Pendiente* |
+| **Día 13** | Vie 31 Jul | Extracción de features de espectro (Potencia, SNR, etc.). | Extractor de características espectrales y resumen JSON de sesión. | **COMPLETADO** |
 
 ---
 
@@ -42,7 +42,7 @@ Este tablero permite registrar el progreso diario durante las 4 semanas de ejecu
 
 | Día | Fecha | Objetivo Ejecutivo | Entregable Clave | Estado |
 |---|---|---|---|---|
-| **Día 14** | Lun 03 Ago | Motor de alertas espectrales por reglas fijas. | Motor de reglas capaz de levantar alertas bajo umbrales programados. | *Pendiente* |
+| **Día 14** | Lun 03 Ago | Motor de alertas espectrales por reglas fijas. | Motor de reglas capaz de levantar alertas bajo umbrales programados. | **COMPLETADO** |
 | **Día 15** | Mar 04 Ago | Empaquetado y generación de paquetes de evidencia. | Estructura de evidencia por alerta con hashes de integridad. | *Pendiente* |
 | **Día 16** | Mié 05 Ago | API REST para consulta de sesiones y eventos. | Endpoints en FastAPI documentados con Swagger interactivo. | *Pendiente* |
 | **Día 17** | Jue 06 Ago | Dashboard de control web mínimo. | Pantalla de estado con Waterfall básico y tabla de alertas en vivo. | *Pendiente* |
