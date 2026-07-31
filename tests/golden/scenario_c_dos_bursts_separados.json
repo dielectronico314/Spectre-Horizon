@@ -1,0 +1,34 @@
+[
+  {
+    "event_id": "test_session_TestBand_evt_0001",
+    "session_id": "test_session",
+    "band_name": "TestBand",
+    "rule_name": "power_threshold",
+    "capture_sha256": "deadbeef",
+    "start_t_s": 0.5,
+    "end_t_s": 0.9,
+    "duration_s": 0.4,
+    "pico_dbfs": -23.0,
+    "potencia_media_activa_dbfs": -25.0,
+    "severidad": "medium",
+    "confianza": 0.9,
+    "n_fusiones": 0,
+    "closed_reason": "threshold_off"
+  },
+  {
+    "event_id": "test_session_TestBand_evt_0002",
+    "session_id": "test_session",
+    "band_name": "TestBand",
+    "rule_name": "power_threshold",
+    "capture_sha256": "deadbeef",
+    "start_t_s": 3.0,
+    "end_t_s": 3.4,
+    "duration_s": 0.3999999999999999,
+    "pico_dbfs": -23.0,
+    "potencia_media_activa_dbfs": -25.0,
+    "severidad": "medium",
+    "confianza": 0.9,
+    "n_fusiones": 0,
+    "closed_reason": "threshold_off"
+  }
+]

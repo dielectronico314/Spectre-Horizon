@@ -7,9 +7,10 @@ Este documento detalla las matemáticas, unidades y limitaciones de las caracter
 - **Cálculo:** Búsqueda del máximo valor absoluto en los bins de la banda de interés en una trama determinada.
 - **Limitaciones:** Sujeto a *Scalloping Loss* (hasta 1.42 dB para ventana de Hann) si la frecuencia real no coincide exactamente con el centro del bin de la FFT.
 
-## 2. Potencia de Banda / Channel Power (`potencia_dbfs`)
+## 2. Potencia de Banda / Channel Power (`potencia_dbfs` y `potencia_media_dbfs`)
 - **Unidad:** dBFS.
-- **Cálculo:** Se convierten todos los bins de la banda de dBFS a potencia lineal ($10^{dB/10}$), se suman, y se divide la suma total por el Factor de Ancho de Banda de Ruido Equivalente (`ENBW_bins`) de la ventana temporal utilizada (ej. 1.5 para Hann). Finalmente se convierte nuevamente a dBFS.
+- **Cálculo:** Para una trama individual (`potencia_dbfs`), se convierten todos los bins de la banda a potencia lineal ($10^{dB/10}$), se suman, y se divide la suma total por el Factor de Ancho de Banda de Ruido Equivalente (`ENBW_bins`) de la ventana temporal utilizada (ej. 1.5 para Hann). Finalmente se convierte nuevamente a dBFS.
+- **Aclaración Importante (Resumen de sesión):** La métrica `potencia_media_dbfs` en el JSON final promedia la potencia de banda a lo largo de **TODA la sesión** (incluyendo los momentos de silencio). No representa la potencia exclusiva de la señal mientras está activa (Burst).
 - **Limitaciones:** Esta métrica asume que la señal ocupa múltiples bins. No debe confundirse con la potencia del "pico".
 
 ## 3. Ancho de Banda Ocupado / OBW (`bw_hz`)

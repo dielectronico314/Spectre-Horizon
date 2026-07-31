@@ -17,9 +17,9 @@ then
 fi
 
 # 2. Ejecutar SoapySDRUtil dentro del contenedor para hacer un ping al hardware
-echo "Consultando al contenedor 'mysdr' por dispositivos conectados..."
+echo "Consultando al contenedor 'harogic_final' por dispositivos conectados..."
 # Redirigimos stderr a stdout para poder leer los mensajes del contenedor
-OUTPUT=$(rfswift exec -c mysdr --command "SoapySDRUtil --find" 2>&1)
+OUTPUT=$(rfswift exec -c harogic_final --command "SoapySDRUtil --find" 2>&1)
 
 # 3. Analizar la salida para determinar el estado
 if echo "$OUTPUT" | grep -q "driver = harogic"; then

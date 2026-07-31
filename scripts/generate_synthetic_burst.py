@@ -17,18 +17,19 @@ from datetime import datetime, timezone
 
 def main():
     sample_rate = 2000000.0
-    center_freq = 5000000000.0
+    center_freq = 106500000.0
     duration = 5.0
     num_samples = int(sample_rate * duration)
     
-    output_dir = "/workspace/rf-spectrum/data/samples/test_burst"
+    output_dir = "/workspace/rf-spectrum/data/samples/test_burst_106p5MHz"
     os.makedirs(output_dir, exist_ok=True)
     
     iq_filepath = os.path.join(output_dir, "test_burst.iq")
     meta_filepath = os.path.join(output_dir, "test_burst.sigmf-meta")
     gt_filepath = os.path.join(output_dir, "ground_truth.json")
     
-    print(f"📡 Generando Burst Sintético (5 GHz, {duration}s)...")
+    fc_mhz = center_freq / 1e6
+    print(f"📡 Generando Burst Sintético ({fc_mhz:.1f} MHz, {duration}s)...")
     
     t = np.arange(num_samples) / sample_rate
     
@@ -80,7 +81,11 @@ def main():
                 "core:datetime": timestamp_iso
             }
         ],
-        "annotations": []
+        "annotations": [],
+        "input": {
+            "center_freq_hz": center_freq,
+            "data_sha256": dataset_hash
+        }
     }
     
     with open(meta_filepath, 'w') as f:

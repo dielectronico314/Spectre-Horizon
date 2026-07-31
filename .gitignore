@@ -228,3 +228,10 @@ Install_HTRA_SDK/
 *.zip
 *.tar.xz
 *.npz
+
+# Output de Pruebas de Sistema (Ignorar data generada)
+tests/day12_validation/
+tests/day13_results/
+tests/day13_synthetic/
+tests/day14_results/
+

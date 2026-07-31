@@ -1,0 +1,14 @@
+{
+    "_doc": "Config dedicada para capturas en la banda ISM de 2.4 GHz (WiFi, Bluetooth). Mide la potencia y SNR usando una estrategia temporal para capturar ráfagas cortas (paquetes).",
+    "bands": [
+        {
+            "name": "WiFi_2.4GHz",
+            "offset_hz_low": -15000000,
+            "offset_hz_high": 15000000,
+            "noise_floor_strategy": "temporal",
+            "margin_on_db": 8.0,
+            "margin_off_db": 4.0,
+            "required_consecutive": 1
+        }
+    ]
+}

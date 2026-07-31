@@ -59,6 +59,8 @@ def main():
             "core:version": "1.0.0",
             "core:dataset_hash": dataset_hash,
             "core:recorder": "Spectre-Horizon Synthetic Generator",
+            "core:hw": "Simulador Offline",
+            "core:author": "Harogic Auto-Test",
             "core:geolocation": "Simulado"
         },
         "captures": [
@@ -66,8 +68,12 @@ def main():
                 "core:sample_start": 0,
                 "core:frequency": center_freq,
                 "core:datetime": timestamp_iso,
+                "core:overflows": 0,
                 "core:antenna": "Virtual_Antenna",
-                "core:gain": 0
+                "core:gain": 0,
+                "telemetry:duration_sec": duration,
+                "telemetry:throughput_mbps": 16.0,
+                "telemetry:size_mb": 80.0
             }
         ],
         "annotations": []

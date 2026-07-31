@@ -1,0 +1,14 @@
+{
+    "_doc": "Config dedicada para capturas reales de la emisora FM en 106.5 MHz (no reusar features_config_relative.json, que fue disenada para el burst sintetico de prueba). Usa offsets relativos al center_freq del manifest (sistema agnostico de frecuencia, Dia 13), pero con un ancho de banda y nombre que corresponden a un canal FM real, no al tono sintetico +50kHz.",
+    "bands": [
+        {
+            "name": "FM_106.5",
+            "offset_hz_low": -100000,
+            "offset_hz_high": 100000,
+            "noise_floor_strategy": "spectral",
+            "margin_on_db": 10.0,
+            "margin_off_db": 5.0,
+            "required_consecutive": 3
+        }
+    ]
+}

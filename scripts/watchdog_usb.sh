@@ -4,7 +4,7 @@
 # Reinicia el contenedor si detecta que la antena fue desconectada y reconectada.
 
 VENDOR_PRODUCT="367f:0001"
-CONTAINER_NAME="mysdr"
+CONTAINER_NAME="harogic_final"
 
 echo "🛡️ Watchdog USB iniciado. Vigilando $VENDOR_PRODUCT..."
 

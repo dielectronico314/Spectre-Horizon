@@ -35,12 +35,12 @@ while [[ "$#" -gt 0 ]]; do
 done
 
 echo "Instalando dependencias de telemetría (psutil)..."
-docker exec mysdr pip install --quiet psutil
+docker exec harogic_final pip install --quiet psutil
 
 echo "Lanzando script de captura en el contenedor RF-Swift..."
 # Bucle infinito para soportar reinicios del contenedor
 while true; do
-    docker exec -i mysdr python3 - \
+    docker exec -i harogic_final python3 - \
         --freq "$FREQ" \
         --rate "$RATE" \
         --gain "$GAIN" \
@@ -56,7 +56,7 @@ while true; do
     fi
     
     # Si sale con error (ej. Docker lo mató porque se reinició), esperamos y volvemos a lanzar
-    echo "⏳ Esperando a que el contenedor mysdr esté listo de nuevo..."
+    echo "⏳ Esperando a que el contenedor harogic_final esté listo de nuevo..."
     sleep 3
 done
 
@@ -65,5 +65,5 @@ kill $WATCHDOG_PID 2>/dev/null
 
 echo -e "\nSincronizando archivos capturados a tu escritorio..."
 mkdir -p rf-spectrum/data/samples
-docker cp mysdr:/workspace/rf-spectrum/data/samples/. rf-spectrum/data/samples/
+docker cp harogic_final:/workspace/rf-spectrum/data/samples/. rf-spectrum/data/samples/
 echo "¡Sincronización completada!"

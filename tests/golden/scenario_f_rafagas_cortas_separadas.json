@@ -1,0 +1,50 @@
+[
+  {
+    "event_id": "test_session_TestBand_evt_0001",
+    "session_id": "test_session",
+    "band_name": "TestBand",
+    "rule_name": "power_threshold",
+    "capture_sha256": "deadbeef",
+    "start_t_s": 0.5,
+    "end_t_s": 0.504,
+    "duration_s": 0.0040000000000000036,
+    "pico_dbfs": -23.0,
+    "potencia_media_activa_dbfs": -25.0,
+    "severidad": "medium",
+    "confianza": 0.9,
+    "n_fusiones": 0,
+    "closed_reason": "threshold_off"
+  },
+  {
+    "event_id": "test_session_TestBand_evt_0002",
+    "session_id": "test_session",
+    "band_name": "TestBand",
+    "rule_name": "power_threshold",
+    "capture_sha256": "deadbeef",
+    "start_t_s": 0.525,
+    "end_t_s": 0.529,
+    "duration_s": 0.0040000000000000036,
+    "pico_dbfs": -23.0,
+    "potencia_media_activa_dbfs": -25.0,
+    "severidad": "medium",
+    "confianza": 0.9,
+    "n_fusiones": 0,
+    "closed_reason": "threshold_off"
+  },
+  {
+    "event_id": "test_session_TestBand_evt_0003",
+    "session_id": "test_session",
+    "band_name": "TestBand",
+    "rule_name": "power_threshold",
+    "capture_sha256": "deadbeef",
+    "start_t_s": 0.55,
+    "end_t_s": 0.554,
+    "duration_s": 0.0040000000000000036,
+    "pico_dbfs": -23.0,
+    "potencia_media_activa_dbfs": -25.0,
+    "severidad": "medium",
+    "confianza": 0.9,
+    "n_fusiones": 0,
+    "closed_reason": "threshold_off"
+  }
+]

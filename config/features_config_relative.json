@@ -2,8 +2,8 @@
     "bands": [
         {
             "name": "CW_Tone",
-            "freq_low_hz": 106540000.0,
-            "freq_high_hz": 106560000.0,
+            "offset_hz_low": 40000,
+            "offset_hz_high": 60000,
             "noise_floor_strategy": "spectral",
             "margin_on_db": 10.0,
             "margin_off_db": 5.0,
@@ -11,8 +11,8 @@
         },
         {
             "name": "Synth_Burst",
-            "freq_low_hz": 106650000.0,
-            "freq_high_hz": 106750000.0,
+            "offset_hz_low": 150000,
+            "offset_hz_high": 250000,
             "noise_floor_strategy": "temporal",
             "margin_on_db": 6.0,
             "margin_off_db": 3.0,

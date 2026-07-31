@@ -102,7 +102,7 @@ def save_sigmf_meta(filepath, args, samples_read, overflows_count, duration_real
     
     metadata = {
         "global": {
-            "core:datatype": "cf32_le",
+            "core:datatype": "ci16_le",
             "core:sample_rate": args.rate,
             "core:hw": "Harogic SAN-400 (CalFile: Interno)",
             "core:author": "RF-Swift Automator",
@@ -174,11 +174,12 @@ def main():
             sdr.setFrequency(direction, canal, args.freq)
             sdr.setGain(direction, canal, args.gain)
             
-            rxStream = sdr.setupStream(direction, SoapySDR.SOAPY_SDR_CF32)
+            rxStream = sdr.setupStream(direction, SoapySDR.SOAPY_SDR_CS16)
             mtu = sdr.getStreamMTU(rxStream)
             sdr.activateStream(rxStream)
             buffer_size = mtu if mtu > 0 else 32768
             buff = np.zeros(buffer_size, np.complex64)
+            buff_view = buff.view(np.int16)
             logger.info("✅ SDR Inicializado y Stream activado correctamente.")
             
             # ==============================================================
@@ -202,7 +203,7 @@ def main():
                         sr = sdr.readStream(rxStream, [buff], buffer_size, timeoutUs=1000000)
                         
                         if sr.ret > 0:
-                            f.write(buff[:sr.ret].tobytes())
+                            f.write(buff_view[:sr.ret * 2].tobytes())
                             samples_read += sr.ret
                         elif sr.ret == SoapySDR.SOAPY_SDR_TIMEOUT:
                             logger.warning("⚠️ Timeout: Posible desconexión o retardo.")
