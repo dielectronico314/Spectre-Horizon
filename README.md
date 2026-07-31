@@ -79,6 +79,8 @@ The solution operates under a highly isolated layer model to guarantee reproduci
 1. **Chunking:** Data is split into time blocks, each with its own `.sigmf-meta` contract. If the system collapses, only the current block is lost.
 2. **Userspace Watchdog:** A background bash daemon monitors USB bus events.
 3. **Auto-Recovery:** If the USB cable is disconnected and reconnected, the Watchdog restarts the container automatically to refresh the `/dev/bus/usb` mapping.
+4. **Decoupled DSP Extraction (Day 13):** Pure mathematical features (SNR, power, peak) are extracted from the raw IQ blocks into agnostic CSV streams, detached from decision-making logic.
+5. **Tactical Event Engine (Day 14):** A Finite State Machine (FSM) interprets the DSP features using declarative rules (`rules_config.json`) to detect signal bursts, fuse micro-drops (preventing alert avalanches), and calculate severity/confidence scores.
 
 ```mermaid
 flowchart TB
@@ -104,6 +106,8 @@ flowchart TB
         E["🐍 Python3 Libs"]:::python
         F("🧠 capture_iq.py (Main Pipeline)"):::python
         V("🛡️ validate_meta.py (SigMF Auditor)"):::python
+        I("📊 extract_features.py (DSP)"):::python
+        J("🧠 run_event_engine.py (FSM)"):::python
         
         C -->|"Hardware Injection"| D
         D -->|"Interface"| E
@@ -115,13 +119,19 @@ flowchart TB
     
     subgraph STORAGE["💾 Persistence Layer"]
         direction LR
-        G[("📁 Raw Samples (.iq)")]:::storage
+        G[("📁 Raw Samples (.iq/npz)")]:::storage
         H[("📄 JSON Contract (.sigmf-meta)")]:::storage
+        K[("📄 Features (.csv)")]:::storage
+        L[("🚨 Tactical Events (.json)")]:::storage
     end
     
     F ==>|"Time blocks (Chunking)"| G
     F ==>|"Telemetry & SHA256"| H
     V -.->|"Strict v0.1 Audit"| H
+    G -.->|"DSP Processing"| I
+    I ==>|"Math Metrics"| K
+    K -.->|"Rule Policies"| J
+    J ==>|"Filtered Alerts"| L
 ```
 
 ---
@@ -145,7 +155,10 @@ Currently in **Phase 1** (Automation). Progress:
 - [x] **Day 6:** Stress tests & hardware telemetry (PSUtil).
 - [x] **Day 7:** Immune Architecture (Hotplug Recovery, USB Watchdog, and Chunking).
 - [x] **Day 8:** Official Metadata Contract (SigMF v0.1) & SHA256 Validator.
-- [ ] **Day 9+:** Event Extraction and Dashboard API Construction.
+- [x] **Day 9-12:** Streaming Processing Pipeline & Deterministic Replay.
+- [x] **Day 13:** DSP Feature Extraction (Power, SNR, Bandwidth tracking).
+- [x] **Day 14:** Deterministic Logical Event Engine (FSM for tactical alerts).
+- [ ] **Day 15+:** Evidence Packaging, REST API, and Dashboard Construction.
 
 ---
 *Designed with maximum rigor for RF research.*
