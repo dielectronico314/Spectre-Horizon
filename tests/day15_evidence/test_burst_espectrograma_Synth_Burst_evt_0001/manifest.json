@@ -1,0 +1,30 @@
+{
+    "event_metadata": {
+        "event_id": "test_burst_espectrograma_Synth_Burst_evt_0001",
+        "session_id": "test_burst_espectrograma",
+        "band_name": "Synth_Burst",
+        "rule_name": "power_threshold",
+        "capture_sha256": "016e125b2f586c78bdf1bfea8f707c2f70deac69b2b6acc26bb7142b5d21b4c2",
+        "start_t_s": 0.999936,
+        "end_t_s": 3.000064,
+        "duration_s": 2.000128,
+        "pico_dbfs": -6.66,
+        "potencia_media_activa_dbfs": -6.004948809828513,
+        "severidad": "high",
+        "confianza": 1.0,
+        "n_fusiones": 0,
+        "closed_reason": "threshold_off"
+    },
+    "packaging_info": {
+        "timestamp_utc": "2026-07-31T19:35:26.874598Z",
+        "software": "Spectre-Horizon v0.1",
+        "padding_s": 0.5
+    },
+    "files_sha256": {
+        "evidence_features.csv": "b58cfb876e324081f0b121effbab1f3d4779ef384cae330f1871374a255e63f7",
+        "evidence_spectrogram.npz": "c257fd55e6a514783a791c9996b3db73087f37e66ab6cb27560de5abf5f7a277",
+        "rules_config.json": "03e7eeb9623c2906a68c4d0ebd42c92bed6aa8c1ae69857b9ced5c0788084bcf",
+        "features_config.json": "22ed7fa8285aa7d0fc1da9382183a5ad803473c241fc9d7d975079e3ec3be8c4",
+        "report.md": "d44e83991a36c29c0e2ab3737fdf39244c356991d154047ac5022ce964a24008"
+    }
+}

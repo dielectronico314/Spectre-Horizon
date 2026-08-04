@@ -1,0 +1,62 @@
+{
+  "input": {
+    "meta_file": "captura_2400.0MHz_part012.sigmf-meta",
+    "data_file": "captura_2400.0MHz_part012.iq",
+    "data_sha256": "04092d6c17978a89866d970e4188aa7b36baf566d47458c6cf0d5ba2ce05432a",
+    "datatype": "cf32_le",
+    "sample_rate_hz": 1953125.0,
+    "center_freq_hz": 2400000000.0
+  },
+  "config": {
+    "file": "spectrogram_config.json",
+    "sha256": "8fd482557ba7cb58a9aafb015d11cd73e9967ba880e65a6323c4be62ba6dc126",
+    "resolved": {
+      "nfft": 1024,
+      "window": "hann",
+      "window_arg": null,
+      "overlap": 0.5,
+      "remove_dc": false,
+      "cal_offset_db": 0.0,
+      "max_seconds": null,
+      "png_max_cols": 1600,
+      "png_time_reduction": "maxhold",
+      "png_vmin_percentile": 5.0,
+      "png_vmax_percentile": 99.95,
+      "png_cmap": "viridis",
+      "png_dpi": 110
+    }
+  },
+  "derived": {
+    "n_samples_used": 117669888,
+    "n_frames": 229823,
+    "hop_samples": 512,
+    "bin_spacing_hz": 1907.3486328125,
+    "enbw_bins": 1.5,
+    "rbw_hz": 2861.02294921875,
+    "frame_duration_s": 0.000524288,
+    "window_s1": 512.0,
+    "window_s2": 384.0,
+    "coherent_gain": 0.5,
+    "scalloping_loss_db_worst": null,
+    "png_time_group": 144,
+    "png_vmin_db": -113.75702667236328,
+    "png_vmax_db": -106.1762466430664,
+    "npz_sha256": "7bdd47b25edf68341473ae8acf6a414cb10b88f5b4b0d49a7927d784844358dd",
+    "png_sha256": "e56201810375f04de61daa4f2a570326e169a47c0d6043620283ba896c15c831"
+  },
+  "scale": {
+    "unit": "dBFS por RBW",
+    "normalization": "|FFT(x*w)|^2 / (sum(w))^2",
+    "fullscale_divisor": 1.0,
+    "cw_fullscale_on_bin_reads_db": 0.0,
+    "to_dbfs_per_hz": "dBFS - 10*log10(rbw_hz)"
+  },
+  "environment": {
+    "python": "3.12.3",
+    "numpy": "2.5.1",
+    "scipy": "1.17.1",
+    "matplotlib": "3.11.0",
+    "machine": "x86_64",
+    "platform": "Linux-6.8.0-136-generic-x86_64-with-glibc2.39"
+  }
+}

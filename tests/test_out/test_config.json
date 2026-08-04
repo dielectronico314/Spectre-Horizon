@@ -1,0 +1,1 @@
+{"bands": [{"name": "CW_Mock", "offset_hz_low": 48000, "offset_hz_high": 52000, "noise_floor_strategy": "spectral", "margin_on_db": 10.0, "margin_off_db": 5.0}]}

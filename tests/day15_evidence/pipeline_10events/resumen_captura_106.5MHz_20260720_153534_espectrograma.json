@@ -1,0 +1,102 @@
+[
+    {
+        "band_name": "FM_Sub1",
+        "duracion_activa_s": 2.0292567040000002,
+        "pico_max_dbfs": -104.1282958984375,
+        "potencia_media_dbfs": -103.33650391381732,
+        "snr_media_db": 13.890234592363353,
+        "bw_media_hz": 2101.4582444173366,
+        "n_tramas": 7743,
+        "capture_sha256": "19c10fbb7b7e9ce3c9c277b503a9908809cc078d64c09fea47371e0f2365c0d0"
+    },
+    {
+        "band_name": "FM_Sub2",
+        "duracion_activa_s": 2.0292567040000002,
+        "pico_max_dbfs": -105.0180892944336,
+        "potencia_media_dbfs": -103.39263337135438,
+        "snr_media_db": 13.813985668656809,
+        "bw_media_hz": 2123.628123915351,
+        "n_tramas": 7743,
+        "capture_sha256": "19c10fbb7b7e9ce3c9c277b503a9908809cc078d64c09fea47371e0f2365c0d0"
+    },
+    {
+        "band_name": "FM_Sub3",
+        "duracion_activa_s": 2.0292567040000002,
+        "pico_max_dbfs": -103.99958801269531,
+        "potencia_media_dbfs": -103.37379706430909,
+        "snr_media_db": 13.851148250382275,
+        "bw_media_hz": 2069.1887531480047,
+        "n_tramas": 7743,
+        "capture_sha256": "19c10fbb7b7e9ce3c9c277b503a9908809cc078d64c09fea47371e0f2365c0d0"
+    },
+    {
+        "band_name": "FM_Sub4",
+        "duracion_activa_s": 2.0292567040000002,
+        "pico_max_dbfs": -104.75727081298828,
+        "potencia_media_dbfs": -103.18741322117968,
+        "snr_media_db": 14.00666582160998,
+        "bw_media_hz": 2064.0157812651346,
+        "n_tramas": 7743,
+        "capture_sha256": "19c10fbb7b7e9ce3c9c277b503a9908809cc078d64c09fea47371e0f2365c0d0"
+    },
+    {
+        "band_name": "FM_Sub5",
+        "duracion_activa_s": 2.0292567040000002,
+        "pico_max_dbfs": -104.6006088256836,
+        "potencia_media_dbfs": -103.32892660273764,
+        "snr_media_db": 13.809193756604062,
+        "bw_media_hz": 2095.5462765511993,
+        "n_tramas": 7743,
+        "capture_sha256": "19c10fbb7b7e9ce3c9c277b503a9908809cc078d64c09fea47371e0f2365c0d0"
+    },
+    {
+        "band_name": "FM_Sub6",
+        "duracion_activa_s": 2.0292567040000002,
+        "pico_max_dbfs": -104.28717041015625,
+        "potencia_media_dbfs": -103.28447994550932,
+        "snr_media_db": 13.85622059761608,
+        "bw_media_hz": 2126.3377758539973,
+        "n_tramas": 7743,
+        "capture_sha256": "19c10fbb7b7e9ce3c9c277b503a9908809cc078d64c09fea47371e0f2365c0d0"
+    },
+    {
+        "band_name": "FM_Sub7",
+        "duracion_activa_s": 2.0292567040000002,
+        "pico_max_dbfs": -104.36128234863281,
+        "potencia_media_dbfs": -103.1664083343628,
+        "snr_media_db": 13.958656846068248,
+        "bw_media_hz": 2102.936236383871,
+        "n_tramas": 7743,
+        "capture_sha256": "19c10fbb7b7e9ce3c9c277b503a9908809cc078d64c09fea47371e0f2365c0d0"
+    },
+    {
+        "band_name": "FM_Sub8",
+        "duracion_activa_s": 2.0292567040000002,
+        "pico_max_dbfs": -104.64801025390625,
+        "potencia_media_dbfs": -103.26104810030658,
+        "snr_media_db": 13.329582848906686,
+        "bw_media_hz": 2105.3995563280946,
+        "n_tramas": 7743,
+        "capture_sha256": "19c10fbb7b7e9ce3c9c277b503a9908809cc078d64c09fea47371e0f2365c0d0"
+    },
+    {
+        "band_name": "FM_Sub9",
+        "duracion_activa_s": 2.0292567040000002,
+        "pico_max_dbfs": -92.7083740234375,
+        "potencia_media_dbfs": -101.79104812013138,
+        "snr_media_db": 12.64112243199093,
+        "bw_media_hz": 2139.886035547228,
+        "n_tramas": 7743,
+        "capture_sha256": "19c10fbb7b7e9ce3c9c277b503a9908809cc078d64c09fea47371e0f2365c0d0"
+    },
+    {
+        "band_name": "FM_Sub10",
+        "duracion_activa_s": 2.0292567040000002,
+        "pico_max_dbfs": -94.48734283447266,
+        "potencia_media_dbfs": -96.81758073533088,
+        "snr_media_db": 17.84146026331495,
+        "bw_media_hz": 2285.9609082397005,
+        "n_tramas": 7743,
+        "capture_sha256": "19c10fbb7b7e9ce3c9c277b503a9908809cc078d64c09fea47371e0f2365c0d0"
+    }
+]

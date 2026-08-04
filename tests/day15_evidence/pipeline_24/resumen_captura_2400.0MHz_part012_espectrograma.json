@@ -1,0 +1,12 @@
+[
+    {
+        "band_name": "WiFi_2.4GHz",
+        "duracion_activa_s": 0.0,
+        "pico_max_dbfs": -101.37615966796875,
+        "potencia_media_dbfs": -89.19445592381524,
+        "snr_media_db": 0.18636530421209593,
+        "bw_media_hz": 1872.1267986285573,
+        "n_tramas": 229823,
+        "capture_sha256": "04092d6c17978a89866d970e4188aa7b36baf566d47458c6cf0d5ba2ce05432a"
+    }
+]

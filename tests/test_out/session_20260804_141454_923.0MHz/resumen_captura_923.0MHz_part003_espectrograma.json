@@ -1,0 +1,12 @@
+[
+    {
+        "band_name": "CW_Mock",
+        "duracion_activa_s": 0.2344697435897436,
+        "pico_max_dbfs": -22.183950424194336,
+        "potencia_media_dbfs": -22.89740198231276,
+        "snr_media_db": 27.34152209745439,
+        "bw_media_hz": 1608.5457402234638,
+        "n_tramas": 895,
+        "capture_sha256": "ce8e458358487e339de2cbe4541eef5d4e38ae9eb1e4c2e79b5a3173a25db1d9"
+    }
+]

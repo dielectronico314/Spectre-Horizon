@@ -46,9 +46,9 @@ async def dashboard_estado(request: Request):
     sessions_count = len(sessions) if sessions else 0
 
     return templates.TemplateResponse(
-        "estado.html",
-        {
-            "request": request,
+        request=request,
+        name="estado.html",
+        context={
             "section": "estado",
             "status": status,
             "ultima_sesion": ultima_sesion,
@@ -91,9 +91,9 @@ async def dashboard_eventos(
     bandas = sorted(bandas)
 
     return templates.TemplateResponse(
-        "eventos.html",
-        {
-            "request": request,
+        request=request,
+        name="eventos.html",
+        context={
             "section": "eventos",
             "eventos": eventos,
             "bandas": bandas,
@@ -123,9 +123,9 @@ async def dashboard_evento_detalle(request: Request, event_id: str):
     explicacion = explain_evento(evento)
 
     return templates.TemplateResponse(
-        "evento_detalle.html",
-        {
-            "request": request,
+        request=request,
+        name="evento_detalle.html",
+        context={
             "section": "eventos",
             "evento": evento,
             "severidad_desc": severidad_desc,

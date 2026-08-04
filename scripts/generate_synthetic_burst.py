@@ -16,7 +16,7 @@ import numpy as np
 from datetime import datetime, timezone
 
 def main():
-    sample_rate = 2000000.0
+    sample_rate = 1953125.0
     center_freq = 106500000.0
     duration = 5.0
     num_samples = int(sample_rate * duration)

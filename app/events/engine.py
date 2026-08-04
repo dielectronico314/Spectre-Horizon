@@ -64,11 +64,11 @@ class EventEngine:
     # Internos
     # ------------------------------------------------------------------ #
     def _next_event_id(self) -> str:
-        # Incluye band_name: cada banda tiene su propio EventEngine y por lo
-        # tanto su propio contador, así que sin el nombre de banda dos eventos
-        # de bandas distintas en la misma sesión podrían compartir event_id.
+        # Usa los primeros 12 caracteres del SHA256 de la captura cruda
+        # para garantizar unicidad global sin depender del nombre de sesión.
         self._event_counter += 1
-        return f"{self.session_id}_{self.band_name}_evt_{self._event_counter:04d}"
+        hash_prefix = self.capture_sha256[:12] if self.capture_sha256 else "unknown"
+        return f"{hash_prefix}_{self.band_name}_{self._event_counter:04d}"
 
     def _new_event(self) -> dict:
         return {

@@ -22,8 +22,18 @@ def main():
 
     args = parser.parse_args()
 
-    if not args.npz_file.exists() or not args.config.exists():
-        print("Error: Archivos no encontrados.")
+    if not args.npz_file.exists():
+        print(f"❌ Error: El archivo especificado no existe: {args.npz_file}")
+        sys.exit(1)
+        
+    if not args.config.exists():
+        print(f"❌ Error: El archivo de configuración no existe: {args.config}")
+        sys.exit(1)
+        
+    if args.npz_file.suffix.lower() != '.npz':
+        print(f"❌ Error Crítico: Se esperaba un archivo de matriz de Numpy (.npz) para el espectrograma.")
+        print(f"   Se recibió en su lugar: '{args.npz_file.name}'")
+        print(f"   Asegúrate de pasar el archivo generado por generate_spectrogram.py, no el .sigmf-meta.")
         sys.exit(1)
 
     # Cargar Configuración
@@ -73,7 +83,7 @@ def main():
             spec_config = json.load(f)
         nfft = int(spec_config["fft"]["nfft"])
         if sample_rate is None:
-            sample_rate = spec_config["fft"].get("sample_rate", 2000000.0)
+            sample_rate = spec_config["fft"].get("sample_rate", 1953125.0)
         # Calcular vector de frecuencias (relative a center_freq)
         freqs_relative = np.fft.fftshift(np.fft.fftfreq(nfft, 1.0 / sample_rate))
         if center_freq is not None:

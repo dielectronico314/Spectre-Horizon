@@ -13,7 +13,7 @@ from datetime import datetime, timezone
 
 def main():
     # Configuraciones de la señal sintética
-    sample_rate = 2000000.0  # 2 MHz
+    sample_rate = 1953125.0  # ~1.95 MHz (Tasa nominal real del hardware Harogic)
     center_freq = 5000000000.0  # 5 GHz
     duration = 5.0  # 5 segundos de señal
     num_samples = int(sample_rate * duration)

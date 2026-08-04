@@ -1,0 +1,95 @@
+{
+    "_doc": "Configuración con 10 sub-bandas para generar 10 eventos distintos en la misma captura de FM 106.5 MHz.",
+    "bands": [
+        {
+            "name": "FM_Sub1",
+            "offset_hz_low": -400000,
+            "offset_hz_high": -350000,
+            "noise_floor_strategy": "spectral",
+            "margin_on_db": 5.0,
+            "margin_off_db": 3.0,
+            "required_consecutive": 3
+        },
+        {
+            "name": "FM_Sub2",
+            "offset_hz_low": -350000,
+            "offset_hz_high": -300000,
+            "noise_floor_strategy": "spectral",
+            "margin_on_db": 5.0,
+            "margin_off_db": 3.0,
+            "required_consecutive": 3
+        },
+        {
+            "name": "FM_Sub3",
+            "offset_hz_low": -300000,
+            "offset_hz_high": -250000,
+            "noise_floor_strategy": "spectral",
+            "margin_on_db": 5.0,
+            "margin_off_db": 3.0,
+            "required_consecutive": 3
+        },
+        {
+            "name": "FM_Sub4",
+            "offset_hz_low": -250000,
+            "offset_hz_high": -200000,
+            "noise_floor_strategy": "spectral",
+            "margin_on_db": 5.0,
+            "margin_off_db": 3.0,
+            "required_consecutive": 3
+        },
+        {
+            "name": "FM_Sub5",
+            "offset_hz_low": -200000,
+            "offset_hz_high": -150000,
+            "noise_floor_strategy": "spectral",
+            "margin_on_db": 5.0,
+            "margin_off_db": 3.0,
+            "required_consecutive": 3
+        },
+        {
+            "name": "FM_Sub6",
+            "offset_hz_low": 150000,
+            "offset_hz_high": 200000,
+            "noise_floor_strategy": "spectral",
+            "margin_on_db": 5.0,
+            "margin_off_db": 3.0,
+            "required_consecutive": 3
+        },
+        {
+            "name": "FM_Sub7",
+            "offset_hz_low": 200000,
+            "offset_hz_high": 250000,
+            "noise_floor_strategy": "spectral",
+            "margin_on_db": 5.0,
+            "margin_off_db": 3.0,
+            "required_consecutive": 3
+        },
+        {
+            "name": "FM_Sub8",
+            "offset_hz_low": 250000,
+            "offset_hz_high": 300000,
+            "noise_floor_strategy": "spectral",
+            "margin_on_db": 5.0,
+            "margin_off_db": 3.0,
+            "required_consecutive": 3
+        },
+        {
+            "name": "FM_Sub9",
+            "offset_hz_low": 300000,
+            "offset_hz_high": 350000,
+            "noise_floor_strategy": "spectral",
+            "margin_on_db": 5.0,
+            "margin_off_db": 3.0,
+            "required_consecutive": 3
+        },
+        {
+            "name": "FM_Sub10",
+            "offset_hz_low": 350000,
+            "offset_hz_high": 400000,
+            "noise_floor_strategy": "spectral",
+            "margin_on_db": 5.0,
+            "margin_off_db": 3.0,
+            "required_consecutive": 3
+        }
+    ]
+}

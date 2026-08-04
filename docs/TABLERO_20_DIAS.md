@@ -43,9 +43,9 @@ Este tablero permite registrar el progreso diario durante las 4 semanas de ejecu
 | Día | Fecha | Objetivo Ejecutivo | Entregable Clave | Estado |
 |---|---|---|---|---|
 | **Día 14** | Lun 03 Ago | Motor de alertas espectrales por reglas fijas. | Motor de reglas capaz de levantar alertas bajo umbrales programados. | **COMPLETADO** |
-| **Día 15** | Mar 04 Ago | Empaquetado y generación de paquetes de evidencia. | Estructura de evidencia por alerta con hashes de integridad. | *Pendiente* |
-| **Día 16** | Mié 05 Ago | API REST para consulta de sesiones y eventos. | Endpoints en FastAPI documentados con Swagger interactivo. | *Pendiente* |
-| **Día 17** | Jue 06 Ago | Dashboard de control web mínimo. | Pantalla de estado con Waterfall básico y tabla de alertas en vivo. | *Pendiente* |
+| **Día 15** | Mar 04 Ago | Empaquetado y generación de paquetes de evidencia. | Estructura de evidencia por alerta con hashes de integridad. | **COMPLETADO** |
+| **Día 16** | Mié 05 Ago | API REST para consulta de sesiones y eventos. | Endpoints en FastAPI documentados con Swagger interactivo. | **COMPLETADO** |
+| **Día 17** | Jue 06 Ago | Dashboard de control web mínimo. | Pantalla de estado con Waterfall básico y tabla de alertas en vivo. | **COMPLETADO** |
 | **Día 18** | Vie 07 Ago | Generación automatizada de reportes de sesión. | Reporte descargable (HTML imprimible o PDF) con historial espectral. | *Pendiente* |
 
 ---

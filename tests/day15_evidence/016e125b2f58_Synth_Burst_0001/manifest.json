@@ -1,0 +1,86 @@
+{
+    "event_metadata": {
+        "event_id": "016e125b2f58_Synth_Burst_0001",
+        "session_id": "test_burst_espectrograma",
+        "band_name": "Synth_Burst",
+        "rule_name": "power_threshold",
+        "capture_sha256": "016e125b2f586c78bdf1bfea8f707c2f70deac69b2b6acc26bb7142b5d21b4c2",
+        "start_t_s": 0.999936,
+        "end_t_s": 3.000064,
+        "duration_s": 2.000128,
+        "pico_dbfs": -6.66,
+        "potencia_media_activa_dbfs": -6.004948809828513,
+        "severidad": "high",
+        "confianza": 1.0,
+        "n_fusiones": 0,
+        "closed_reason": "threshold_off"
+    },
+    "software": {
+        "python": "3.12.3",
+        "script_generate_spectrogram_sha256": "77ef6adc97d13655d62eca0eedba9c1b534925e4fdc9613f793cbecdbc8a04e8",
+        "script_extract_features_sha256": "08340b41e4589656440ea6c5123c0bd023e3c605d5c8b7da7f7d3ae632e61763",
+        "script_run_event_engine_sha256": "e2b96cb8b49ace4adc4a0eebdf8c5767922128d179ce397613e601302065e9bb"
+    },
+    "config_resuelto": {
+        "rules": {
+            "_doc": "Politica de decision del motor de eventos (Dia 14). No mide senal (eso es features_config*.json + app/processing/features.py), solo decide cuando una medicion ya hecha se convierte en un evento. margen_umbral_db se aplica sobre snr_db (potencia_banda - piso_ruido), no sobre dBFS absoluto: ver docs/EVENTS_REF.md.",
+            "_doc_perfiles": "Un perfil agrupa los parametros de dwell/fusion que le corresponden a un TIPO de senal, no a una banda especifica. Cada banda en 'bands' referencia un perfil por nombre; las claves puestas directamente en la banda (fuera de 'profile') sobrescriben al perfil para esa banda puntual. Orden de resolucion: defaults -> profiles[profile] -> bands[banda] (sin la clave 'profile').",
+            "defaults": {
+                "margen_umbral_db": 6.0,
+                "margen_severidad_medium_db": 6.0,
+                "margen_severidad_high_db": 12.0,
+                "confianza_escala_db": 10.0
+            },
+            "profiles": {
+                "continuous": {
+                    "_doc": "Senales continuas (CW, FM, portadoras) que pueden tener fading breve sin realmente apagarse. Dwell largo evita falsos OFF por fading.",
+                    "min_on_frames": 4,
+                    "min_off_frames": 6,
+                    "merge_gap_s": 0.5
+                },
+                "packet_traffic": {
+                    "_doc": "Trafico empaquetado (WiFi/BT, rafagas de ms). merge_gap_s=15ms: mas corto que el hueco tipico entre rafagas separadas de trafico real, pero mayor que el hueco de una sola trama. Validado en tests/test_events_known.py (escenarios F/G/H) antes de usarse en produccion - ver docs/EVENTS_REF.md seccion 9.",
+                    "min_on_frames": 2,
+                    "min_off_frames": 3,
+                    "merge_gap_s": 0.015
+                }
+            },
+            "bands": {
+                "CW_Tone": {
+                    "profile": "continuous"
+                },
+                "Synth_Burst": {
+                    "profile": "continuous"
+                },
+                "FM_106.5": {
+                    "profile": "continuous"
+                },
+                "WiFi_2.4GHz": {
+                    "profile": "packet_traffic"
+                }
+            }
+        },
+        "features": {
+            "_doc": "Config dedicada para capturas reales de la emisora FM en 106.5 MHz (no reusar features_config_relative.json, que fue disenada para el burst sintetico de prueba). Usa offsets relativos al center_freq del manifest (sistema agnostico de frecuencia, Dia 13), pero con un ancho de banda y nombre que corresponden a un canal FM real, no al tono sintetico +50kHz.",
+            "bands": [
+                {
+                    "name": "FM_106.5",
+                    "offset_hz_low": -100000,
+                    "offset_hz_high": 100000,
+                    "noise_floor_strategy": "spectral",
+                    "margin_on_db": 10.0,
+                    "margin_off_db": 5.0,
+                    "required_consecutive": 3
+                }
+            ]
+        }
+    },
+    "files_sha256": {
+        "evento.sigmf-data": "ce440c634318b6f944133a2af61eab7ce8ef0bebc567edbf8b6a000023723686",
+        "evento.sigmf-meta": "35e91cd1749848bf95d2f4ca1f094d6739c7e80c95664f9d92c95ce4f1881740",
+        "espectrograma_evento.png": "c2ea4775b12165c6fb8d7278d382736c9f708d2e81b263d1c28d11cc153d28ad",
+        "features_evento.csv": "b58cfb876e324081f0b121effbab1f3d4779ef384cae330f1871374a255e63f7",
+        "resumen.md": "667a62898bd71a44e73a28eafc677b71dafc08e43af8aaf9d890d4f6b5006841"
+    },
+    "manifest_sha256": "c73da78dcceb8bf06ed70c83a31796cb2b2042d8683931510508d20e8f5fe02f"
+}

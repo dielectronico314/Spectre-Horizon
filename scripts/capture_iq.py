@@ -194,32 +194,33 @@ def main():
                 samples_read = 0
                 overflows_count = 0
                 
-                with open(filepath, 'wb') as f:
-                    while (time.time() - chunk_start_time) < args.chunk_duration:
-                        # Revisar si se acabó el tiempo global
-                        if (time.time() - global_start_time) >= args.duration:
-                            break
+                try:
+                    with open(filepath, 'wb') as f:
+                        while (time.time() - chunk_start_time) < args.chunk_duration:
+                            # Revisar si se acabó el tiempo global
+                            if (time.time() - global_start_time) >= args.duration:
+                                break
+                                
+                            sr = sdr.readStream(rxStream, [buff], buffer_size, timeoutUs=1000000)
                             
-                        sr = sdr.readStream(rxStream, [buff], buffer_size, timeoutUs=1000000)
+                            if sr.ret > 0:
+                                f.write(buff_view[:sr.ret * 2].tobytes())
+                                samples_read += sr.ret
+                            elif sr.ret == SoapySDR.SOAPY_SDR_TIMEOUT:
+                                logger.warning("⚠️ Timeout: Posible desconexión o retardo.")
+                            elif sr.ret == SoapySDR.SOAPY_SDR_OVERFLOW:
+                                overflows_count += 1
+                            elif sr.ret < 0:
+                                raise Exception(f"Error crítico en readStream (hardware desconectado): {sr.ret}")
+                finally:
+                    # Al cerrar el archivo (terminó el bloque o falló), guardamos su metadata
+                    duration_real = time.time() - chunk_start_time
+                    if samples_read > 0:
+                        save_sigmf_meta(filepath, args, samples_read, overflows_count, duration_real)
+                    else:
+                        logger.warning(f"🗑️ Bloque {filename} vacío, ignorando metadatos.")
                         
-                        if sr.ret > 0:
-                            f.write(buff_view[:sr.ret * 2].tobytes())
-                            samples_read += sr.ret
-                        elif sr.ret == SoapySDR.SOAPY_SDR_TIMEOUT:
-                            logger.warning("⚠️ Timeout: Posible desconexión o retardo.")
-                        elif sr.ret == SoapySDR.SOAPY_SDR_OVERFLOW:
-                            overflows_count += 1
-                        elif sr.ret < 0:
-                            raise Exception(f"Error crítico en readStream (hardware desconectado): {sr.ret}")
-                
-                # Al cerrar el archivo (terminó el bloque o falló), guardamos su metadata
-                duration_real = time.time() - chunk_start_time
-                if samples_read > 0:
-                    save_sigmf_meta(filepath, args, samples_read, overflows_count, duration_real)
-                else:
-                    logger.warning(f"🗑️ Bloque {filename} vacío, ignorando metadatos.")
-                    
-                chunk_index += 1
+                    chunk_index += 1
                 
         except KeyboardInterrupt:
             logger.warning("⏹️ Detenido manualmente por el usuario.")
@@ -231,9 +232,10 @@ def main():
             # El ciclo global 'while' volverá al inicio y reintentará instanciar SoapySDR
         finally:
             try:
-                # Intento de cierre seguro de la conexión anterior si existe
+                # Cierre seguro de la conexión y destrucción del objeto C++
                 sdr.deactivateStream(rxStream)
                 sdr.closeStream(rxStream)
+                del sdr
             except:
                 pass
 
