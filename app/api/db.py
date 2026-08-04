@@ -5,7 +5,9 @@ import logging
 logger = logging.getLogger(__name__)
 
 # Ubicación por defecto de la base de datos
-DATA_ROOT = Path("/workspace/data")
+# Desarrollo: ./data/index.sqlite
+# Producción: override con variable de entorno DB_PATH
+DATA_ROOT = Path(__file__).parent.parent.parent / "data"
 DB_PATH = DATA_ROOT / "index.sqlite"
 
 SCHEMA = """
