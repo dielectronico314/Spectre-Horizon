@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}{{ evento.event_id }} — Cenital RF{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Evento: {{ evento.band_name }}</h2>
+
+    <div class="detail-section">
+        <h3>Información básica</h3>
+        <div class="detail-row">
+            <span class="detail-label">ID del evento:</span>
+            <span class="detail-value"><code>{{ evento.event_id }}</code></span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Sesión:</span>
+            <span class="detail-value"><code>{{ evento.session_id }}</code></span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Banda:</span>
+            <span class="detail-value">{{ evento.band_name }}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Severidad:</span>
+            <span class="detail-value">
+                {% if evento.severidad == 'low' %}
+                    🟡 Baja
+                {% elif evento.severidad == 'medium' %}
+                    🟠 Media
+                {% elif evento.severidad == 'high' %}
+                    🔴 Alta
+                {% endif %}
+                — {{ severidad_desc }}
+            </span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Certeza:</span>
+            <span class="detail-value">{{ confianza_label }} ({{ "%.1f"|format(evento.confianza * 100) }}%)</span>
+        </div>
+    </div>
+
+    <div class="detail-section">
+        <h3>¿Por qué se generó este evento?</h3>
+        <p>{{ explicacion }}</p>
+        <div style="margin-top: 1rem; padding: 1rem; background: white; border-radius: 4px; border-left: 3px solid #1976d2;">
+            <strong>Detalles técnicos:</strong><br>
+            Pico detectado: {{ "%.1f"|format(evento.pico_dbfs) }} dBFS<br>
+            Potencia media: {{ "%.1f"|format(evento.potencia_media_activa_dbfs) }} dBFS<br>
+            Duración: {{ "%.3f"|format(evento.duration_s) }} segundos
+            {% if evento.n_fusiones > 0 %}
+            <br>Interrupciones detectadas en esta señal: {{ evento.n_fusiones }} (contado como 1 evento)
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="detail-section">
+        <h3>Temporalización</h3>
+        <div class="detail-row">
+            <span class="detail-label">Inicio (desde captura):</span>
+            <span class="detail-value">{{ "%.6f"|format(evento.start_t_s) }} segundos</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Fin (desde captura):</span>
+            <span class="detail-value">{{ "%.6f"|format(evento.end_t_s) }} segundos</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Duración:</span>
+            <span class="detail-value">{{ "%.6f"|format(evento.duration_s) }} segundos</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Cierre:</span>
+            <span class="detail-value">{{ closed_reason_label }}</span>
+        </div>
+    </div>
+
+    <div class="detail-section">
+        <h3>Evidencia forense</h3>
+        <p style="margin-bottom: 1rem;">Archivos disponibles para esta detección:</p>
+        <div class="evidence-links">
+            {% if evidence_links %}
+                {% for nombre, url in evidence_links.items() %}
+                <div class="evidence-link">
+                    <strong>{{ nombre | replace('_', ' ') | title }}</strong>
+                    <a href="{{ url }}" download>Descargar</a>
+                </div>
+                {% endfor %}
+            {% else %}
+            <p style="color: #999;">No hay archivos de evidencia disponibles para este evento.</p>
+            {% endif %}
+        </div>
+    </div>
+
+    <a href="/dashboard/eventos" class="button">← Volver a eventos</a>
+</div>
+{% endblock %}

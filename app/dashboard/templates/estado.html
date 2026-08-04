@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+
+{% block title %}Estado del Sensor — Cenital RF{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Estado del Sensor</h2>
+
+    {% if status.en_vivo %}
+        <div class="status-bar">
+            <span class="status-label">🟢 Sensor en vivo (capturando ahora)</span>
+        </div>
+    {% elif ultima_sesion and not ultima_sesion.tuvo_interrupciones %}
+        <div class="status-bar">
+            <span class="status-label">🟢 Sensor: conectado</span>
+            <span>(última señal hace poco)</span>
+        </div>
+    {% elif ultima_sesion and ultima_sesion.tuvo_interrupciones %}
+        <div class="status-bar warning">
+            <span class="status-label">⚠️ Última sesión tuvo interrupciones</span>
+            <span>— Sensor se reconectó correctamente. Ver detalle abajo.</span>
+        </div>
+    {% else %}
+        <div class="status-bar error">
+            <span class="status-label">🔴 Sensor: sin datos recientes</span>
+        </div>
+    {% endif %}
+
+    {% if ultima_sesion %}
+    <div class="detail-section">
+        <h3>Última captura registrada</h3>
+        <div class="detail-row">
+            <span class="detail-label">Frecuencia central:</span>
+            <span class="detail-value">
+                {% if ultima_sesion.fc_hz %}
+                    {{ (ultima_sesion.fc_hz / 1e6) | round(1) }} MHz
+                {% else %}
+                    (no registrada)
+                {% endif %}
+            </span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">Hora (UTC):</span>
+            <span class="detail-value">{{ ultima_sesion.start_datetime or "(desconocida)" }}</span>
+        </div>
+        <div class="detail-row">
+            <span class="detail-label">ID de sesión:</span>
+            <span class="detail-value"><code>{{ ultima_sesion.session_id }}</code></span>
+        </div>
+    </div>
+
+    {% if ultima_sesion.tuvo_interrupciones %}
+    <div class="detail-section" style="border-left-color: #ff9800;">
+        <h3>⚠️ Interrupciones detectadas</h3>
+        <p>
+            Durante esta captura, el sensor se desconectó y reconectó una o más veces.
+            Esto puede deberse a:
+        </p>
+        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
+            <li>Pérdida temporal de conexión de red</li>
+            <li>Reinicio del hardware</li>
+            <li>Cambio de configuración durante la captura</li>
+        </ul>
+        <p style="margin-top: 1rem;">
+            <strong>Estado:</strong> Se recuperó correctamente. Los eventos se registraron sin pérdida.
+        </p>
+    </div>
+    {% endif %}
+
+    <div class="detail-section">
+        <h3>Resumen de sesiones</h3>
+        <div class="detail-row">
+            <span class="detail-label">Sesiones totales registradas:</span>
+            <span class="detail-value"><strong>{{ status.eventos_totales }}</strong> eventos en {{ sessions_count | default(0) }} sesión(es)</span>
+        </div>
+    </div>
+
+    <a href="/dashboard/eventos" class="button">Ver todos los eventos</a>
+    {% else %}
+    <p style="color: #999; margin-top: 1rem;">No hay sesiones registradas aún.</p>
+    {% endif %}
+</div>
+{% endblock %}

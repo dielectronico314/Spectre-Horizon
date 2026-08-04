@@ -1,0 +1,96 @@
+{% extends "base.html" %}
+
+{% block title %}Eventos detectados — Cenital RF{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Eventos detectados</h2>
+
+    <form method="get" class="filter-bar">
+        <div class="filter-group">
+            <label for="banda">Banda</label>
+            <select name="banda" id="banda">
+                <option value="">— Todas —</option>
+                {% for b in bandas %}
+                <option value="{{ b }}" {% if filtro_banda == b %}selected{% endif %}>
+                    {{ b }}
+                </option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="severidad">Severidad</label>
+            <select name="severidad" id="severidad">
+                <option value="">— Todas —</option>
+                <option value="low" {% if filtro_severidad == 'low' %}selected{% endif %}>
+                    🟡 Baja
+                </option>
+                <option value="medium" {% if filtro_severidad == 'medium' %}selected{% endif %}>
+                    🟠 Media
+                </option>
+                <option value="high" {% if filtro_severidad == 'high' %}selected{% endif %}>
+                    🔴 Alta
+                </option>
+            </select>
+        </div>
+
+        <div class="filter-group">
+            <label for="desde">Desde (fecha)</label>
+            <input type="date" name="desde" id="desde" value="{{ filtro_desde }}">
+        </div>
+
+        <div class="filter-group">
+            <label for="hasta">Hasta (fecha)</label>
+            <input type="date" name="hasta" id="hasta" value="{{ filtro_hasta }}">
+        </div>
+
+        <button type="submit" class="button" style="margin-top: 1.5rem;">Filtrar</button>
+    </form>
+
+    {% if eventos %}
+    <table>
+        <thead>
+            <tr>
+                <th>Cuándo</th>
+                <th>Banda</th>
+                <th>Severidad</th>
+                <th>Duración</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for ev in eventos %}
+            <tr>
+                <td>
+                    {% if ev.session %}
+                        {{ ev.session.start_datetime | default("(hora desconocida)") }}
+                    {% else %}
+                        (hora no disponible)
+                    {% endif %}
+                </td>
+                <td>{{ ev.band_name }}</td>
+                <td>
+                    {% if ev.severidad == 'low' %}
+                        🟡 Baja
+                    {% elif ev.severidad == 'medium' %}
+                        🟠 Media
+                    {% elif ev.severidad == 'high' %}
+                        🔴 Alta
+                    {% else %}
+                        {{ ev.severidad }}
+                    {% endif %}
+                </td>
+                <td>{{ "%.2f"|format(ev.duration_s) }}s</td>
+                <td>
+                    <a href="/dashboard/eventos/{{ ev.event_id }}">Detalle →</a>
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {% else %}
+    <p style="color: #999; margin-top: 1rem;">No se encontraron eventos con los filtros seleccionados.</p>
+    {% endif %}
+</div>
+{% endblock %}
