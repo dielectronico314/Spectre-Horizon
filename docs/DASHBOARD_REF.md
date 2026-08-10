@@ -121,10 +121,14 @@ Valida:
 
 **Nota:** Test usa `/dashboard/` directo via TestClient, no requiere Selenium.
 
+## Waterfall 3D (WebGL)
+
+Implementado con Plotly.js vía CDN para evitar el uso de matplotlib y su carga en el backend. 
+**Límite importante:** Esta vista 3D está diezmada (max-hold en tiempo, promedio en frecuencia con RBW efectivo ~6x) y es puramente para **inspección visual rápida**. No utilizar para mediciones precisas de potencia o frecuencia; para ese fin, recírrase siempre al archivo `.npz` subyacente o a la tabla de eventos.
+
 ## Mejoras Futuras (Fuera de Alcance Día 17)
 
 - Waterfall en vivo (streaming, requiere WebSocket/Demonio Orquestador, Días 18-19)
-- Visualización 3D del espectrograma (encaja en 3.2 si hay presupuesto)
 - Auto-refresh con HTMX (botón "Actualizar" hace GET silencioso)
 - Exportar sesión a CSV/PDF
 

@@ -400,6 +400,44 @@ def main(argv: list[str] | None = None) -> int:
         manifest["derived"]["npz_sha256"] = sha256(out_npz)
         print(f"  -> {out_npz}")
 
+    # --------------------------------------------------------------------------- #
+    # Generación de matriz 3D decimada para Plotly.js (WebGL en el navegador)
+    # Target: ~250x200 puntos. Max-hold en tiempo, promedio lineal en frecuencia.
+    # --------------------------------------------------------------------------- #
+    TARGET_T = 250
+    TARGET_F = 200
+    
+    t_factor = max(1, dbfs.shape[0] // TARGET_T)
+    f_factor = max(1, dbfs.shape[1] // TARGET_F)
+    
+    t_len = (dbfs.shape[0] // t_factor) * t_factor
+    f_len = (dbfs.shape[1] // f_factor) * f_factor
+    
+    # Max-hold en tiempo
+    dbfs_t = dbfs[:t_len, :].reshape(-1, t_factor, dbfs.shape[1]).max(axis=1)
+    times_dec = times[:t_len:t_factor]
+    
+    # Promedio en potencia lineal en frecuencia
+    linear_power = 10 ** (dbfs_t[:, :f_len] / 10.0)
+    linear_dec = linear_power.reshape(dbfs_t.shape[0], -1, f_factor).mean(axis=2)
+    
+    # Evitar log10(0)
+    dbfs_dec = 10 * np.log10(np.clip(linear_dec, 1e-12, None))
+    
+    # Para freqs_dec, promedio del bin
+    freqs_dec = freqs[:f_len].reshape(-1, f_factor).mean(axis=1)
+    
+    out_3d_json = args.outdir / f"{stem}_waterfall3d.json"
+    with open(out_3d_json, 'w') as f3d:
+        json.dump({
+            "times_s": np.round(times_dec, 3).tolist(),
+            "freqs_hz": np.round(freqs_dec, 1).tolist(),
+            "dbfs": np.round(dbfs_dec, 2).tolist()
+        }, f3d, separators=(',', ':'))
+        
+    manifest["derived"]["waterfall3d_sha256"] = sha256(out_3d_json)
+    print(f"  -> {out_3d_json} (decimado t={t_factor}x, f={f_factor}x)")
+
     manifest["derived"]["png_sha256"] = sha256(out_png)
     out_man = args.outdir / f"{stem}_manifest.json"
     out_man.write_text(json.dumps(manifest, indent=2), encoding="utf-8")

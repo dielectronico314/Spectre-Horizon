@@ -237,6 +237,31 @@ def get_session_waterfall(session_id: str):
     finally:
         conn.close()
 
+@api_router.get("/sessions/{session_id}/waterfall3d.json", tags=["Sesiones"])
+def get_session_waterfall3d(session_id: str):
+    """
+    Retorna el espectrograma (waterfall) en formato JSON 3D decimado.
+    """
+    conn = get_db_connection()
+    try:
+        row = conn.execute("SELECT ruta_meta FROM sessions WHERE session_id = ?", (session_id,)).fetchone()
+        if not row or not row["ruta_meta"]:
+            raise HTTPException(status_code=404, detail="Sesión no encontrada o sin metadata")
+            
+        ruta_meta = row["ruta_meta"]
+        meta_path = Path("/workspace") / ruta_meta
+        if not meta_path.exists():
+            raise HTTPException(status_code=404, detail="Metadata original no encontrada")
+            
+        # Reemplazar extensión (.sigmf-meta) por _waterfall3d.json
+        json_path = meta_path.with_name(meta_path.stem.replace(".sigmf-meta", "") + "_waterfall3d.json")
+        if not json_path.exists():
+            raise HTTPException(status_code=404, detail="El espectrograma 3D no se generó para esta captura")
+            
+        return FileResponse(json_path, media_type="application/json")
+    finally:
+        conn.close()
+
 app.include_router(api_router)
 
 mount_dashboard(app)

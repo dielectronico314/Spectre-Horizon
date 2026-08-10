@@ -49,11 +49,28 @@
                         <span style="color: #00dd00;">0 (Limpio)</span>
                     {% endif %}
                 </p>
-                
-                <div style="margin-top: 1rem; border: 1px solid var(--glass-border); border-radius: var(--radius-sm); overflow: hidden; background: #000; min-height: 150px; display: flex; align-items: center; justify-content: center;">
-                    <img src="/api/v1/sessions/{{ s.session_id }}/waterfall" alt="Waterfall de sesión" style="width: 100%; height: auto; display: block;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                    <div style="display: none; padding: 1rem; text-align: center; color: #ff5555; font-size: 0.85em;">
-                        ⚠️ El espectrograma completo no se generó para esta captura.
+                <div style="margin-top: 1rem; position: relative;">
+                    <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
+                        <button class="button" style="padding: 0.2rem 0.5rem; font-size: 0.8em;" onclick="switchView('{{ s.session_id }}', '2d')">2D</button>
+                        <button class="button outline" style="padding: 0.2rem 0.5rem; font-size: 0.8em;" onclick="switchView('{{ s.session_id }}', '3d')">3D</button>
+                    </div>
+                    <div style="border: 1px solid var(--glass-border); border-radius: var(--radius-sm); overflow: hidden; background: #000; min-height: 150px; display: flex; align-items: center; justify-content: center; position: relative;">
+                        <!-- 2D View -->
+                        <div id="view-2d-{{ s.session_id }}" style="width: 100%; display: block;">
+                            <img src="/api/v1/sessions/{{ s.session_id }}/waterfall" alt="Waterfall de sesión" style="width: 100%; height: auto; display: block;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                            <div style="display: none; padding: 1rem; text-align: center; color: #ff5555; font-size: 0.85em;">
+                                ⚠️ El espectrograma 2D no se generó para esta captura.
+                            </div>
+                        </div>
+                        
+                        <!-- 3D View -->
+                        <div id="view-3d-{{ s.session_id }}" style="width: 100%; height: 350px; display: none; background: white;">
+                            <div id="plotly-{{ s.session_id }}" style="width: 100%; height: 100%;">
+                                <div style="display:flex; align-items:center; justify-content:center; height:100%; color:#666;">
+                                    Cargando matriz 3D...
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -70,4 +87,58 @@
     <p style="color: #999; margin-top: 1rem;">No hay sesiones registradas en el sistema.</p>
     {% endif %}
 </div>
+
+<script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
+<script>
+const loaded3D = new Set();
+
+async function switchView(sessionId, view) {
+    const v2d = document.getElementById(`view-2d-${sessionId}`);
+    const v3d = document.getElementById(`view-3d-${sessionId}`);
+    
+    if (view === '2d') {
+        v2d.style.display = 'block';
+        v3d.style.display = 'none';
+    } else {
+        v2d.style.display = 'none';
+        v3d.style.display = 'block';
+        
+        if (!loaded3D.has(sessionId)) {
+            loaded3D.add(sessionId);
+            try {
+                const res = await fetch(`/api/v1/sessions/${sessionId}/waterfall3d.json`);
+                if (!res.ok) throw new Error("No existe");
+                const data = await res.json();
+                
+                const plotData = [{
+                    z: data.dbfs,
+                    x: data.freqs_hz.map(f => f / 1e6),
+                    y: data.times_s,
+                    type: 'surface',
+                    colorscale: 'Viridis',
+                    colorbar: { title: 'dBFS' }
+                }];
+                
+                const layout = {
+                    title: 'Waterfall 3D',
+                    autosize: true,
+                    margin: { l: 0, r: 0, b: 0, t: 30 },
+                    scene: {
+                        xaxis: { title: 'Freq (MHz)' },
+                        yaxis: { title: 'Tiempo (s)' },
+                        zaxis: { title: 'Nivel (dBFS)' }
+                    }
+                };
+                
+                Plotly.newPlot(`plotly-${sessionId}`, plotData, layout, {responsive: true});
+            } catch (err) {
+                document.getElementById(`plotly-${sessionId}`).innerHTML = 
+                    `<div style="display:flex; align-items:center; justify-content:center; height:100%; color:#ff5555; text-align:center; padding:1rem;">
+                        ⚠️ El espectrograma 3D no se generó para esta captura.
+                    </div>`;
+            }
+        }
+    }
+}
+</script>
 {% endblock %}
