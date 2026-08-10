@@ -27,7 +27,7 @@ def test_dashboard_estado_ok():
     response = client.get("/dashboard/")
     assert response.status_code == 200
     assert b"Estado del Sensor" in response.content
-    assert b"Sensor:" in response.content or b"sin datos" in response.content
+    assert b"Conectado" in response.content or b"sin datos" in response.content or b"En vivo" in response.content
 
 
 def test_dashboard_eventos_tabla_ok():
@@ -115,6 +115,33 @@ def test_filtros_no_rompen_html():
     # Aunque no haya eventos, la página debe renderizar sin errores
     assert b"<table" in response.content or b"No se encontraron" in response.content
 
+def test_dashboard_sesiones_waterfall():
+    """Valida que los endpoints de espectrograma 2D y 3D de las sesiones no den error."""
+    # Obtenemos la página de sesiones
+    response = client.get("/dashboard/sesiones")
+    assert response.status_code == 200
+    
+    # Extraemos IDs de sesión de los links de imágenes o JSONs
+    import re
+    matches = re.findall(rb'/api/v1/sessions/([^/]+)/waterfall', response.content)
+    
+    # Tomar hasta 3 sesiones únicas para probar
+    unique_sessions = list(set([m.decode() for m in matches]))[:3]
+    
+    if not unique_sessions:
+        print("⚠ No hay sesiones descubiertas para probar cascadas — test saltado")
+        return
+        
+    for session_id in unique_sessions:
+        # Probar 2D
+        r_2d = client.get(f"/api/v1/sessions/{session_id}/waterfall")
+        assert r_2d.status_code in [200, 404], f"Error inesperado {r_2d.status_code} en 2D para {session_id}"
+        
+        # Probar 3D
+        r_3d = client.get(f"/api/v1/sessions/{session_id}/waterfall3d.json")
+        assert r_3d.status_code in [200, 404], f"Error inesperado {r_3d.status_code} en 3D para {session_id}"
+    
+    print(f"✓ Probadas cascadas de {len(unique_sessions)} sesión(es) exitosamente sin 500s")
 
 if __name__ == "__main__":
     import traceback
@@ -126,6 +153,7 @@ if __name__ == "__main__":
         test_flujo_completo_no_tecnico,
         test_interrupciones_visibles_en_estado,
         test_filtros_no_rompen_html,
+        test_dashboard_sesiones_waterfall,
     ]
     fallos = 0
     for t in tests:

@@ -3,6 +3,7 @@ from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
 from typing import List, Optional
 from datetime import date
 from pydantic import ValidationError
+from pathlib import Path
 
 from app.api.db import get_db_connection, init_db
 from app.api.models import HealthResponse, SensorStatusResponse, SessionResponse, SessionDetailResponse, EventoResponse, EvidenceLinks

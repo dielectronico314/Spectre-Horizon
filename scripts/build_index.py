@@ -49,7 +49,20 @@ def detect_interrupciones(session_dir: Path) -> bool:
 
         t1_iso = cap1.get("core:datetime")
         t2_iso = cap2.get("core:datetime")
-        dur1 = cap1.get("telemetry:duration_sec", 0)
+        
+        # Calcular dur1 desde el tamaño físico real, no el nominal
+        dur1 = 0
+        iq_file = meta_files[i].with_suffix('.iq')
+        if not iq_file.exists():
+            iq_file = meta_files[i].with_suffix('.sigmf-data')
+            
+        if iq_file.exists():
+            fs = meta1.get("global", {}).get("core:sample_rate", 1.0)
+            datatype = meta1.get("global", {}).get("core:datatype", "ci16_le")
+            bytes_per_sample = 8 if datatype == "cf32_le" else 4
+            dur1 = iq_file.stat().st_size / (bytes_per_sample * fs)
+        else:
+            dur1 = cap1.get("telemetry:duration_sec", 0)
 
         if not t1_iso or not t2_iso:
             continue
