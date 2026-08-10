@@ -6,18 +6,27 @@
 <div class="card">
     <h2>Eventos detectados</h2>
 
-    <form method="get" class="filter-bar">
-        <div class="filter-group">
-            <label for="banda">Banda</label>
-            <select name="banda" id="banda">
-                <option value="">— Todas —</option>
-                {% for b in bandas %}
-                <option value="{{ b }}" {% if filtro_banda == b %}selected{% endif %}>
-                    {{ b }}
-                </option>
-                {% endfor %}
-            </select>
-        </div>
+    <form method="get">
+        <div class="filter-bar">
+            <div class="filter-group">
+                <label for="espectro">Espectro</label>
+                <select name="espectro" id="espectro">
+                    <option value="">— Todos —</option>
+                    {% for esp in espectros_disponibles %}
+                    <option value="{{ esp }}" {% if filtro_espectro == esp %}selected{% endif %}>{{ esp }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="filter-group">
+                <label for="frecuencia_mhz">Frecuencia Exacta</label>
+                <select name="frecuencia_mhz" id="frecuencia_mhz">
+                    <option value="">— Todas —</option>
+                    {% for f in frecuencias %}
+                    <option value="{{ f }}" {% if filtro_frecuencia|string == f|string %}selected{% endif %}>{{ f }} MHz</option>
+                    {% endfor %}
+                </select>
+            </div>
 
         <div class="filter-group">
             <label for="severidad">Severidad</label>
@@ -44,11 +53,46 @@
             <label for="hasta">Hasta (fecha)</label>
             <input type="date" name="hasta" id="hasta" value="{{ filtro_hasta }}">
         </div>
-
+        
         <button type="submit" class="button" style="margin-top: 1.5rem;">Filtrar</button>
+        </div>
+
+        <details style="margin-top: 1rem; margin-bottom: 1rem;">
+            <summary style="cursor: pointer; color: var(--primary); font-size: 0.9em;">Modo Experto (Filtros Avanzados)</summary>
+            <div class="filter-bar" style="margin-top: 0.5rem; background: var(--bg-card-hover); padding: 1rem; border-radius: var(--radius-sm);">
+                <div class="filter-group">
+                    <label for="banda">Banda Interna (Regla)</label>
+                    <select name="banda" id="banda">
+                        <option value="">— Todas —</option>
+                        {% for b in bandas %}
+                        <option value="{{ b }}" {% if filtro_banda == b %}selected{% endif %}>{{ b }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+        </details>
     </form>
 
     {% if eventos %}
+    {% set destacados = eventos | selectattr('severidad', 'equalto', 'high') | list %}
+    {% if destacados %}
+    <div class="destacados-section" style="margin-top: 2rem; margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--glass-border);">
+        <h3>🔴 Eventos Destacados</h3>
+        <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
+            {% for ev in destacados[:3] %}
+            {% set fc = ev.session.fc_hz if ev.session else 0 %}
+            <div class="card" style="flex: 1; min-width: 250px; border-left: 4px solid #ff5555; padding: 1.5rem; background: var(--bg-card);">
+                <h4 style="margin-top: 0; margin-bottom: 0.5rem; font-size: 1.1em;">Señal anómala en {{ get_spectrum_category(fc) }}</h4>
+                <p style="margin: 0; font-size: 0.9em; color: var(--text-muted); line-height: 1.5;">
+                    <strong>Frecuencia:</strong> {{ format_freq_mhz(fc) }} <br>
+                    <strong>Duración:</strong> {{ "%.2f"|format(ev.duration_s) }}s
+                </p>
+                <a href="/dashboard/eventos/{{ ev.event_id }}" class="button outline" style="margin-top: 1rem; display: block; text-align: center; font-size: 0.85em; padding: 0.5rem;">Ver Evidencia</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
     <table>
         <thead>
             <tr>
@@ -69,7 +113,14 @@
                         (hora no disponible)
                     {% endif %}
                 </td>
-                <td>{{ ev.band_name }}</td>
+                <td>
+                    {% if ev.session and ev.session.fc_hz %}
+                        <strong>{{ format_freq_mhz(ev.session.fc_hz) }}</strong> ({{ get_spectrum_category(ev.session.fc_hz) }})<br>
+                        <small style="color: var(--text-muted);">{{ ev.band_name }}</small>
+                    {% else %}
+                        {{ ev.band_name }}
+                    {% endif %}
+                </td>
                 <td>
                     {% if ev.severidad == 'low' %}
                         🟡 Baja

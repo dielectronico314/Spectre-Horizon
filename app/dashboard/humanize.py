@@ -60,3 +60,27 @@ def explain_evento(evento: dict) -> str:
         f"durante {duracion:.2f} segundos seguidos. "
         f"Esto se clasifica como {sev_label['descripcion'].lower()}."
     )
+
+def get_spectrum_category(fc_hz: float) -> str:
+    """Clasifica una frecuencia central en su banda de espectro oficial."""
+    if not fc_hz:
+        return "Desconocido"
+    # Bandas ITU
+    if 3e6 <= fc_hz < 30e6:
+        return "HF"
+    elif 30e6 <= fc_hz < 300e6:
+        return "VHF"
+    elif 300e6 <= fc_hz < 3000e6:
+        return "UHF"
+    elif 3000e6 <= fc_hz < 30000e6:
+        return "SHF"
+    return "Otro"
+
+def format_freq_mhz(fc_hz: float) -> str:
+    """Convierte Hz a MHz humanizados con 1 o 2 decimales."""
+    if not fc_hz:
+        return "N/A"
+    mhz = fc_hz / 1e6
+    if mhz.is_integer() or round(mhz, 1) == mhz:
+        return f"{mhz:.1f} MHz"
+    return f"{mhz:.2f} MHz"

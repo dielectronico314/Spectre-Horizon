@@ -118,7 +118,9 @@ def list_events(
     banda: Optional[str] = None,
     severidad: Optional[str] = None,
     desde: Optional[date] = None,
-    hasta: Optional[date] = None
+    hasta: Optional[date] = None,
+    espectro: Optional[str] = None,
+    frecuencia_mhz: Optional[float] = None
 ):
     if severidad and severidad not in ["low", "medium", "high"]:
         raise HTTPException(status_code=422, detail="severidad debe ser 'low', 'medium' o 'high'")
@@ -145,6 +147,23 @@ def list_events(
         if hasta:
             query += " AND s.start_datetime <= ?"
             params.append(hasta.isoformat() + "T23:59:59Z")
+        
+        if espectro:
+            espectro = espectro.upper()
+            if espectro == "HF":
+                query += " AND s.fc_hz >= 3e6 AND s.fc_hz < 30e6"
+            elif espectro == "VHF":
+                query += " AND s.fc_hz >= 30e6 AND s.fc_hz < 300e6"
+            elif espectro == "UHF":
+                query += " AND s.fc_hz >= 300e6 AND s.fc_hz < 3000e6"
+            elif espectro == "SHF":
+                query += " AND s.fc_hz >= 3000e6 AND s.fc_hz < 30000e6"
+
+        if frecuencia_mhz is not None:
+            # Tolerancia de +/- 0.1 MHz para evitar problemas de precisión flotante
+            fc_hz = frecuencia_mhz * 1e6
+            query += " AND s.fc_hz >= ? AND s.fc_hz <= ?"
+            params.extend([fc_hz - 100000, fc_hz + 100000])
             
         rows = conn.execute(query, params).fetchall()
         return [dict(row) for row in rows]

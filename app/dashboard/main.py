@@ -11,7 +11,8 @@ import httpx
 from datetime import datetime
 
 from app.dashboard.humanize import (
-    get_severidad, get_confianza_label, get_closed_reason, explain_evento
+    get_severidad, get_confianza_label, get_closed_reason, explain_evento,
+    get_spectrum_category, format_freq_mhz
 )
 
 router = APIRouter(prefix="/dashboard", tags=["Dashboard"])
@@ -19,6 +20,10 @@ router = APIRouter(prefix="/dashboard", tags=["Dashboard"])
 # Configuración de Jinja2
 TEMPLATE_DIR = Path(__file__).parent / "templates"
 templates = Jinja2Templates(directory=str(TEMPLATE_DIR))
+templates.env.globals.update({
+    "get_spectrum_category": get_spectrum_category,
+    "format_freq_mhz": format_freq_mhz,
+})
 
 # URL base de la API del Día 16 (running en localhost)
 API_BASE = "http://localhost:8000/api/v1"
@@ -61,6 +66,8 @@ async def dashboard_estado(request: Request):
 async def dashboard_eventos(
     request: Request,
     banda: str = None,
+    espectro: str = None,
+    frecuencia_mhz: float = None,
     severidad: str = None,
     desde: str = None,
     hasta: str = None,
@@ -69,6 +76,10 @@ async def dashboard_eventos(
     params = {}
     if banda:
         params["banda"] = banda
+    if espectro:
+        params["espectro"] = espectro
+    if frecuencia_mhz is not None:
+        params["frecuencia_mhz"] = frecuencia_mhz
     if severidad:
         params["severidad"] = severidad
     if desde:
@@ -86,9 +97,20 @@ async def dashboard_eventos(
         except:
             ev["session"] = None
 
-    # Extraer lista de bandas únicas para el dropdown de filtros
+    # Extraer lista de bandas únicas (Modo Experto)
     bandas = set(e.get("band_name") for e in eventos if e.get("band_name"))
     bandas = sorted(bandas)
+
+    # Extraer lista de frecuencias exactas de TODAS las sesiones
+    all_sessions = await get_from_api("/sessions")
+    frecuencias = set()
+    for s in all_sessions:
+        if s.get("fc_hz"):
+            mhz = round(s["fc_hz"] / 1e6, 2)
+            frecuencias.add(mhz)
+    frecuencias = sorted(frecuencias)
+    
+    espectros_disponibles = ["HF", "VHF", "UHF", "SHF"]
 
     return templates.TemplateResponse(
         request=request,
@@ -97,7 +119,11 @@ async def dashboard_eventos(
             "section": "eventos",
             "eventos": eventos,
             "bandas": bandas,
+            "frecuencias": frecuencias,
+            "espectros_disponibles": espectros_disponibles,
             "filtro_banda": banda or "",
+            "filtro_espectro": espectro or "",
+            "filtro_frecuencia": frecuencia_mhz or "",
             "filtro_severidad": severidad or "",
             "filtro_desde": desde or "",
             "filtro_hasta": hasta or "",
