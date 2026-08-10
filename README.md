@@ -86,6 +86,7 @@ flowchart TB
     classDef storage fill:#1b1b2f,stroke:#ff6b6b,stroke-width:2px,color:#e0e0e0
     classDef alert fill:#e94560,stroke:#ffffff,stroke-width:2px,color:#fff
     classDef bash fill:#2d6a4f,stroke:#95d5b2,stroke-width:2px,color:#fff
+    classDef web fill:#d4a373,stroke:#faedcd,stroke-width:2px,color:#000
 
     SENSOR["📡 Harogic SAN-400 (9kHz - 40GHz)"]:::hardware
 
@@ -166,12 +167,25 @@ flowchart TB
         RULES -.->|"Policies"| ENGINE
     end
 
+    subgraph LAYER5["🖥️ LAYER 5 — API & Dashboard (FastAPI/Jinja2)"]
+        direction TB
+        subgraph WEB["Web Server (Port 8000)"]
+            direction LR
+            API["FastAPI REST"]:::python
+            JINJA["Jinja2 Templates"]:::python
+            DASH["Dashboard UI (HTML/JS/Plotly)"]:::web
+            API <--> JINJA
+            JINJA --> DASH
+        end
+    end
+
     subgraph PERSISTENCE["💾 Persistence Layer"]
         direction LR
         RAW[("📁 .iq / .sigmf-meta")]:::storage
         NPZ[("📊 Spectrogram (.npz)")]:::storage
         CSV[("📄 Features (.csv)")]:::storage
         EVENTS[("🚨 Events (.json)")]:::storage
+        SQLITE[("🗄️ SQLite Index")]:::storage
     end
 
     SENSOR <-->|"USB 3.0"| LAYER1
@@ -183,6 +197,10 @@ flowchart TB
     SPECTRO ==>|"FFT Matrix"| NPZ
     CSV -.->|"Rule evaluation"| ENGINE
     FSM ==>|"Filtered Alerts"| EVENTS
+    EVENTS -.->|"Indexer (build_index.py)"| SQLITE
+    RAW -.->|"Indexer (build_index.py)"| SQLITE
+    SQLITE <-->|"Queries"| API
+    NPZ -.->|"3D JSON Decimation"| API
 ```
 
 ### Layer-by-Layer Summary
@@ -193,6 +211,7 @@ flowchart TB
 | **2** | **Containerized Acquisition** — Captures raw IQ data inside Docker with SigMF metadata contracts and SHA256 integrity hashes. | `capture_iq.py`, `validate_meta.py`, `probe_device.py` | 1-8 |
 | **3** | **DSP & Feature Extraction** — Generates spectrograms (FFT) and extracts physical metrics (SNR, power, bandwidth) per frame. | `stream_processor.py`, `extract_features.py`, `features_config_*.json` | 9-13 |
 | **4** | **Tactical Event Engine** — A deterministic FSM that converts raw metrics into consolidated alerts with severity, confidence, and anti-fragmentation logic. | `engine.py`, `run_event_engine.py`, `rules_config.json` | 14 |
+| **5** | **API & Web Dashboard** — Provides a REST interface and a server-rendered Jinja2 dashboard for exploring sessions, events, and 2D/3D WebGL waterfalls. | `app/api/main.py`, `app/dashboard/main.py`, `index.sqlite` | 15-17 |
 
 ---
 
@@ -288,9 +307,9 @@ Currently in **Phase 3** (Events & Intelligence). Progress:
 - [x] **Day 12:** Real-time Streaming FFT Pipeline (Lock-free Ring Buffer).
 - [x] **Day 13:** DSP Feature Extraction (Power, SNR, Bandwidth per frame).
 - [x] **Day 14:** Deterministic Logical Event Engine (FSM for tactical alerts).
-- [ ] **Day 15:** Evidence Packaging with integrity hashes.
-- [ ] **Day 16:** REST API for session & event queries (FastAPI).
-- [ ] **Day 17:** Minimal Web Dashboard (Waterfall + Alert Table).
+- [x] **Day 15:** Evidence Packaging with integrity hashes.
+- [x] **Day 16:** REST API for session & event queries (FastAPI).
+- [x] **Day 17:** Minimal Web Dashboard (Waterfall + Alert Table).
 - [ ] **Day 18:** Automated Session Report Generation (HTML/PDF).
 - [ ] **Day 19:** System Packaging & Rehearsal Demo.
 - [ ] **Day 20:** Formal Acceptance, Live Demo & Final Report.
