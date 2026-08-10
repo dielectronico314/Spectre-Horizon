@@ -48,14 +48,20 @@ def explain_evento(evento: dict) -> str:
     Genera explicación humana de por qué se generó un evento.
     Usa snr_margin_db inferido de pico_dbfs y potencia_media_activa_dbfs.
     """
-    # Asumimos un piso de ruido realista de SDR Harogic (-120 dBFS) en vez de -40
-    # para que la resta (pico - piso) dé el margen positivo real en dB.
-    margen_db = evento.get("pico_dbfs", 0) - (-120.0) 
+    piso_ruido_dbfs = evento.get("piso_ruido_dbfs")
     severidad = evento.get("severidad", "low")
     duracion = evento.get("duration_s", 0)
-
     sev_label = get_severidad(severidad)
 
+    if piso_ruido_dbfs is None:
+        return (
+            f"La potencia detectada en la banda {evento.get('band_name', '?')} "
+            f"superó el umbral durante {duracion:.2f} segundos seguidos, "
+            f"pero el margen de ruido exacto no está disponible para este evento antiguo. "
+            f"Esto se clasifica como {sev_label['descripcion'].lower()}."
+        )
+
+    margen_db = evento.get("pico_dbfs", 0) - piso_ruido_dbfs
     return (
         f"La potencia detectada en la banda {evento.get('band_name', '?')} "
         f"superó el nivel de ruido esperado por aproximadamente {margen_db:.0f} dB "

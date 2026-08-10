@@ -242,13 +242,13 @@ def build_index():
                 conn.execute("""
                     INSERT INTO events (
                         event_id, session_id, band_name, rule_name, start_t_s, end_t_s, 
-                        duration_s, pico_dbfs, potencia_media_activa_dbfs, severidad, 
+                        duration_s, pico_dbfs, potencia_media_activa_dbfs, piso_ruido_dbfs, severidad, 
                         confianza, closed_reason, ruta_evidencia
-                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 """, (
                     event_id, session_id, em["band_name"], em["rule_name"], 
                     em["start_t_s"], em["end_t_s"], em["duration_s"], 
-                    em.get("pico_dbfs"), em.get("potencia_media_activa_dbfs"),
+                    em.get("pico_dbfs"), em.get("potencia_media_activa_dbfs"), em.get("piso_ruido_dbfs"),
                     em.get("severidad"), em.get("confianza"), em.get("closed_reason"),
                     ruta_evidencia
                 ))

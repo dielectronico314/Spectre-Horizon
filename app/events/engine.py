@@ -83,6 +83,7 @@ class EventEngine:
             "_pico_snr_db": float("-inf"),
             "_sum_potencia_dbfs": 0.0,
             "_sum_snr_db": 0.0,
+            "_sum_piso_db": 0.0,
             "_n_active_frames": 0,
             "n_fusiones": 0,
         }
@@ -95,11 +96,13 @@ class EventEngine:
         event["_pico_snr_db"] = max(event["_pico_snr_db"], snr_db)
         event["_sum_potencia_dbfs"] += potencia_dbfs
         event["_sum_snr_db"] += snr_db
+        event["_sum_piso_db"] += (potencia_dbfs - snr_db)
         event["_n_active_frames"] += 1
 
     def _finalize(self, event: dict, closed_reason: str) -> dict:
         n = event["_n_active_frames"]
         potencia_media_activa_dbfs = event["_sum_potencia_dbfs"] / n
+        piso_ruido_dbfs = event["_sum_piso_db"] / n
         margen_medio_snr_db = (event["_sum_snr_db"] / n) - self.margen_umbral_db
         margen_pico_snr_db = event["_pico_snr_db"] - self.margen_umbral_db
 
@@ -123,6 +126,7 @@ class EventEngine:
             "duration_s": event["_last_active_t_s"] - event["start_t_s"],
             "pico_dbfs": event["_pico_dbfs"],
             "potencia_media_activa_dbfs": potencia_media_activa_dbfs,
+            "piso_ruido_dbfs": piso_ruido_dbfs,
             "severidad": severidad,
             "confianza": confianza,
             "n_fusiones": event["n_fusiones"],

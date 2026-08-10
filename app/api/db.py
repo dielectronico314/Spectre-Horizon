@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS events (
     duration_s                  REAL,
     pico_dbfs                   REAL,
     potencia_media_activa_dbfs  REAL,
+    piso_ruido_dbfs             REAL,
     severidad                   TEXT,
     confianza                   REAL,
     closed_reason               TEXT,
