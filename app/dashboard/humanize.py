@@ -48,7 +48,9 @@ def explain_evento(evento: dict) -> str:
     Genera explicación humana de por qué se generó un evento.
     Usa snr_margin_db inferido de pico_dbfs y potencia_media_activa_dbfs.
     """
-    margen_db = evento.get("pico_dbfs", 0) - (-40)  # Asume piso ~-40 dBFS
+    # Asumimos un piso de ruido realista de SDR Harogic (-120 dBFS) en vez de -40
+    # para que la resta (pico - piso) dé el margen positivo real en dB.
+    margen_db = evento.get("pico_dbfs", 0) - (-120.0) 
     severidad = evento.get("severidad", "low")
     duracion = evento.get("duration_s", 0)
 
