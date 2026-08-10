@@ -17,25 +17,50 @@ from app.api.db import get_db_connection, init_db
 
 EVIDENCE_DIR = Path("/workspace/data/evidence")
 SAMPLES_DIR = Path("/workspace/rf-spectrum/data/samples")
-INTERRUPTION_GAP_THRESHOLD_S = 5.0  # Gap > 5s entre eventos indica interrupción
+import sys
+try:
+    from scripts.capture_iq import BACKOFF_RETRY_S
+except ImportError:
+    BACKOFF_RETRY_S = 5.0
 
-def detect_interrupciones(eventos):
+def detect_interrupciones(session_dir: Path) -> bool:
     """
-    Detecta si hubo interrupciones analizando gaps temporales entre eventos.
-    Una interrupción se infiere si hay gaps > INTERRUPTION_GAP_THRESHOLD_S
-    entre eventos consecutivos (ordenados por start_t_s).
+    Detecta si hubo interrupciones analizando gaps temporales entre los bloques
+    reales guardados en disco (part00N.sigmf-meta).
+    Un gap mayor a BACKOFF_RETRY_S indica que el hardware cayó y se reconectó.
     """
-    if len(eventos) <= 1:
+    if not session_dir or not session_dir.exists():
         return False
 
-    sorted_eventos = sorted(eventos, key=lambda e: e["event_metadata"]["start_t_s"])
+    meta_files = sorted(session_dir.glob("*.sigmf-meta"))
+    if len(meta_files) <= 1:
+        return False
 
-    for i in range(len(sorted_eventos) - 1):
-        end_actual = sorted_eventos[i]["event_metadata"]["end_t_s"]
-        start_siguiente = sorted_eventos[i + 1]["event_metadata"]["start_t_s"]
-        gap = start_siguiente - end_actual
+    from datetime import datetime
 
-        if gap > INTERRUPTION_GAP_THRESHOLD_S:
+    for i in range(len(meta_files) - 1):
+        with open(meta_files[i], 'r') as f:
+            meta1 = json.load(f)
+        with open(meta_files[i+1], 'r') as f:
+            meta2 = json.load(f)
+
+        cap1 = meta1.get("captures", [{}])[0]
+        cap2 = meta2.get("captures", [{}])[0]
+
+        t1_iso = cap1.get("core:datetime")
+        t2_iso = cap2.get("core:datetime")
+        dur1 = cap1.get("telemetry:duration_sec", 0)
+
+        if not t1_iso or not t2_iso:
+            continue
+
+        t1 = datetime.fromisoformat(t1_iso.replace('Z', '+00:00'))
+        t2 = datetime.fromisoformat(t2_iso.replace('Z', '+00:00'))
+
+        gap_s = (t2 - t1).total_seconds() - dur1
+
+        # Si el gap real es mayor que nuestro backoff (con un leve margen de latencia)
+        if gap_s > (BACKOFF_RETRY_S * 0.9):
             return True
 
     return False
@@ -114,19 +139,27 @@ def build_index():
             ruta_meta = None
             
             if meta_path:
-                ruta_meta = str(meta_path.relative_to(Path("/workspace")))
-                with open(meta_path, 'r') as f:
+                # El directorio de la sesión es meta_path.parent
+                session_dir = meta_path.parent
+                # Para la vista estática, usamos el último bloque generado (el waterfall más reciente)
+                all_meta_files = sorted(session_dir.glob("*.sigmf-meta"))
+                latest_meta_path = all_meta_files[-1] if all_meta_files else meta_path
+                
+                ruta_meta = str(latest_meta_path.relative_to(Path("/workspace")))
+                with open(latest_meta_path, 'r') as f:
                     orig_meta = json.load(f)
                     fs_hz = orig_meta.get("global", {}).get("core:sample_rate")
                     captures = orig_meta.get("captures", [])
                     if captures:
                         start_datetime = captures[0].get("core:datetime")
                         fc_hz = captures[0].get("core:frequency")
+                
+                tuvo_interrupciones = detect_interrupciones(session_dir)
             else:
                 print(f"⚠️ Metadata original no encontrada para la captura con hash {cap_hash[:12]}")
+                tuvo_interrupciones = False
                 
             n_events = len(s_data["events"])
-            tuvo_interrupciones = detect_interrupciones(s_data["events"])
 
             # Insertar sesion
             conn.execute("""

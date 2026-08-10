@@ -26,6 +26,9 @@ try:
 except AttributeError:
     pass # tzset no está disponible en Windows, pero estamos en Linux
 
+# Constante de reintento ante caídas (Backoff), compartida con indexador
+BACKOFF_RETRY_S = 5.0
+
 # ==========================================
 # CONFIGURACIÓN DE OBSERVABILIDAD
 # ==========================================
@@ -227,8 +230,8 @@ def main():
             break
         except Exception as e:
             logger.error(f"❌ FALLO DE HARDWARE DETECTADO: {e}")
-            logger.warning("⏳ Esperando 5 segundos antes de reintentar la conexión (Backoff)...")
-            time.sleep(5)
+            logger.warning(f"⏳ Esperando {BACKOFF_RETRY_S} segundos antes de reintentar la conexión (Backoff)...")
+            time.sleep(BACKOFF_RETRY_S)
             # El ciclo global 'while' volverá al inicio y reintentará instanciar SoapySDR
         finally:
             try:

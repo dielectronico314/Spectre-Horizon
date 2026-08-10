@@ -4,7 +4,10 @@
 
 {% block content %}
 <div class="card">
-    <h2>Estado del Sensor</h2>
+    <div class="estado-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h2 style="margin: 0;">Estado del Sensor</h2>
+        <a href="/dashboard/" class="button outline">Actualizar Estado</a>
+    </div>
 
     {% if status.en_vivo %}
         <div class="status-bar">
@@ -66,6 +69,15 @@
         </p>
     </div>
     {% endif %}
+
+    <div class="detail-section">
+        <h3>Espectrograma Reciente (Waterfall)</h3>
+        <p>Vista estática de la última actividad espectral registrada. Haz clic en "Actualizar Estado" para recargar.</p>
+        <div class="waterfall-container" style="margin-top: 1.5rem; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--glass-border); background: #000;">
+            <img src="/api/v1/sessions/{{ ultima_sesion.session_id }}/waterfall" alt="Espectrograma de la última sesión" style="display: block; width: 100%; height: auto; image-rendering: pixelated;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <p class="error-msg" style="display:none; color: #ff5555; padding: 1rem;">La imagen del espectrograma no está disponible para esta sesión.</p>
+        </div>
+    </div>
 
     <div class="detail-section">
         <h3>Resumen de sesiones</h3>

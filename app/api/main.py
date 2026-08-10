@@ -193,6 +193,31 @@ def download_evidence(event_id: str, filename: str):
     file_path = get_evidence_path(event_id, filename)
     return FileResponse(file_path)
 
+@api_router.get("/sessions/{session_id}/waterfall", tags=["Sesiones"])
+def get_session_waterfall(session_id: str):
+    """
+    Retorna el espectrograma (waterfall) estático del bloque más reciente de la sesión.
+    """
+    conn = get_db_connection()
+    try:
+        row = conn.execute("SELECT ruta_meta FROM sessions WHERE session_id = ?", (session_id,)).fetchone()
+        if not row or not row["ruta_meta"]:
+            raise HTTPException(status_code=404, detail="Sesión no encontrada o sin metadata")
+            
+        ruta_meta = row["ruta_meta"]
+        meta_path = Path("/workspace") / ruta_meta
+        if not meta_path.exists():
+            raise HTTPException(status_code=404, detail="Metadata original no encontrada")
+            
+        # Reemplazar extensión (.sigmf-meta) por _espectrograma.png
+        png_path = meta_path.with_name(meta_path.stem.replace(".sigmf-meta", "") + "_espectrograma.png")
+        if not png_path.exists():
+            raise HTTPException(status_code=404, detail="Espectrograma no encontrado")
+            
+        return FileResponse(png_path)
+    finally:
+        conn.close()
+
 app.include_router(api_router)
 
 mount_dashboard(app)

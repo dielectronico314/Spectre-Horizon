@@ -47,8 +47,8 @@
             Pico detectado: {{ "%.1f"|format(evento.pico_dbfs) }} dBFS<br>
             Potencia media: {{ "%.1f"|format(evento.potencia_media_activa_dbfs) }} dBFS<br>
             Duración: {{ "%.3f"|format(evento.duration_s) }} segundos
-            {% if evento.n_fusiones > 0 %}
-            <br>Interrupciones detectadas en esta señal: {{ evento.n_fusiones }} (contado como 1 evento)
+            {% if evento.get('n_fusiones', 0) > 0 %}
+            <br>Interrupciones detectadas en esta señal: {{ evento.get('n_fusiones') }} (contado como 1 evento)
             {% endif %}
         </div>
     </div>
