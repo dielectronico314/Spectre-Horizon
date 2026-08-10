@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Explorador de Capturas — Cenital RF{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h2>Explorador de Capturas (Sesiones)</h2>
+    <p style="color: var(--text-muted); margin-bottom: 2rem;">
+        Historial completo de todas las capturas realizadas por el hardware, incluyendo aquellas que no presentaron eventos anómalos.
+    </p>
+
+    {% if sesiones %}
+    <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
+        {% for s in sesiones %}
+        <div class="card" style="flex: 1; min-width: 300px; background: var(--bg-card); display: flex; flex-direction: column;">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+                <div>
+                    <h3 style="margin: 0; font-size: 1.2em;">
+                        {% if s.fc_hz %}
+                            {{ format_freq_mhz(s.fc_hz) }}
+                        {% else %}
+                            Frecuencia Desconocida
+                        {% endif %}
+                    </h3>
+                    <div style="font-size: 0.85em; color: var(--text-muted); margin-top: 0.2rem;">
+                        {% if s.fc_hz %}
+                            {{ get_spectrum_category(s.fc_hz) }}
+                        {% endif %}
+                    </div>
+                </div>
+                <div style="text-align: right; font-size: 0.85em;">
+                    <span style="color: var(--text-muted);">{{ s.start_datetime | default("Fecha desconocida") }}</span><br>
+                    {% if s.tuvo_interrupciones %}
+                        <span style="color: #ffaa00; font-weight: 500;">⚠️ Interrupciones HW</span>
+                    {% else %}
+                        <span style="color: #00dd00;">✅ HW Estable</span>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div style="flex-grow: 1;">
+                <p style="margin: 0.5rem 0; font-size: 0.9em;">
+                    <strong>ID:</strong> <span style="color: var(--text-muted); font-family: monospace;">{{ s.session_id }}</span><br>
+                    <strong>Duración:</strong> {{ s.duration_s | default(0) }}s<br>
+                    <strong>Eventos Anómalos:</strong> 
+                    {% if s.n_events > 0 %}
+                        <span style="color: #ff5555; font-weight: bold;">{{ s.n_events }}</span>
+                    {% else %}
+                        <span style="color: #00dd00;">0 (Limpio)</span>
+                    {% endif %}
+                </p>
+                
+                <div style="margin-top: 1rem; border: 1px solid var(--glass-border); border-radius: var(--radius-sm); overflow: hidden; background: #000; min-height: 150px; display: flex; align-items: center; justify-content: center;">
+                    <img src="/api/v1/sessions/{{ s.session_id }}/waterfall" alt="Waterfall de sesión" style="width: 100%; height: auto; display: block;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                    <div style="display: none; padding: 1rem; text-align: center; color: #ff5555; font-size: 0.85em;">
+                        ⚠️ El espectrograma completo no se generó para esta captura.
+                    </div>
+                </div>
+            </div>
+            
+            {% if s.n_events > 0 %}
+            <div style="margin-top: 1.5rem;">
+                <a href="/dashboard/eventos?frecuencia_mhz={{ (s.fc_hz / 1e6)|round(2) if s.fc_hz else '' }}" class="button outline" style="width: 100%; text-align: center;">Ver Eventos Detectados</a>
+            </div>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <p style="color: #999; margin-top: 1rem;">No hay sesiones registradas en el sistema.</p>
+    {% endif %}
+</div>
+{% endblock %}

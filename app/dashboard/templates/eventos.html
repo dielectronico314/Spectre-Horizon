@@ -144,4 +144,58 @@
     <p style="color: #999; margin-top: 1rem;">No se encontraron eventos con los filtros seleccionados.</p>
     {% endif %}
 </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+    const espectroSelect = document.getElementById("espectro");
+    const freqSelect = document.getElementById("frecuencia_mhz");
+    if(!espectroSelect || !freqSelect) return;
+    
+    const allOptions = Array.from(freqSelect.options);
+    
+    function filterFrequencies() {
+        const espectro = espectroSelect.value;
+        const currentVal = freqSelect.value;
+        let valStillValid = false;
+        
+        // Remove all except the first placeholder
+        while (freqSelect.options.length > 1) {
+            freqSelect.remove(1);
+        }
+        
+        for (let i = 1; i < allOptions.length; i++) {
+            const opt = allOptions[i];
+            const mhz = parseFloat(opt.value);
+            let valid = false;
+            
+            if (!espectro) {
+                valid = true;
+            } else if (espectro === "HF" && mhz >= 3 && mhz < 30) {
+                valid = true;
+            } else if (espectro === "VHF" && mhz >= 30 && mhz < 300) {
+                valid = true;
+            } else if (espectro === "UHF" && mhz >= 300 && mhz < 3000) {
+                valid = true;
+            } else if (espectro === "SHF" && mhz >= 3000 && mhz < 30000) {
+                valid = true;
+            }
+            
+            if (valid) {
+                const clone = opt.cloneNode(true);
+                freqSelect.add(clone);
+                if (clone.value === currentVal) valStillValid = true;
+            }
+        }
+        
+        if (valStillValid && currentVal !== "") {
+            freqSelect.value = currentVal;
+        } else if (espectro) {
+            freqSelect.value = ""; // Reset if filtered out
+        }
+    }
+    
+    espectroSelect.addEventListener("change", filterFrequencies);
+    filterFrequencies();
+});
+</script>
 {% endblock %}

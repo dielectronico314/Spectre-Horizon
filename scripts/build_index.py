@@ -105,58 +105,107 @@ def build_index():
                         except json.JSONDecodeError:
                             print(f"Error parseando {mf}")
 
-    # Agrupar por sesión (capture_sha256)
+    # Agrupar por sesión (session_id)
     sessions = {}
+    
+    # 1. Escanear TODAS las sesiones base (tengan o no eventos)
+    for meta_path in SAMPLES_DIR.rglob("*.sigmf-meta"):
+        with open(meta_path, 'r') as f:
+            try:
+                orig_meta = json.load(f)
+            except:
+                continue
+        
+        cap_hash = orig_meta.get("global", {}).get("core:dataset_hash")
+        if not cap_hash:
+            # Fallback en caso de meta viejo sin dataset_hash
+            iq_path = meta_path.with_suffix('.iq')
+            if not iq_path.exists():
+                iq_path = meta_path.with_suffix('.sigmf-data')
+            if iq_path.exists():
+                cap_hash = compute_sha256(iq_path)
+        
+        if not cap_hash:
+            continue
+
+        session_dir = meta_path.parent
+        if session_dir.name.startswith("session_") or session_dir.name.startswith("test_"):
+            session_id = session_dir.name
+        else:
+            session_id = f"{meta_path.stem}_espectrograma"
+
+        fs_hz = orig_meta.get("global", {}).get("core:sample_rate")
+        captures = orig_meta.get("captures", [])
+        start_datetime = None
+        fc_hz = None
+        duration_s = None
+        if captures:
+            start_datetime = captures[0].get("core:datetime")
+            fc_hz = captures[0].get("core:frequency")
+            duration_s = captures[0].get("telemetry:duration_sec", 0)
+        
+        ruta_meta = str(meta_path.relative_to(Path("/workspace")))
+        mtime = meta_path.stat().st_mtime
+        
+        # Guardar en el dict. Si hay multiples bloques, acumulamos duración y guardamos la meta del último bloque
+        if session_id not in sessions:
+            sessions[session_id] = {
+                "session_id": session_id,
+                "capture_sha256": cap_hash,
+                "fc_hz": fc_hz,
+                "fs_hz": fs_hz,
+                "start_datetime": start_datetime,
+                "duration_s": duration_s or 0,
+                "ruta_meta": ruta_meta,
+                "session_dir": session_dir,
+                "events": [],
+                "_mtime": mtime
+            }
+        else:
+            # Acumular duracion
+            sessions[session_id]["duration_s"] += (duration_s or 0)
+            # Si este bloque es mas reciente, actualizar ruta_meta y hash
+            if mtime > sessions[session_id]["_mtime"]:
+                sessions[session_id]["capture_sha256"] = cap_hash
+                sessions[session_id]["ruta_meta"] = ruta_meta
+                sessions[session_id]["_mtime"] = mtime
+
+    # 2. Agregar los eventos de evidence/ 
     for m in manifests:
         em = m["event_metadata"]
-        cap_hash = em["capture_sha256"]
-        if cap_hash not in sessions:
-            sessions[cap_hash] = {
-                "session_id": em["session_id"],
-                "capture_sha256": cap_hash,
-                "events": []
+        session_id = em["session_id"]
+        if session_id in sessions:
+            sessions[session_id]["events"].append(m)
+        else:
+            # Evento huerfano (su captura no existe en samples/)
+            sessions[session_id] = {
+                "session_id": session_id,
+                "capture_sha256": em["capture_sha256"],
+                "fc_hz": None, "fs_hz": None, "start_datetime": None, "duration_s": None,
+                "ruta_meta": None, "session_dir": None,
+                "events": [m],
+                "_mtime": 0
             }
-        sessions[cap_hash]["events"].append(m)
 
-    print(f"[*] Encontradas {len(sessions)} sesiones y {len(manifests)} eventos en {EVIDENCE_DIR}")
+    print(f"[*] Encontradas {len(sessions)} sesiones únicas y {len(manifests)} eventos")
 
     try:
         conn.execute("BEGIN TRANSACTION")
         
-        # Primero limpiamos para reconstruir el índice de cero
         conn.execute("DELETE FROM events")
         conn.execute("DELETE FROM sessions")
 
-        for cap_hash, s_data in sessions.items():
-            session_id = s_data["session_id"]
+        for session_id, s_data in sessions.items():
+            cap_hash = s_data["capture_sha256"]
+            fc_hz = s_data["fc_hz"]
+            fs_hz = s_data["fs_hz"]
+            start_datetime = s_data["start_datetime"]
+            duration_s = s_data["duration_s"]
+            ruta_meta = s_data["ruta_meta"]
             
-            # Buscar metadata original
-            meta_path = find_meta_by_hash(cap_hash)
-            start_datetime = None
-            fs_hz = None
-            fc_hz = None
-            duration_s = None
-            ruta_meta = None
-            
-            if meta_path:
-                # El directorio de la sesión es meta_path.parent
-                session_dir = meta_path.parent
-                # Para la vista estática, usamos el último bloque generado (el waterfall más reciente)
-                all_meta_files = sorted(session_dir.glob("*.sigmf-meta"))
-                latest_meta_path = all_meta_files[-1] if all_meta_files else meta_path
-                
-                ruta_meta = str(latest_meta_path.relative_to(Path("/workspace")))
-                with open(latest_meta_path, 'r') as f:
-                    orig_meta = json.load(f)
-                    fs_hz = orig_meta.get("global", {}).get("core:sample_rate")
-                    captures = orig_meta.get("captures", [])
-                    if captures:
-                        start_datetime = captures[0].get("core:datetime")
-                        fc_hz = captures[0].get("core:frequency")
-                
-                tuvo_interrupciones = detect_interrupciones(session_dir)
+            if s_data["session_dir"]:
+                tuvo_interrupciones = detect_interrupciones(s_data["session_dir"])
             else:
-                print(f"⚠️ Metadata original no encontrada para la captura con hash {cap_hash[:12]}")
                 tuvo_interrupciones = False
                 
             n_events = len(s_data["events"])
@@ -164,6 +213,7 @@ def build_index():
             # Insertar sesion
             conn.execute("""
                 INSERT INTO sessions (session_id, capture_sha256, fc_hz, fs_hz, start_datetime, duration_s, n_events, ruta_meta, tuvo_interrupciones)
+
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
             """, (session_id, cap_hash, fc_hz, fs_hz, start_datetime, duration_s, n_events, ruta_meta, tuvo_interrupciones))
             

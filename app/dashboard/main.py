@@ -62,6 +62,20 @@ async def dashboard_estado(request: Request):
     )
 
 
+@router.get("/sesiones", name="dashboard_sesiones")
+async def dashboard_sesiones(request: Request):
+    """Explorador de Sesiones (todas las capturas)."""
+    sesiones = await get_from_api("/sessions")
+    return templates.TemplateResponse(
+        request=request,
+        name="sesiones.html",
+        context={
+            "section": "sesiones",
+            "sesiones": sesiones
+        }
+    )
+
+
 @router.get("/eventos", name="dashboard_eventos")
 async def dashboard_eventos(
     request: Request,

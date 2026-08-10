@@ -43,10 +43,10 @@ class EventoResponse(BaseModel):
 class SessionResponse(BaseModel):
     session_id: str = Field(..., example="captura_106.5MHz_20260720_153534_espectrograma")
     capture_sha256: str = Field(..., example="19c10fbb7b7e9ce3c9c277b503a9908809cc078d64c09fea47371e0f2365c0d0")
-    fc_hz: Optional[float] = Field(..., example=106500000.0)
-    fs_hz: float = Field(..., example=1953125.0)
-    start_datetime: Optional[str] = Field(..., example="2026-07-20T15:35:36.459378Z")
-    duration_s: Optional[float] = Field(..., example=5.0)
+    fc_hz: Optional[float] = Field(None, example=106500000.0)
+    fs_hz: Optional[float] = Field(None, example=1953125.0)
+    start_datetime: Optional[str] = Field(None, example="2026-07-20T15:35:36.459378Z")
+    duration_s: Optional[float] = Field(None, example=5.0)
     n_events: int = Field(..., example=10)
     tuvo_interrupciones: bool = Field(default=False, example=False, description="Si detectó gaps temporales entre eventos indicando interrupciones de captura")
 
