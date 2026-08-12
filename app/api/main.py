@@ -78,11 +78,16 @@ def sensor_status():
         ultima_captura_utc = row["start_datetime"] if row else None
         eventos_totales = count_row["c"] if count_row else 0
         
+        # Consultar la conectividad real del hardware
+        estado_hardware = probe()
+        sensor_conectado = estado_hardware.get("status") == "success"
+        
         return {
             "ultima_sesion": ultima_sesion,
             "ultima_captura_utc": ultima_captura_utc,
             "en_vivo": False,
-            "eventos_totales": eventos_totales
+            "eventos_totales": eventos_totales,
+            "sensor_conectado": sensor_conectado
         }
     finally:
         conn.close()

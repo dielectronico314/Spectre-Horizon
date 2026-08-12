@@ -11,6 +11,7 @@ class SensorStatusResponse(BaseModel):
     ultima_captura_utc: Optional[str] = Field(None, example="2026-07-20T15:35:36.459378Z")
     en_vivo: bool = Field(False, description="Flag indicando si hay un proceso live escribiendo actualmente. Normalmente false en despliegue analitico.")
     eventos_totales: int = Field(0, example=143)
+    sensor_conectado: bool = Field(False, description="Indica si el sensor físico fue detectado en el bus USB.")
 
 class EvidenceLinks(BaseModel):
     event_id: str = Field(..., example="19c10fbb7b7e_FM_Sub1_0001")

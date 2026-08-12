@@ -9,23 +9,25 @@
         <a href="/dashboard/" class="button outline">Actualizar Estado</a>
     </div>
 
-    {% if status.en_vivo %}
-        <div class="status-bar">
-            <span class="status-label">🟢 Sensor en vivo (capturando ahora)</span>
+    {% if status.sensor_conectado %}
+        <div class="status-bar" style="background-color: var(--success); color: #000;">
+            <span class="status-label">🟢 Sensor Conectado y Listo</span>
+            {% if status.en_vivo %}
+                <span>— Capturando en vivo ahora mismo</span>
+            {% else %}
+                <span>(Hardware OK)</span>
+            {% endif %}
         </div>
-    {% elif ultima_sesion and not ultima_sesion.tuvo_interrupciones %}
-        <div class="status-bar">
-            <span class="status-label">🟢 Sensor: conectado</span>
-            <span>(última señal hace poco)</span>
+        {% if ultima_sesion and ultima_sesion.tuvo_interrupciones %}
+        <div class="status-bar warning" style="margin-top: 0.5rem;">
+            <span class="status-label">⚠️ Sesión anterior tuvo interrupciones</span>
+            <span>— Sensor se recuperó. Ver detalle abajo.</span>
         </div>
-    {% elif ultima_sesion and ultima_sesion.tuvo_interrupciones %}
-        <div class="status-bar warning">
-            <span class="status-label">⚠️ Última sesión tuvo interrupciones</span>
-            <span>— Sensor se reconectó correctamente. Ver detalle abajo.</span>
-        </div>
+        {% endif %}
     {% else %}
         <div class="status-bar error">
-            <span class="status-label">🔴 Sensor: sin datos recientes</span>
+            <span class="status-label">🔴 ALERTA: Sensor Desconectado</span>
+            <span>Verifique la conexión USB o la alimentación.</span>
         </div>
     {% endif %}
 
