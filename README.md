@@ -56,8 +56,15 @@ git clone https://github.com/dielectronico314/Spectre-Horizon.git
 cd Spectre-Horizon
 ```
 
-### 3. Start a Resilient Capture
-Capture 3 minutes of FM Radio (106.5 MHz), dividing the output into 60-second SigMF chunks:
+### 3. Iniciar el Sistema Completo (API + Dashboard)
+Lanza todo el stack unificado de análisis (backend y frontend) con un solo comando:
+```bash
+bash run_demo.sh
+```
+El dashboard estará disponible en `http://localhost:8000/dashboard/`.
+
+### 4. Iniciar una Captura de Espectro (Opcional)
+Capturar 3 minutos de Radio FM (106.5 MHz), dividiendo la salida en fragmentos SigMF de 60 segundos:
 ```bash
 ./scripts/capture.sh \
     --freq 106.5e6 \
@@ -167,7 +174,7 @@ flowchart TB
         RULES -.->|"Policies"| ENGINE
     end
 
-    subgraph LAYER5["🖥️ LAYER 5 — API & Dashboard (FastAPI/Jinja2)"]
+    subgraph LAYER5["🖥️ LAYER 5 — Unified API & Dashboard"]
         direction TB
         subgraph WEB["Web Server (Port 8000)"]
             direction LR
@@ -211,7 +218,7 @@ flowchart TB
 | **2** | **Containerized Acquisition** — Captures raw IQ data inside Docker with SigMF metadata contracts and SHA256 integrity hashes. | `capture_iq.py`, `validate_meta.py`, `probe_device.py` | 1-8 |
 | **3** | **DSP & Feature Extraction** — Generates spectrograms (FFT) and extracts physical metrics (SNR, power, bandwidth) per frame. | `stream_processor.py`, `extract_features.py`, `features_config_*.json` | 9-13 |
 | **4** | **Tactical Event Engine** — A deterministic FSM that converts raw metrics into consolidated alerts with severity, confidence, and anti-fragmentation logic. | `engine.py`, `run_event_engine.py`, `rules_config.json` | 14 |
-| **5** | **API & Web Dashboard** — Provides a REST interface and a server-rendered Jinja2 dashboard for exploring sessions, events, and 2D/3D WebGL waterfalls. | `app/api/main.py`, `app/dashboard/main.py`, `index.sqlite` | 15-17 |
+| **5** | **Unified API & Web Dashboard** — Provides a single-port REST interface and server-rendered Jinja2 dashboard for exploring sessions, events, and evidence. | `app/api/main.py`, `app/dashboard/main.py`, `run_demo.sh` | 15-19 |
 
 ---
 
@@ -310,8 +317,8 @@ Currently in **Phase 3** (Events & Intelligence). Progress:
 - [x] **Day 15:** Evidence Packaging with integrity hashes.
 - [x] **Day 16:** REST API for session & event queries (FastAPI).
 - [x] **Day 17:** Minimal Web Dashboard (Waterfall + Alert Table).
-- [ ] **Day 18:** Automated Session Report Generation (HTML/PDF).
-- [ ] **Day 19:** System Packaging & Rehearsal Demo.
+- [x] **Day 18:** Automated Session Report Generation & Strict Technical Language.
+- [x] **Day 19:** System Unification, Database Purging & Executive Rehearsal Demo.
 - [ ] **Day 20:** Formal Acceptance, Live Demo & Final Report.
 
 ---
