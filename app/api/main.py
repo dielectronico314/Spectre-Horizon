@@ -84,7 +84,7 @@ def sensor_status():
         try:
             res = subprocess.run(
                 ["python3", str(PROJECT_ROOT / "scripts" / "probe_device.py")],
-                capture_output=True, text=True, timeout=2
+                capture_output=True, text=True, timeout=10
             )
             if res.returncode == 0:
                 stdout = res.stdout
