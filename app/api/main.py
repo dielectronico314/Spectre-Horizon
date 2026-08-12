@@ -1,14 +1,24 @@
 from fastapi import FastAPI, HTTPException, Query, APIRouter, Request
-from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, Response
 from typing import List, Optional
 from datetime import date
 from pydantic import ValidationError
 from pathlib import Path
+from starlette.concurrency import run_in_threadpool
+import sys
+
+# Agregar ruta de scripts al PYTHONPATH para importar probe_device
+PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
+sys.path.append(str(PROJECT_ROOT))
+from scripts.probe_device import probe
+
+WORKSPACE_DIR = Path("/workspace") if Path("/workspace").exists() else PROJECT_ROOT
 
 from app.api.db import get_db_connection, init_db
 from app.api.models import HealthResponse, SensorStatusResponse, SessionResponse, SessionDetailResponse, EventoResponse, EvidenceLinks
 from app.api.security import get_evidence_path
 from app.dashboard.main import mount_dashboard
+from app.reports.generator import generate_report_html
 
 tags_metadata = [
     {"name": "General", "description": "Endpoints de salud y estado del sistema."},
@@ -77,6 +87,14 @@ def sensor_status():
     finally:
         conn.close()
 
+@api_router.get("/sensor/health", tags=["General"])
+async def sensor_health():
+    """
+    Retorna el estado en tiempo real del hardware conectándose mediante SoapySDR.
+    """
+    res = await run_in_threadpool(probe)
+    return res
+
 @api_router.get("/sessions", response_model=List[SessionResponse], tags=["Sesiones"])
 def list_sessions(
     desde: Optional[date] = Query(None, description="Filtrar sesiones desde esta fecha (inclusive)"),
@@ -92,6 +110,8 @@ def list_sessions(
         if hasta:
             query += " AND start_datetime <= ?"
             params.append(hasta.isoformat() + "T23:59:59Z")
+            
+        query += " ORDER BY start_datetime DESC"
             
         rows = conn.execute(query, params).fetchall()
         return [dict(row) for row in rows]
@@ -225,7 +245,7 @@ def get_session_waterfall(session_id: str):
             raise HTTPException(status_code=404, detail="Sesión no encontrada o sin metadata")
             
         ruta_meta = row["ruta_meta"]
-        meta_path = Path("/workspace") / ruta_meta
+        meta_path = WORKSPACE_DIR / ruta_meta
         if not meta_path.exists():
             raise HTTPException(status_code=404, detail="Metadata original no encontrada")
             
@@ -235,6 +255,36 @@ def get_session_waterfall(session_id: str):
             raise HTTPException(status_code=404, detail="Espectrograma no encontrado")
             
         return FileResponse(png_path)
+    finally:
+        conn.close()
+
+@api_router.get("/sessions/{session_id}/waterfall_thumb", tags=["Sesiones"])
+def get_session_waterfall_thumb(session_id: str):
+    """
+    Retorna la miniatura del espectrograma de la sesión, o el espectrograma completo si la miniatura no existe.
+    """
+    conn = get_db_connection()
+    try:
+        row = conn.execute("SELECT ruta_meta FROM sessions WHERE session_id = ?", (session_id,)).fetchone()
+        if not row or not row["ruta_meta"]:
+            raise HTTPException(status_code=404, detail="Sesión no encontrada o sin metadata")
+            
+        ruta_meta = row["ruta_meta"]
+        meta_path = WORKSPACE_DIR / ruta_meta
+        if not meta_path.exists():
+            raise HTTPException(status_code=404, detail="Metadata original no encontrada")
+            
+        # Intentar cargar _thumb.png
+        thumb_path = meta_path.with_name(meta_path.stem.replace(".sigmf-meta", "") + "_thumb.png")
+        if thumb_path.exists():
+            return FileResponse(thumb_path)
+            
+        # Fallback al espectrograma normal
+        png_path = meta_path.with_name(meta_path.stem.replace(".sigmf-meta", "") + "_espectrograma.png")
+        if png_path.exists():
+            return FileResponse(png_path)
+            
+        raise HTTPException(status_code=404, detail="Thumbnail ni espectrograma encontrados")
     finally:
         conn.close()
 
@@ -250,7 +300,7 @@ def get_session_waterfall3d(session_id: str):
             raise HTTPException(status_code=404, detail="Sesión no encontrada o sin metadata")
             
         ruta_meta = row["ruta_meta"]
-        meta_path = Path("/workspace") / ruta_meta
+        meta_path = WORKSPACE_DIR / ruta_meta
         if not meta_path.exists():
             raise HTTPException(status_code=404, detail="Metadata original no encontrada")
             
@@ -262,6 +312,22 @@ def get_session_waterfall3d(session_id: str):
         return FileResponse(json_path, media_type="application/json")
     finally:
         conn.close()
+
+@api_router.post("/sessions/{session_id}/reporte", tags=["Sesiones"])
+def generate_report_endpoint(session_id: str, request: Request):
+    """
+    Genera y devuelve el HTML del reporte para una sesión específica al vuelo, 
+    sin guardarlo en disco en el servidor.
+    """
+    try:
+        # Generar contenido
+        html_content = generate_report_html(session_id)
+        
+        # Devolver directamente como archivo adjunto (al vuelo)
+        headers = {"Content-Disposition": f'attachment; filename="reporte_{session_id}.html"'}
+        return Response(content=html_content, media_type="text/html", headers=headers)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
 
 app.include_router(api_router)
 

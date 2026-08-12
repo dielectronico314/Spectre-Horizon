@@ -12,7 +12,7 @@
     {% if sesiones %}
     <div style="display: flex; gap: 1.5rem; flex-wrap: wrap;">
         {% for s in sesiones %}
-        <div class="card" style="flex: 1; min-width: 300px; background: var(--bg-card); display: flex; flex-direction: column;">
+        <div class="card" style="flex: 1; min-width: 280px; max-width: 350px; background: var(--bg-card); display: flex; flex-direction: column; padding: 1.5rem;">
             <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
                 <div>
                     <h3 style="margin: 0; font-size: 1.2em;">
@@ -31,11 +31,17 @@
                 <div style="text-align: right; font-size: 0.85em;">
                     <span style="color: var(--text-muted);">{{ s.start_datetime | default("Fecha desconocida") }}</span><br>
                     {% if s.tuvo_interrupciones %}
-                        <span style="color: #ffaa00; font-weight: 500;">⚠️ Interrupciones HW</span>
+                        <span style="color: var(--warning); font-weight: 500;">⚠️ Interrupciones HW</span>
                     {% else %}
-                        <span style="color: #00dd00;">✅ HW Estable</span>
+                        <span style="color: var(--success);">✅ HW Estable</span>
                     {% endif %}
                 </div>
+            </div>
+
+            <!-- Miniatura (Thumbnail) -->
+            <div style="margin-top: 1rem; margin-bottom: 1rem; width: 100%; aspect-ratio: 16/9; border-radius: var(--radius-sm); overflow: hidden; background: #000; border: 1px solid var(--glass-border);">
+                <img src="/api/v1/sessions/{{ s.session_id }}/waterfall_thumb" alt="Miniatura 2D" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+                <div style="display:none; color:var(--text-muted); width:100%; height:100%; align-items:center; justify-content:center; font-size:0.85rem; text-align:center;">Sin preview</div>
             </div>
 
             <div style="flex-grow: 1;">
@@ -44,107 +50,28 @@
                     <strong>Duración:</strong> {{ s.duration_s | default(0) }}s<br>
                     <strong>Eventos Anómalos:</strong> 
                     {% if s.n_events > 0 %}
-                        <span style="color: #ff5555; font-weight: bold;">{{ s.n_events }}</span>
+                        <span style="color: var(--error); font-weight: bold;">{{ s.n_events }}</span>
                     {% else %}
-                        <span style="color: #00dd00;">0 (Limpio)</span>
+                        <span style="color: var(--success);">0 (Limpio)</span>
                     {% endif %}
                 </p>
-                <div style="margin-top: 1rem; position: relative;">
-                    <div style="display: flex; gap: 0.5rem; margin-bottom: 0.5rem;">
-                        <button id="btn-2d-{{ s.session_id }}" class="button" style="padding: 0.2rem 0.5rem; font-size: 0.8em;" onclick="switchView('{{ s.session_id }}', '2d')">2D</button>
-                        <button id="btn-3d-{{ s.session_id }}" class="button outline" style="padding: 0.2rem 0.5rem; font-size: 0.8em;" onclick="switchView('{{ s.session_id }}', '3d')">3D</button>
-                    </div>
-                    <div style="border: 1px solid var(--glass-border); border-radius: var(--radius-sm); overflow: hidden; background: #000; min-height: 150px; display: flex; align-items: center; justify-content: center; position: relative;">
-                        <!-- 2D View -->
-                        <div id="view-2d-{{ s.session_id }}" style="width: 100%; display: block;">
-                            <img src="/api/v1/sessions/{{ s.session_id }}/waterfall" alt="Waterfall de sesión" style="width: 100%; height: auto; display: block;" loading="lazy" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                            <div style="display: none; padding: 1rem; text-align: center; color: #ff5555; font-size: 0.85em;">
-                                ⚠️ El espectrograma 2D no se generó para esta captura.
-                            </div>
-                        </div>
-                        
-                        <!-- 3D View -->
-                        <div id="view-3d-{{ s.session_id }}" style="width: 100%; height: 350px; display: none; background: white;">
-                            <div id="plotly-{{ s.session_id }}" style="width: 100%; height: 100%;">
-                                <div style="display:flex; align-items:center; justify-content:center; height:100%; color:#666;">
-                                    Cargando matriz 3D...
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                <div style="margin-top: 1.5rem; text-align: center;">
+                    <a href="/dashboard/sesiones/{{ s.session_id }}" class="button glow" style="width: 100%; font-size: 0.9rem; padding: 0.75rem; text-decoration: none; display: block;">
+                        🔬 Ver Detalle de Sesión
+                    </a>
                 </div>
             </div>
             
             {% if s.n_events > 0 %}
-            <div style="margin-top: 1.5rem;">
-                <a href="/dashboard/eventos?frecuencia_mhz={{ (s.fc_hz / 1e6)|round(2) if s.fc_hz else '' }}" class="button outline" style="width: 100%; text-align: center;">Ver Eventos Detectados</a>
+            <div style="margin-top: 1rem;">
+                <a href="/dashboard/eventos?frecuencia_mhz={{ (s.fc_hz / 1e6)|round(2) if s.fc_hz else '' }}" class="button outline" style="width: 100%; text-align: center; font-size: 0.85rem; padding: 0.5rem; text-decoration: none; display: block;">Ver Eventos Detectados</a>
             </div>
             {% endif %}
         </div>
         {% endfor %}
     </div>
     {% else %}
-    <p style="color: #999; margin-top: 1rem;">No hay sesiones registradas en el sistema.</p>
+    <p style="color: var(--text-muted); margin-top: 1rem;">No hay sesiones registradas en el sistema.</p>
     {% endif %}
 </div>
-
-<script src="https://cdn.plot.ly/plotly-2.32.0.min.js"></script>
-<script>
-const loaded3D = new Set();
-
-async function switchView(sessionId, view) {
-    const v2d = document.getElementById(`view-2d-${sessionId}`);
-    const v3d = document.getElementById(`view-3d-${sessionId}`);
-    const btn2d = document.getElementById(`btn-2d-${sessionId}`);
-    const btn3d = document.getElementById(`btn-3d-${sessionId}`);
-    
-    if (view === '2d') {
-        v2d.style.display = 'block';
-        v3d.style.display = 'none';
-        btn2d.className = 'button';
-        btn3d.className = 'button outline';
-    } else {
-        v2d.style.display = 'none';
-        v3d.style.display = 'block';
-        btn3d.className = 'button';
-        btn2d.className = 'button outline';
-        
-        if (!loaded3D.has(sessionId)) {
-            loaded3D.add(sessionId);
-            try {
-                const res = await fetch(`/api/v1/sessions/${sessionId}/waterfall3d.json`);
-                if (!res.ok) throw new Error("No existe");
-                const data = await res.json();
-                
-                const plotData = [{
-                    z: data.dbfs,
-                    x: data.freqs_hz.map(f => f / 1e6),
-                    y: data.times_s,
-                    type: 'surface',
-                    colorscale: 'Viridis',
-                    colorbar: { title: 'dBFS' }
-                }];
-                
-                const layout = {
-                    title: 'Waterfall 3D',
-                    autosize: true,
-                    margin: { l: 0, r: 0, b: 0, t: 30 },
-                    scene: {
-                        xaxis: { title: 'Freq (MHz)' },
-                        yaxis: { title: 'Tiempo (s)' },
-                        zaxis: { title: 'Nivel (dBFS)' }
-                    }
-                };
-                
-                Plotly.newPlot(`plotly-${sessionId}`, plotData, layout, {responsive: true});
-            } catch (err) {
-                document.getElementById(`plotly-${sessionId}`).innerHTML = 
-                    `<div style="display:flex; align-items:center; justify-content:center; height:100%; color:#ff5555; text-align:center; padding:1rem;">
-                        ⚠️ El espectrograma 3D no se generó para esta captura.
-                    </div>`;
-            }
-        }
-    }
-}
-</script>
 {% endblock %}

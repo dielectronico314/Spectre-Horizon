@@ -2,23 +2,19 @@
 
 ## Stack
 
-- **API**: FastAPI en puerto 8000 (`app/api/main.py`)
-- **Dashboard**: FastAPI en puerto 8001 (`app/dashboard/server.py`)
+- **API & Dashboard Unificados**: FastAPI en puerto 8000 (`app/api/main.py`)
 - **BD**: SQLite (ruta: configurable en `app/api/db.py`)
 
-## Desarrollo — Dos Procesos en Paralelo
+## Desarrollo — Proceso Único Unificado
 
 ```bash
-# Terminal 1: API
+# Terminal 1: API (incluye Dashboard montado en /dashboard/)
 python -m uvicorn app.api.main:app --port 8000 --reload
-
-# Terminal 2: Dashboard (cliente HTTP a API)
-python -m uvicorn app.dashboard.server:app --port 8001 --reload
 ```
 
-O en un comando:
+O en un comando, usando el script de docker (Vía oficial Día 19):
 ```bash
-bash run_servers.sh
+bash run_demo.sh
 ```
 
 ### URLs
@@ -26,7 +22,7 @@ bash run_servers.sh
 | Servicio | URL | Docs |
 |----------|-----|------|
 | API | `http://localhost:8000/api/v1` | `http://localhost:8000/docs` |
-| Dashboard | `http://localhost:8001/dashboard` | — |
+| Dashboard | `http://localhost:8000/dashboard` | — |
 
 ## Arquitectura de Datos
 
@@ -52,30 +48,18 @@ Dashboard es cliente de API. Cero acceso directo a BD.
 
 ## Producción
 
-Opción A: Misma máquina, dos procesos
+Todo el stack vive ahora dentro del contenedor de Docker, el cual expone un puerto unificado:
 ```bash
-# Supervisor/systemd: API en :8000
-# Supervisor/systemd: Dashboard en :8001
-# Nginx reverse proxy (opcional)
-```
-
-Opción B: Máquinas separadas
-```bash
-# Server A: app.api.main en :8000
-# Server B: app.dashboard.server en :8001
-# Actualizar API_BASE en humanize.py (ej: "http://api.internal:8000/api/v1")
+# Iniciar contenedor Docker (API + Dashboard integrados)
+bash run_demo.sh
 ```
 
 ## Testing
 
 ```bash
-# Tests de API
+# Tests de API y Dashboard
 python tests/test_api_critical.py
-
-# Tests de Dashboard
 python tests/test_dashboard_flujo.py
-
-# Ambos (Dashboard monta también en API :8000 para compatibilidad)
 ```
 
 ## Configuración Mínima
@@ -100,16 +84,10 @@ pip install -r requirements.txt
 
 ## Logs & Debugging
 
-API:
+API & Dashboard unificados:
 ```bash
 # Con DEBUG
 python -m uvicorn app.api.main:app --port 8000 --reload --log-level debug
-```
-
-Dashboard:
-```bash
-# Logs de HTTP requests a API
-python -m uvicorn app.dashboard.server:app --port 8001 --reload --log-level debug
 ```
 
 ## Health Checks
@@ -118,9 +96,8 @@ python -m uvicorn app.dashboard.server:app --port 8001 --reload --log-level debu
 # API viva?
 curl http://localhost:8000/api/v1/health
 
-# Dashboard puede alcanzar API?
-# (Automático: si `/dashboard/` falla, es porque API no responde)
-curl http://localhost:8001/dashboard/
+# Dashboard responde?
+curl http://localhost:8000/dashboard/
 ```
 
 ## Roadmap Futuro (Post-Día 17)
@@ -130,5 +107,3 @@ curl http://localhost:8001/dashboard/
 - [ ] **Día 20**: Auth (API keys, caducidad)
 
 ---
-
-**Nota**: Las versiones de `mount_dashboard()` en API (para desarrollo) y `app/dashboard/server.py` (para producción) son equivalentes. En desarrollo se usa ambos por conveniencia; en producción elegir uno según escala.

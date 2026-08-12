@@ -297,6 +297,13 @@ def render_png(
     fig.tight_layout()
     # metadata=None en los campos volátiles: sin timestamp -> PNG comparable
     fig.savefig(out_png, metadata={"Software": None, "Creation Time": None})
+    
+    # Generar thumbnail optimizado
+    thumb_path = out_png.with_name(out_png.name.replace("_espectrograma", "_thumb"))
+    if "_espectrograma" not in out_png.name:
+        thumb_path = out_png.with_name(out_png.stem + "_thumb.png")
+    fig.savefig(thumb_path, dpi=30, metadata={"Software": None, "Creation Time": None})
+    
     plt.close(fig)
     return {"png_time_group": group, "png_vmin_db": vmin, "png_vmax_db": vmax}
 

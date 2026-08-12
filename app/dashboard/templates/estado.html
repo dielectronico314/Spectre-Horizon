@@ -53,7 +53,7 @@
     </div>
 
     {% if ultima_sesion.tuvo_interrupciones %}
-    <div class="detail-section" style="border-left-color: #ff9800;">
+    <div class="detail-section" style="border-left-color: var(--warning);">
         <h3>⚠️ Interrupciones detectadas</h3>
         <p>
             Durante esta captura, el sensor se desconectó y reconectó una o más veces.
@@ -74,8 +74,8 @@
         <h3>Espectrograma Reciente (Waterfall)</h3>
         <p>Vista estática de la última actividad espectral registrada. Haz clic en "Actualizar Estado" para recargar.</p>
         <div class="waterfall-container" style="margin-top: 1.5rem; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--glass-border); background: #000;">
-            <img src="/api/v1/sessions/{{ ultima_sesion.session_id }}/waterfall" alt="Espectrograma de la última sesión" style="display: block; width: 100%; height: auto; image-rendering: pixelated;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-            <p class="error-msg" style="display:none; color: #ff5555; padding: 1rem;">La imagen del espectrograma no está disponible para esta sesión.</p>
+            <img src="/api/v1/sessions/{{ ultima_sesion.session_id }}/waterfall" alt="Espectrograma de la última sesión" style="display: block; width: 100%; max-height: 500px; object-fit: contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+            <p class="error-msg" style="display:none; color: var(--error); padding: 1rem;">La imagen del espectrograma no está disponible para esta sesión.</p>
         </div>
     </div>
 
@@ -89,7 +89,7 @@
 
     <a href="/dashboard/eventos" class="button">Ver todos los eventos</a>
     {% else %}
-    <p style="color: #999; margin-top: 1rem;">No hay sesiones registradas aún.</p>
+    <p style="color: var(--text-muted); margin-top: 1rem;">No hay sesiones registradas aún.</p>
     {% endif %}
 </div>
 {% endblock %}

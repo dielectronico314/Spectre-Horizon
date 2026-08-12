@@ -235,3 +235,12 @@ tests/day13_results/
 tests/day13_synthetic/
 tests/day14_results/
 
+
+# Ignorar temporales y resultados generados
+data/index.sqlite
+data/evidence/
+tests/test_out/
+*.tar.gz
+eventos_*.json
+out/
+

@@ -62,12 +62,18 @@ def explain_evento(evento: dict) -> str:
         )
 
     margen_db = evento.get("pico_dbfs", 0) - piso_ruido_dbfs
-    return (
+    explicacion = (
         f"La potencia detectada en la banda {evento.get('band_name', '?')} "
         f"superó el nivel de ruido esperado por aproximadamente {margen_db:.0f} dB "
         f"durante {duracion:.2f} segundos seguidos. "
         f"Esto se clasifica como {sev_label['descripcion'].lower()}."
     )
+    
+    # Documentar explícitamente el tono continuo sintético del Golden Dataset
+    if evento.get("session_id") == "session_golden_demo_v1" and evento.get("band_name") == "CW_Tone":
+        explicacion += " (Nota: Este tono es sintético y deliberadamente continuo para fines de validación, no es un artefacto de fuga del oscilador local)."
+        
+    return explicacion
 
 def get_spectrum_category(fc_hz: float) -> str:
     """Clasifica una frecuencia central en su banda de espectro oficial."""

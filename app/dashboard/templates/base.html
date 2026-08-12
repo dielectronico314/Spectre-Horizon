@@ -5,170 +5,385 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Cenital RF Dashboard{% endblock %}</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background: #f5f5f5;
-            color: #333;
-            line-height: 1.6;
+        :root {
+            --bg-body: #0a0a0c;
+            --bg-card: #15151a;
+            --bg-card-hover: #1f1f26;
+            --bg-input: #23232b;
+            --glass-border: rgba(255, 255, 255, 0.08);
+            
+            --text-main: #e2e2e8;
+            --text-muted: #9ba1a6;
+            
+            --primary: #a78bfa;
+            --primary-hover: #bfa8ff;
+            --primary-dim: rgba(167, 139, 250, 0.15);
+            
+            --success: #4ade80;
+            --warning: #fbbf24;
+            --error: #f87171;
+            
+            --radius-sm: 6px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
         }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: var(--bg-body);
+            color: var(--text-main);
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
         header {
-            background: #1a1a1a;
-            color: white;
-            padding: 1rem 2rem;
+            background: rgba(21, 21, 26, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 1.25rem 2.5rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 50;
         }
-        header h1 { font-size: 1.5rem; }
+
+        header h1 { 
+            font-size: 1.25rem; 
+            font-weight: 600;
+            letter-spacing: -0.025em;
+            color: var(--primary);
+        }
+
         nav a {
-            color: #aaa;
+            color: var(--text-muted);
             text-decoration: none;
             margin-left: 2rem;
-            transition: color 0.2s;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: var(--transition);
         }
-        nav a:hover, nav a.active { color: white; }
+
+        nav a:hover, nav a.active { 
+            color: var(--text-main); 
+            text-shadow: 0 0 10px rgba(255,255,255,0.1);
+        }
+
         main {
             max-width: 1200px;
-            margin: 2rem auto;
+            margin: 3rem auto;
             padding: 0 2rem;
         }
+
         .card {
-            background: white;
-            border-radius: 8px;
-            padding: 2rem;
+            background: var(--bg-card);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            padding: 2.5rem;
             margin-bottom: 2rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+            transition: var(--transition);
         }
+        
+        .card:hover {
+            border-color: rgba(167, 139, 250, 0.3);
+            box-shadow: 0 8px 30px rgba(0,0,0,0.4);
+        }
+
+        h2, h3 {
+            color: var(--text-main);
+            font-weight: 600;
+            letter-spacing: -0.025em;
+        }
+
         .status-bar {
             display: flex;
-            gap: 2rem;
+            gap: 1.5rem;
             align-items: center;
-            padding: 1.5rem;
-            background: #f9f9f9;
-            border-left: 4px solid #4CAF50;
-            border-radius: 4px;
-            margin-bottom: 1rem;
+            padding: 1.25rem 1.5rem;
+            background: var(--bg-card-hover);
+            border: 1px solid var(--glass-border);
+            border-left: 4px solid var(--success);
+            border-radius: var(--radius-sm);
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
-        .status-bar.warning { border-left-color: #ff9800; }
-        .status-bar.error { border-left-color: #f44336; }
-        .status-label { font-weight: bold; }
+
+        .status-bar.warning { border-left-color: var(--warning); }
+        .status-bar.error { border-left-color: var(--error); }
+        .status-label { font-weight: 600; }
+
         table {
             width: 100%;
-            border-collapse: collapse;
-            margin-top: 1rem;
+            border-collapse: separate;
+            border-spacing: 0;
+            margin-top: 1.5rem;
         }
+
         thead {
-            background: #f5f5f5;
-            border-bottom: 2px solid #ddd;
+            background: var(--bg-card-hover);
         }
+
         th, td {
-            padding: 0.75rem;
+            padding: 1rem;
             text-align: left;
-            border-bottom: 1px solid #eee;
+            border-bottom: 1px solid var(--glass-border);
         }
+
         th {
-            font-weight: 600;
-            color: #666;
+            font-weight: 500;
+            font-size: 0.85rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--text-muted);
         }
-        tr:hover { background: #fafafa; }
+
+        th:first-child { border-top-left-radius: var(--radius-sm); border-bottom-left-radius: var(--radius-sm); }
+        th:last-child { border-top-right-radius: var(--radius-sm); border-bottom-right-radius: var(--radius-sm); }
+
+        tr { transition: var(--transition); }
+        tbody tr:hover { background: var(--bg-card-hover); }
+
         a {
-            color: #1976d2;
+            color: var(--primary);
             text-decoration: none;
+            transition: var(--transition);
         }
-        a:hover { text-decoration: underline; }
+
+        a:hover { 
+            color: var(--primary-hover);
+            text-shadow: 0 0 8px var(--primary-dim);
+        }
+
         .button {
-            display: inline-block;
-            padding: 0.5rem 1.5rem;
-            background: #1976d2;
-            color: white;
-            border: none;
-            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0.6rem 1.5rem;
+            background: var(--primary);
+            color: #111;
+            font-weight: 600;
+            border: 1px solid transparent;
+            border-radius: var(--radius-sm);
             cursor: pointer;
             text-decoration: none;
             font-size: 0.95rem;
-            margin-top: 1rem;
+            transition: var(--transition);
+            box-shadow: 0 2px 10px rgba(167, 139, 250, 0.2);
         }
-        .button:hover { background: #1565c0; }
+
+        .button:hover { 
+            background: var(--primary-hover);
+            box-shadow: 0 4px 15px rgba(167, 139, 250, 0.4);
+            transform: translateY(-1px);
+        }
+
+        .button.outline {
+            background: transparent;
+            color: var(--primary);
+            border-color: var(--primary);
+            box-shadow: none;
+        }
+        
+        .button.outline:hover {
+            background: var(--primary-dim);
+            color: var(--primary-hover);
+        }
+
         .filter-bar {
             display: flex;
-            gap: 1rem;
+            gap: 1.5rem;
             margin-bottom: 2rem;
             flex-wrap: wrap;
             align-items: flex-end;
         }
+
         .filter-group {
             display: flex;
             flex-direction: column;
         }
+
         .filter-group label {
             font-size: 0.85rem;
-            color: #666;
-            margin-bottom: 0.25rem;
+            color: var(--text-muted);
+            margin-bottom: 0.4rem;
             font-weight: 500;
         }
+
         .filter-group select,
         .filter-group input {
-            padding: 0.5rem;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 0.6rem;
+            background: var(--bg-input);
+            color: var(--text-main);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
             font-size: 0.95rem;
             min-width: 150px;
+            outline: none;
+            transition: var(--transition);
+            color-scheme: dark;
         }
+
+        .filter-group select:focus,
+        .filter-group input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 2px var(--primary-dim);
+        }
+
         .detail-section {
             margin: 2rem 0;
-            padding: 1.5rem;
-            background: #f9f9f9;
-            border-left: 4px solid #1976d2;
-            border-radius: 4px;
+            padding: 1.5rem 2rem;
+            background: var(--bg-card-hover);
+            border: 1px solid var(--glass-border);
+            border-left: 4px solid var(--primary);
+            border-radius: var(--radius-sm);
         }
+
         .detail-section h3 {
-            margin-bottom: 1rem;
-            color: #1a1a1a;
+            margin-bottom: 1.25rem;
+            font-size: 1.1rem;
+            color: var(--text-main);
         }
+
         .detail-row {
             display: flex;
             justify-content: space-between;
-            padding: 0.5rem 0;
-            border-bottom: 1px solid #e0e0e0;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid var(--glass-border);
         }
+
         .detail-row:last-child { border-bottom: none; }
+
         .detail-label {
             font-weight: 500;
-            color: #666;
+            color: var(--text-muted);
         }
+
         .detail-value {
-            color: #1a1a1a;
+            color: var(--text-main);
+            font-weight: 500;
             word-break: break-word;
         }
+
         .evidence-links {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 1rem;
-            margin-top: 1rem;
+            margin-top: 1.5rem;
         }
+
         .evidence-link {
-            padding: 1rem;
-            background: white;
-            border: 1px solid #ddd;
-            border-radius: 4px;
+            padding: 1.25rem;
+            background: var(--bg-input);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-sm);
             text-align: center;
+            transition: var(--transition);
         }
-        .evidence-link a { display: block; padding: 0.5rem 0; }
+        
+        .evidence-link:hover {
+            border-color: var(--primary);
+            background: var(--bg-card-hover);
+            transform: translateY(-2px);
+        }
+
+        .evidence-link a { 
+            display: block; 
+            font-weight: 500; 
+        }
+
         footer {
             text-align: center;
-            padding: 2rem;
-            color: #999;
+            padding: 2.5rem;
+            color: var(--text-muted);
             font-size: 0.85rem;
-            border-top: 1px solid #eee;
+            border-top: 1px solid var(--glass-border);
             margin-top: 4rem;
+        }
+        /* Modal Lightbox */
+        dialog {
+            margin: auto;
+            background: var(--bg-card);
+            color: var(--text-main);
+            border: 1px solid var(--glass-border);
+            border-radius: var(--radius-md);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5), 0 0 20px var(--primary-dim);
+            padding: 0;
+            width: 90vw;
+            max-width: 1400px;
+            height: 85vh;
+            max-height: 900px;
+            overflow: hidden;
+        }
+
+        dialog::backdrop {
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(5px);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid var(--glass-border);
+            background: rgba(21, 21, 26, 0.95);
+        }
+
+        .modal-body {
+            padding: 0;
+            height: calc(100% - 73px);
+            display: flex;
+            flex-direction: column;
+            background: #000;
+        }
+        
+        .modal-close {
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+        }
+        
+        .modal-close:hover {
+            background: var(--bg-card-hover);
+            color: var(--error);
+        }
+        
+        .button.glow {
+            box-shadow: 0 0 15px var(--primary-dim);
+            border: 1px solid rgba(167, 139, 250, 0.3);
+            background: rgba(167, 139, 250, 0.1);
+            color: var(--primary);
+        }
+        
+        .button.glow:hover {
+            box-shadow: 0 0 25px rgba(167, 139, 250, 0.4);
+            border: 1px solid var(--primary);
+            background: var(--primary-dim);
         }
     </style>
 </head>
 <body>
     <header>
-        <h1>Cenital RF Spectrum</h1>
+        <div style="display: flex; align-items: center; gap: 1rem;">
+            <h1>Cenital RF Spectrum</h1>
+            <div id="sensor-health-indicator" style="width: 12px; height: 12px; border-radius: 50%; background: var(--text-muted); box-shadow: 0 0 5px var(--text-muted); transition: all 0.5s ease; cursor: help;" title="Comprobando estado del hardware USB..."></div>
+        </div>
         <nav>
             <a href="/dashboard/" {% if section == 'estado' %}class="active"{% endif %}>Estado</a>
             <a href="/dashboard/eventos" {% if section == 'eventos' %}class="active"{% endif %}>Eventos</a>
@@ -181,5 +396,43 @@
     <footer>
         <p>Dashboard mínimo — Día 17. Datos vía API REST del Día 16.</p>
     </footer>
+
+    <script>
+        async function checkSensorHealth() {
+            const indicator = document.getElementById('sensor-health-indicator');
+            if (!indicator) return;
+
+            try {
+                const res = await fetch('/api/v1/sensor/health');
+                const data = await res.json();
+
+                if (data.status === 'success' || (data.status === 'error' && data.error_state === 'Sensor Ocupado o Sin Permisos')) {
+                    // Verde: Conectado (libre) u Ocupado (capturando activamente)
+                    indicator.style.background = 'var(--success)';
+                    indicator.style.boxShadow = '0 0 10px var(--success)';
+                    indicator.title = data.status === 'success' ? 'Sensor Hardware Conectado y Listo' : 'Sensor Ocupado (Capturando Datos)';
+                } else if (data.status === 'error' && data.error_state === 'Sensor no conectado') {
+                    // Rojo: Desconectado físicamente del USB
+                    indicator.style.background = 'var(--error)';
+                    indicator.style.boxShadow = '0 0 12px var(--error)';
+                    indicator.title = '¡Alerta! Sensor Hardware Desconectado del USB';
+                } else {
+                    // Amarillo: Otro error (Driver ausente, problema de inicialización)
+                    indicator.style.background = 'var(--warning)';
+                    indicator.style.boxShadow = '0 0 10px var(--warning)';
+                    indicator.title = 'Estado del Sensor: ' + data.error_state;
+                }
+            } catch (err) {
+                // Gris si falla la conexión a la API
+                indicator.style.background = 'var(--text-muted)';
+                indicator.style.boxShadow = '0 0 5px var(--text-muted)';
+                indicator.title = 'Desconectado del Servidor API';
+            }
+        }
+
+        // Ejecutar inmediatamente al cargar la página y luego cada 15 segundos
+        checkSensorHealth();
+        setInterval(checkSensorHealth, 15000);
+    </script>
 </body>
 </html>

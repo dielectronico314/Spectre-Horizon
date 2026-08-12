@@ -51,7 +51,10 @@ def main():
     else:
         freqs = None
 
-    session_id = args.npz_file.stem
+    if args.npz_file.parent.name.startswith("session_") or args.npz_file.parent.name.startswith("test_"):
+        session_id = args.npz_file.parent.name
+    else:
+        session_id = args.npz_file.stem
     capture_sha256 = "NO_HASH"
     center_freq = None
     sample_rate = None

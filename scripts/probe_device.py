@@ -34,8 +34,7 @@ def probe():
         output["status"] = "error"
         output["error_state"] = "Driver ausente"
         output["message"] = "SoapySDR module no encontrado en Python. El driver base está ausente."
-        print(json.dumps(output, indent=2))
-        sys.exit(1)
+        return output
 
     try:
         devices = SoapySDR.Device.enumerate()
@@ -43,8 +42,7 @@ def probe():
         output["status"] = "error"
         output["error_state"] = "Error de enumeración"
         output["message"] = str(e)
-        print(json.dumps(output, indent=2))
-        sys.exit(1)
+        return output
         
     harogic_devices = [d for d in devices if dict(d).get("driver") == "harogic"]
     
@@ -53,8 +51,7 @@ def probe():
         output["status"] = "error"
         output["error_state"] = "Sensor no conectado"
         output["message"] = "No se encontraron sensores Harogic en el bus USB."
-        print(json.dumps(output, indent=2))
-        sys.exit(1)
+        return output
 
     # 3. Analizar capacidades del sensor
     for dev_kwargs in harogic_devices:
@@ -76,8 +73,7 @@ def probe():
             output["status"] = "error"
             output["error_state"] = state
             output["message"] = f"Fallo al abrir el sensor: {str(e)}"
-            print(json.dumps(output, indent=2))
-            sys.exit(1)
+            return output
             
         try:
             # Extraer capacidades reales consultando al hardware
@@ -97,15 +93,15 @@ def probe():
             output["status"] = "error"
             output["error_state"] = "Error de lectura de capacidades"
             output["message"] = f"Error obteniendo capacidades: {str(e)}"
-            print(json.dumps(output, indent=2))
-            sys.exit(1)
+            return output
             
     output["status"] = "success"
     output["error_state"] = "Ninguno"
     output["message"] = "Sensor detectado y capacidades mapeadas correctamente."
     output["devices_found"] = len(output["devices"])
-    print(json.dumps(output, indent=2))
-    sys.exit(0)
+    return output
 
 if __name__ == "__main__":
-    probe()
+    res = probe()
+    print(json.dumps(res, indent=2))
+    sys.exit(0 if res["status"] == "success" else 1)

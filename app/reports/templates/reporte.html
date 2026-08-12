@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Reporte Técnico - {{ data.session_id }}</title>
+    <style>
+        body { font-family: sans-serif; margin: 2rem; color: #333; }
+        h1, h2, h3 { color: #2c3e50; }
+        .warning { background: #fef0f0; border-left: 4px solid #f56c6c; padding: 1rem; margin: 1rem 0; }
+        table { width: 100%; border-collapse: collapse; margin-top: 1rem; }
+        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+        th { background-color: #f2f2f2; }
+    </style>
+</head>
+<body>
+    <h1>Reporte Técnico de Sesión</h1>
+    
+    <h2>1. Sesión</h2>
+    <ul>
+        <li><strong>ID:</strong> {{ data.session_id }}</li>
+        <li><strong>Frecuencia Central:</strong> {{ data.freq_mhz }} MHz</li>
+        <li><strong>Fecha/Hora (UTC):</strong> {{ data.start_datetime }}</li>
+        <li><strong>Duración:</strong> {{ data.duration_s }}s</li>
+        <li><strong>Tipo de Dato:</strong> {{ data.dtype }}</li>
+        <li><strong>Tasa de Muestreo (fs):</strong> {{ data.fs_hz }} Hz</li>
+    </ul>
+
+    {% if data.tuvo_interrupciones %}
+    <div class="warning">
+        <strong>⚠ Advertencia:</strong> Esta sesión tuvo interrupciones de hardware que fueron recuperadas automáticamente.
+    </div>
+    {% endif %}
+
+    <h2>2. Configuración</h2>
+    <p>NFFT / Ventana / Overlap: (En desarrollo)</p>
+
+    <h2>3. Resumen Espectral</h2>
+    <ul>
+        <li><strong>Potencia Media:</strong> {{ data.resumen.potencia_media_dbfs }} dBFS</li>
+        <li><strong>SNR Medio:</strong> {{ data.resumen.snr_medio_db }} dB</li>
+        <li><strong>Ancho de Banda Medio:</strong> {{ data.resumen.bw_medio_khz }} kHz</li>
+    </ul>
+    
+    <h2>4. Eventos Detectados</h2>
+    {% if data.eventos %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID Evento</th>
+                    <th>Severidad</th>
+                    <th>Duración (s)</th>
+                    <th>Explicación (Generada Automáticamente)</th>
+                    <th>Trazabilidad (Hash)</th>
+                    <th>Enlace</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for evt in data.eventos %}
+                <tr>
+                    <td>{{ evt.event_id }}</td>
+                    <td>{{ evt.severidad_human }}</td>
+                    <td>{{ evt.duration_s }}</td>
+                    <td>{{ evt.explicacion }}</td>
+                    <td>{{ data.hashes.get(evt.event_id, "No disponible") }}</td>
+                    <td><a href="/dashboard/eventos/{{ evt.event_id }}">Ver en Dashboard</a></td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    {% else %}
+        <p>No se detectaron eventos anómalos en esta sesión.</p>
+    {% endif %}
+
+    <h2>5. Limitaciones de este reporte</h2>
+    <ul>
+        <li>Los niveles de potencia están expresados en dBFS (relativo a fondo de escala), no en dBm absolutos — no se ha calibrado con reference level del hardware.</li>
+        <li>La severidad y confianza son heurísticos de margen sobre el piso de ruido estimado, no una probabilidad calibrada ni una categorización de la señal.</li>
+        <li>Este sistema NO reconoce ni identifica la procedencia de la señal ni su protocolo — solo reporta presencia de energía por encima de un umbral configurado.</li>
+        <li>La detección se limita a las bandas configuradas para esta sesión; no es una vigilancia exhaustiva del espectro completo.</li>
+        <li>fs real del hardware: {{ data.fs_hz }} — puede diferir ligeramente del valor nominal solicitado (ver deuda técnica documentada).</li>
+    </ul>
+    
+    {% if not pdf_supported %}
+    <p style="font-size: 0.8em; color: #666; margin-top: 3rem;">
+        Nota: WeasyPrint no disponible — usa Ctrl+P > Guardar como PDF en el navegador para imprimir este reporte.
+    </p>
+    {% endif %}
+</body>
+</html>

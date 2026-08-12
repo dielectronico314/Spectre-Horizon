@@ -73,15 +73,13 @@
         </details>
     </form>
 
-    {% if eventos %}
-    {% set destacados = eventos | selectattr('severidad', 'equalto', 'high') | list %}
     {% if destacados %}
     <div class="destacados-section" style="margin-top: 2rem; margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--glass-border);">
         <h3>🔴 Eventos Destacados</h3>
         <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
             {% for ev in destacados[:3] %}
             {% set fc = ev.session.fc_hz if ev.session else 0 %}
-            <div class="card" style="flex: 1; min-width: 250px; border-left: 4px solid #ff5555; padding: 1.5rem; background: var(--bg-card);">
+            <div class="card" style="flex: 1; min-width: 250px; border-left: 4px solid var(--error); padding: 1.5rem; background: var(--bg-card); box-shadow: 0 4px 15px rgba(0,0,0,0.2);">
                 <h4 style="margin-top: 0; margin-bottom: 0.5rem; font-size: 1.1em;">Señal anómala en {{ get_spectrum_category(fc) }}</h4>
                 <p style="margin: 0; font-size: 0.9em; color: var(--text-muted); line-height: 1.5;">
                     <strong>Frecuencia:</strong> {{ format_freq_mhz(fc) }} <br>
@@ -93,6 +91,7 @@
         </div>
     </div>
     {% endif %}
+    {% if eventos %}
     <table>
         <thead>
             <tr>
@@ -141,7 +140,7 @@
         </tbody>
     </table>
     {% else %}
-    <p style="color: #999; margin-top: 1rem;">No se encontraron eventos con los filtros seleccionados.</p>
+    <p style="color: var(--text-muted); margin-top: 1rem;">No se encontraron eventos con los filtros seleccionados.</p>
     {% endif %}
 </div>
 

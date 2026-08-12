@@ -17,11 +17,11 @@ from datetime import datetime, timezone
 
 def main():
     sample_rate = 1953125.0
-    center_freq = 106500000.0
+    center_freq = 433000000.0
     duration = 5.0
     num_samples = int(sample_rate * duration)
     
-    output_dir = "/workspace/rf-spectrum/data/samples/test_burst_106p5MHz"
+    output_dir = "/workspace/rf-spectrum/data/samples/session_golden_demo_v1"
     os.makedirs(output_dir, exist_ok=True)
     
     iq_filepath = os.path.join(output_dir, "test_burst.iq")

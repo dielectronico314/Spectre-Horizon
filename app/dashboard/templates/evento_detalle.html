@@ -42,7 +42,7 @@
     <div class="detail-section">
         <h3>¿Por qué se generó este evento?</h3>
         <p>{{ explicacion }}</p>
-        <div style="margin-top: 1rem; padding: 1rem; background: white; border-radius: 4px; border-left: 3px solid #1976d2;">
+        <div style="margin-top: 1rem; padding: 1rem; background: var(--bg-card); border-radius: var(--radius-sm); border-left: 3px solid var(--primary);">
             <strong>Detalles técnicos:</strong><br>
             Pico detectado: {{ "%.1f"|format(evento.pico_dbfs) }} dBFS<br>
             Potencia media: {{ "%.1f"|format(evento.potencia_media_activa_dbfs) }} dBFS<br>
@@ -85,7 +85,7 @@
                 </div>
                 {% endfor %}
             {% else %}
-            <p style="color: #999;">No hay archivos de evidencia disponibles para este evento.</p>
+            <p style="color: var(--text-muted);">No hay archivos de evidencia disponibles para este evento.</p>
             {% endif %}
         </div>
     </div>

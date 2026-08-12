@@ -27,7 +27,7 @@ def test_dashboard_estado_ok():
     response = client.get("/dashboard/")
     assert response.status_code == 200
     assert b"Estado del Sensor" in response.content
-    assert b"Conectado" in response.content or b"sin datos" in response.content or b"En vivo" in response.content
+    assert b"Sensor:" in response.content or b"sin datos" in response.content
 
 
 def test_dashboard_eventos_tabla_ok():

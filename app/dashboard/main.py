@@ -45,9 +45,18 @@ async def dashboard_estado(request: Request):
     """Pantalla de estado del sensor."""
     status = await get_from_api("/sensor/status")
 
-    # Obtener última sesión (el endpoint /sensor/status ya incluye info, pero tomamos todas y usamos la última)
     sessions = await get_from_api("/sessions")
-    ultima_sesion = sessions[0] if sessions else None
+    
+    # Offline fallback logic: if offline, force session_golden_demo_v1 to the front if it exists
+    ultima_sesion = None
+    if status.get("status") != "online" and sessions:
+        for s in sessions:
+            if s.get("session_id") == "session_golden_demo_v1":
+                ultima_sesion = s
+                break
+                
+    if not ultima_sesion:
+        ultima_sesion = sessions[0] if sessions else None
     sessions_count = len(sessions) if sessions else 0
 
     return templates.TemplateResponse(
@@ -76,12 +85,30 @@ async def dashboard_sesiones(request: Request):
     )
 
 
+@router.get("/sesiones/{session_id}", name="dashboard_sesion_detalle")
+async def dashboard_sesion_detalle(request: Request, session_id: str):
+    """Vista detallada de una sesión (2D/3D)."""
+    try:
+        session = await get_from_api(f"/sessions/{session_id}")
+    except Exception:
+        raise HTTPException(status_code=404, detail="Sesión no encontrada")
+
+    return templates.TemplateResponse(
+        request=request,
+        name="sesion_detalle.html",
+        context={
+            "section": "sesiones",
+            "session": session
+        }
+    )
+
+
 @router.get("/eventos", name="dashboard_eventos")
 async def dashboard_eventos(
     request: Request,
     banda: str = None,
     espectro: str = None,
-    frecuencia_mhz: float = None,
+    frecuencia_mhz: str = None,
     severidad: str = None,
     desde: str = None,
     hasta: str = None,
@@ -92,8 +119,11 @@ async def dashboard_eventos(
         params["banda"] = banda
     if espectro:
         params["espectro"] = espectro
-    if frecuencia_mhz is not None:
-        params["frecuencia_mhz"] = frecuencia_mhz
+    if frecuencia_mhz and frecuencia_mhz.strip():
+        try:
+            params["frecuencia_mhz"] = float(frecuencia_mhz)
+        except ValueError:
+            pass
     if severidad:
         params["severidad"] = severidad
     if desde:
@@ -126,6 +156,36 @@ async def dashboard_eventos(
     
     espectros_disponibles = ["HF", "VHF", "UHF", "SHF"]
 
+    # Filtrar destacados: excluir LO Leakage (offset == 0 o cercano) y deduplicar bloque espectral solapado
+    destacados_crudos = [e for e in eventos if e.get("severidad") == "high"]
+    
+    # Excluir fugas del oscilador local (LO Leakage) - requiere cruzar con features_config en el futuro
+    # destacados_crudos = [e for e in destacados_crudos if abs(e.get("freq_offset_hz", 999.0)) > 1.0]
+    
+    # Agrupar por solapamiento de tiempo (eventos que empiezan y duran casi lo mismo son el mismo fenómeno en bandas adyacentes)
+    destacados_final = []
+    for e in destacados_crudos:
+        is_duplicate = False
+        for d in destacados_final:
+            if e.get("session_id") == d.get("session_id"):
+                time_diff = abs(e.get("start_t_s", 0) - d.get("start_t_s", 0))
+                dur_diff = abs(e.get("duration_s", 0) - d.get("duration_s", 0))
+                
+                band_e = e.get("band_name", "")
+                band_d = d.get("band_name", "")
+                
+                # Frecuencias adyacentes: si son exactamente la misma banda, o ambas son del bloque adyacente FM_Sub
+                es_banda_adyacente = (band_e == band_d) or (band_e.startswith("FM_Sub") and band_d.startswith("FM_Sub"))
+                
+                if time_diff < 0.1 and dur_diff < 0.1 and es_banda_adyacente:
+                    is_duplicate = True
+                    # Conservar el de mayor pico
+                    if e.get("pico_dbfs", -999) > d.get("pico_dbfs", -999):
+                        d.update(e)
+                    break
+        if not is_duplicate:
+            destacados_final.append(e)
+
     return templates.TemplateResponse(
         request=request,
         name="eventos.html",
@@ -141,6 +201,7 @@ async def dashboard_eventos(
             "filtro_severidad": severidad or "",
             "filtro_desde": desde or "",
             "filtro_hasta": hasta or "",
+            "destacados": destacados_final,
         }
     )
 
