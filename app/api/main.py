@@ -10,7 +10,8 @@ import sys
 # Agregar ruta de scripts al PYTHONPATH para importar probe_device
 PROJECT_ROOT = Path(__file__).resolve().parent.parent.parent
 sys.path.append(str(PROJECT_ROOT))
-from scripts.probe_device import probe
+import subprocess
+import json
 
 WORKSPACE_DIR = Path("/workspace") if Path("/workspace").exists() else PROJECT_ROOT
 
@@ -78,9 +79,18 @@ def sensor_status():
         ultima_captura_utc = row["start_datetime"] if row else None
         eventos_totales = count_row["c"] if count_row else 0
         
-        # Consultar la conectividad real del hardware
-        estado_hardware = probe()
-        sensor_conectado = estado_hardware.get("status") == "success"
+        # Consultar la conectividad real del hardware mediante subprocess para aislar crashes de C++
+        sensor_conectado = False
+        try:
+            res = subprocess.run(
+                ["python3", str(PROJECT_ROOT / "scripts" / "probe_device.py")],
+                capture_output=True, text=True, timeout=2
+            )
+            if res.returncode == 0:
+                data = json.loads(res.stdout)
+                sensor_conectado = data.get("status") == "success"
+        except Exception:
+            pass
         
         return {
             "ultima_sesion": ultima_sesion,
