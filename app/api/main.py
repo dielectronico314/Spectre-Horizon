@@ -87,8 +87,11 @@ def sensor_status():
                 capture_output=True, text=True, timeout=2
             )
             if res.returncode == 0:
-                data = json.loads(res.stdout)
-                sensor_conectado = data.get("status") == "success"
+                stdout = res.stdout
+                json_start = stdout.find('{')
+                if json_start != -1:
+                    data = json.loads(stdout[json_start:])
+                    sensor_conectado = data.get("status") == "success"
         except Exception:
             pass
         
