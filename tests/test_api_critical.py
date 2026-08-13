@@ -21,8 +21,8 @@ def test_sessions_list_filtro_fecha():
     assert res_in.status_code == 200
     assert len(res_in.json()) >= 1
     
-    # 2. Caso Negativo (Agosto): Rango futuro donde no hay sesiones. 
-    res_out = client.get("/api/v1/sessions?desde=2026-08-01&hasta=2026-08-15")
+    # 2. Caso Negativo (Agosto 2030): Rango futuro donde no hay sesiones. 
+    res_out = client.get("/api/v1/sessions?desde=2030-08-01&hasta=2030-08-15")
     assert res_out.status_code == 200
     assert len(res_out.json()) == 0  # <--- Falla si la API ignora el filtro
 

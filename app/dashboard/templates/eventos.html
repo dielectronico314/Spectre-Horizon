@@ -75,7 +75,7 @@
 
     {% if destacados %}
     <div class="destacados-section" style="margin-top: 2rem; margin-bottom: 2rem; padding-bottom: 2rem; border-bottom: 1px solid var(--glass-border);">
-        <h3>🔴 Eventos Destacados</h3>
+        <h3><i data-lucide="alert-circle" style="color: var(--sev-high); vertical-align: -2px;"></i> Eventos Destacados</h3>
         <div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1rem;">
             {% for ev in destacados[:3] %}
             {% set fc = ev.session.fc_hz if ev.session else 0 %}
@@ -126,7 +126,7 @@
                     {% elif ev.severidad == 'medium' %}
                         🟠 Media
                     {% elif ev.severidad == 'high' %}
-                        🔴 Alta
+                        <i data-lucide="alert-circle" style="color: var(--sev-high); vertical-align: -2px;"></i> Alta
                     {% else %}
                         {{ ev.severidad }}
                     {% endif %}

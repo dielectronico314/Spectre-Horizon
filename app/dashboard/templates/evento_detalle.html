@@ -28,14 +28,24 @@
                 {% elif evento.severidad == 'medium' %}
                     🟠 Media
                 {% elif evento.severidad == 'high' %}
-                    🔴 Alta
+                    <i data-lucide="alert-circle" style="color: var(--sev-high); vertical-align: -2px;"></i> Alta
                 {% endif %}
                 — {{ severidad_desc }}
             </span>
         </div>
         <div class="detail-row">
             <span class="detail-label">Certeza:</span>
-            <span class="detail-value">{{ confianza_label }} ({{ "%.1f"|format(evento.confianza * 100) }}%)</span>
+            <div style="display: flex; align-items: center; gap: 1rem;">
+                <!-- Gauge radial (Paso 4) -->
+                <svg class="confidence-gauge" viewBox="0 0 36 36" data-confidence="{{ evento.confianza }}">
+                    <circle cx="18" cy="18" r="15.915" class="gauge-bg"></circle>
+                    <circle cx="18" cy="18" r="15.915" class="gauge-fill"></circle>
+                    <text x="18" y="20" text-anchor="middle" font-size="8" fill="var(--text-main)" font-weight="bold">
+                        {{ "%.0f"|format(evento.confianza * 100) }}%
+                    </text>
+                </svg>
+                <span class="detail-value">{{ confianza_label }}</span>
+            </div>
         </div>
     </div>
 

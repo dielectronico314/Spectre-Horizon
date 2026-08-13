@@ -40,13 +40,44 @@ async def get_from_api(endpoint: str, params: dict = None) -> dict:
         raise HTTPException(status_code=503, detail=f"API no disponible: {str(e)}")
 
 
+def _parse_iso(dt_str):
+    """Parsea timestamps ISO ya existentes en la API, tolerando el formato
+    mixto '+00:00Z' que devuelve la BD (offset numérico + Z redundante)."""
+    from datetime import datetime
+
+    if not dt_str:
+        return None
+    s = dt_str.strip()
+    if s.endswith("Z"):
+        s = s[:-1] if ("+" in s or s.count("-") > 2) else s[:-1] + "+00:00"
+    try:
+        return datetime.fromisoformat(s)
+    except ValueError:
+        return None
+
+
+def _formatear_hace(segundos):
+    """Formatea una duración en segundos como texto relativo humano ('hace N min')."""
+    if segundos < 60:
+        return f"{int(segundos)} s"
+    minutos = int(segundos // 60)
+    if minutos < 60:
+        return f"{minutos} min"
+    horas = int(minutos // 60)
+    if horas < 24:
+        return f"{horas} h"
+    return f"{int(horas // 24)} d"
+
+
 @router.get("/", name="dashboard_estado")
 async def dashboard_estado(request: Request):
     """Pantalla de estado del sensor."""
+    from datetime import datetime, timezone
+
     status = await get_from_api("/sensor/status")
 
     sessions = await get_from_api("/sessions")
-    
+
     # Offline fallback logic: if offline, force session_golden_demo_v1 to the front if it exists
     ultima_sesion = None
     if status.get("status") != "online" and sessions:
@@ -54,10 +85,32 @@ async def dashboard_estado(request: Request):
             if s.get("session_id") == "session_golden_demo_v1":
                 ultima_sesion = s
                 break
-                
+
     if not ultima_sesion:
         ultima_sesion = sessions[0] if sessions else None
     sessions_count = len(sessions) if sessions else 0
+
+    # Frescura real del heartbeat: tiempo desde la última captura conocida (dato ya existente)
+    now_utc = datetime.now(timezone.utc)
+    tiempo_relativo = None
+    sensor_fresco = False
+    if ultima_sesion:
+        dt = _parse_iso(ultima_sesion.get("start_datetime"))
+        if dt:
+            delta_s = (now_utc - dt).total_seconds()
+            tiempo_relativo = _formatear_hace(delta_s)
+            sensor_fresco = 0 <= delta_s < 300
+
+    # Último evento real, para la tarjeta de resumen (mismo endpoint /events ya expuesto)
+    ultimo_evento = None
+    if ultima_sesion:
+        try:
+            eventos_sesion = await get_from_api("/events")
+            candidatos = [e for e in eventos_sesion if e.get("session_id") == ultima_sesion.get("session_id")]
+            if candidatos:
+                ultimo_evento = max(candidatos, key=lambda e: e.get("start_t_s", 0))
+        except Exception:
+            ultimo_evento = None
 
     return templates.TemplateResponse(
         request=request,
@@ -67,6 +120,11 @@ async def dashboard_estado(request: Request):
             "status": status,
             "ultima_sesion": ultima_sesion,
             "sessions_count": sessions_count,
+            "sesiones": sessions,  # Para línea de tiempo y dial de frecuencias
+            "now_utc": now_utc,
+            "tiempo_relativo": tiempo_relativo,
+            "sensor_fresco": sensor_fresco,
+            "ultimo_evento": ultimo_evento,
         }
     )
 

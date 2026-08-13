@@ -15,7 +15,7 @@
             </div>
         </div>
         <div style="text-align: right; display: flex; gap: 1rem; align-items: center;">
-            <button onclick="generarReporte('{{ session.session_id }}')" class="button glow" id="btn-reporte">📄 Generar Reporte</button>
+            <button onclick="generarReporte('{{ session.session_id }}')" class="button glow" id="btn-reporte"><i data-lucide="file-text" style="vertical-align: -2px;"></i> Generar Reporte</button>
             {% if session.n_events > 0 %}
                 <a href="/dashboard/eventos?frecuencia_mhz={{ (session.fc_hz / 1e6)|round(2) if session.fc_hz else '' }}" class="button">Ver {{ session.n_events }} Evento(s)</a>
             {% else %}
@@ -54,9 +54,9 @@
             <div style="color: var(--text-muted); font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem;">Estado de Hardware</div>
             <div style="font-size: 1.1em;">
                 {% if session.tuvo_interrupciones %}
-                    <span style="color: var(--warning);">⚠️ Interrupciones Registradas</span>
+                    <span style="color: var(--warning);"><i data-lucide="triangle-alert" style="vertical-align: -2px;"></i> Interrupciones Registradas</span>
                 {% else %}
-                    <span style="color: var(--success);">✅ Estable</span>
+                    <span style="color: var(--success);"><i data-lucide="circle-check" style="vertical-align: -2px;"></i> Estable</span>
                 {% endif %}
             </div>
         </div>
@@ -101,11 +101,14 @@ async function generarReporte(id) {
         const blob = await res.blob();
         const url = URL.createObjectURL(blob);
         window.open(url, '_blank');
+        if (window.showToast) window.showToast('Reporte generado ✓', 'success');
     } catch (err) {
-        alert("Error al generar el reporte: " + err.message);
+        if (window.showToast) window.showToast('Error al generar el reporte: ' + err.message, 'error');
+        else alert("Error al generar el reporte: " + err.message);
     } finally {
-        btn.innerHTML = '📄 Generar Reporte';
+        btn.innerHTML = '<i data-lucide="file-text" style="vertical-align: -2px;"></i> Generar Reporte';
         btn.disabled = false;
+        if (window.lucideReplace) window.lucideReplace();
     }
 }
 

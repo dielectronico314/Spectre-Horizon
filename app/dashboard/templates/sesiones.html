@@ -31,9 +31,9 @@
                 <div style="text-align: right; font-size: 0.85em;">
                     <span style="color: var(--text-muted);">{{ s.start_datetime | default("Fecha desconocida") }}</span><br>
                     {% if s.tuvo_interrupciones %}
-                        <span style="color: var(--warning); font-weight: 500;">⚠️ Interrupciones HW</span>
+                        <span style="color: var(--warning); font-weight: 500;"><i data-lucide="triangle-alert" style="vertical-align: -2px;"></i> Interrupciones HW</span>
                     {% else %}
-                        <span style="color: var(--success);">✅ HW Estable</span>
+                        <span style="color: var(--success);"><i data-lucide="circle-check" style="vertical-align: -2px;"></i> HW Estable</span>
                     {% endif %}
                 </div>
             </div>
