@@ -7,9 +7,9 @@
 <script>window.setBackgroundWaterfall('/api/v1/sessions/{{ ultima_sesion.session_id }}/waterfall_thumb');</script>
 {% endif %}
 <div class="card" style="display: flex; align-items: center; gap: 10px; padding: 16px; margin-bottom: 1.5rem;">
-    <span class="status-dot" id="sensor-led" data-state="{{ 'connected' if status.sensor_conectado else 'disconnected' }}" title="Estado del hardware — se actualiza automáticamente"></span>
+    <span class="status-dot" id="sensor-led" data-state="{{ 'connected' if status.sensor_conectado and sensor_fresco else ('warning' if status.sensor_conectado else 'disconnected') }}" title="Estado del hardware y frescura de datos"></span>
     <span style="color: var(--text-primary); font-size: 13px;">
-        <span id="sensor-status-label">{{ 'Sensor conectado' if status.sensor_conectado else 'Sensor desconectado' }}</span>
+        <span id="sensor-status-label">{{ 'Sensor activo' if status.sensor_conectado and sensor_fresco else ('Sensor inactivo' if status.sensor_conectado else 'Sensor desconectado') }}</span>
         {% if tiempo_relativo %}&middot; última señal hace {{ tiempo_relativo }}{% endif %}
     </span>
 </div>
