@@ -1,0 +1,4 @@
+1. [Alto impacto, bajo riesgo] Clasificador entrenado sobre el histórico purgado (14 eventos limpios como semilla) para reemplazar el filtro heurístico de offset=0 — sigue pasivo, mejora la calidad de detección sin cambiar el alcance del sistema.
+2. [Medio impacto] merge_gap_s por perfil de tráfico — validar con tráfico paquetizado real (WiFi/BT), el esquema de "profiles" ya existe en rules_config.json.
+3. [Fuera de alcance de mes 1, requiere decisión de producto] Demonio orquestador / tap de IQ en vivo para consumidores externos (TETRA-Demod) — su propio ciclo de diseño.
+4. [Requiere decisión de alcance, no solo ingeniería] "Radio cognitiva" con decisión/actuación autónoma sobre el espectro es una categoría de riesgo distinta a percepción pasiva — evaluar como proyecto propio si se prioriza.
