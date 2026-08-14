@@ -154,8 +154,19 @@ def build_index():
         duration_s = None
         if captures:
             start_datetime = captures[0].get("core:datetime")
+            if start_datetime and start_datetime.endswith("+00:00Z"):
+                start_datetime = start_datetime.replace("+00:00Z", "+00:00")
             fc_hz = captures[0].get("core:frequency")
-            duration_s = captures[0].get("telemetry:duration_sec", 0)
+            duration_s = captures[0].get("telemetry:duration_sec")
+            if duration_s is None:
+                # Fallback to physical size calculation for synthetic data
+                iq_path = meta_path.with_suffix('.iq')
+                if not iq_path.exists():
+                    iq_path = meta_path.with_suffix('.sigmf-data')
+                if iq_path.exists() and fs_hz:
+                    datatype = orig_meta.get("global", {}).get("core:datatype", "ci16_le")
+                    bytes_per_sample = 8 if datatype == "cf32_le" else 4
+                    duration_s = iq_path.stat().st_size / (bytes_per_sample * fs_hz)
         
         ruta_meta = str(meta_path.relative_to(Path("/workspace")))
         mtime = meta_path.stat().st_mtime
