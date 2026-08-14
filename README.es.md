@@ -13,38 +13,75 @@
   <img src="assets/san-400_01-1.png" alt="Harogic SAN-400 Spectrum Analyzer" width="600"/>
   <br/>
   <br/>
-
-  *Un puente de software robusto para capturar, procesar, analizar y decidir sobre espectro electromagnético de grado industrial utilizando Python, Docker y SigMF.*
+  
+  [Read this document in English](README.md)
 </div>
 
 ---
 
-## 📖 Índice
+## ¿Qué hace este proyecto en 20 segundos?
 
-- [Resumen del Proyecto](#-resumen-del-proyecto)
-- [Arquitectura del Sistema](#-arquitectura-del-sistema)
-- [Watchdog y Tolerancia a Fallos](#️-watchdog-y-tolerancia-a-fallos)
-- [Requisitos de Hardware](#️-requisitos-de-hardware)
-- [Dependencias Externas](#-dependencias-externas-y-descargas)
-- [Instalación y Despliegue](#-instalación-y-despliegue)
-- [Uso y Comandos](#-uso-y-comandos)
-- [Estructura de Datos (SigMF)](#-estructura-de-datos-sigmf)
-- [Estructura del Proyecto](#-estructura-del-proyecto)
-- [Roadmap (Plan de 20 Días)](#-roadmap-plan-de-20-días)
+**Spectre-Horizon es un pipeline completo de conciencia espectral** — desde la captura de señal RF cruda hasta la generación de alertas tácticas — construido para sensores SDR Harogic operando dentro de una arquitectura basada en Docker.
+
+Actúa como un robusto puente de software para **capturar, procesar, analizar y decidir** sobre datos del espectro electromagnético de grado industrial. Al aprovechar Python, contenedores Docker y el estándar de metadatos SigMF, desvincula por completo el flujo de trabajo SDR de las pesadas interfaces gráficas manuales, permitiendo pipelines de datos sin cabeza (headless), resilientes y parametrizables que producen inteligencia procesable — no solo gráficas bonitas.
 
 ---
 
-## 🎯 Resumen del Proyecto
+## 📥 Dependencias Externas y Descargas
 
-**Spectre-Horizon** es un pipeline completo de conciencia espectral — desde la captura de señal RF cruda hasta la generación de alertas tácticas — construido para sensores SDR Harogic operando dentro de una arquitectura basada en Docker.
+Este repositorio **no** contiene binarios pesados de terceros ni software del fabricante. Debes descargar las dependencias requeridas de sus fuentes oficiales:
 
-Nació de la necesidad de desvincular la captura de espectro de las interfaces gráficas pesadas y manuales (como SAStudio4 o GQRX), permitiendo una captura automatizada y parametrizable (headless). El sistema no solo captura: **mide, evalúa y decide**, produciendo inteligencia procesable — no solo gráficas bonitas.
+1. **Contenedor RF-Swift (PentHertz):**
+   - El entorno contenedorizado central para SDRs.
+   - **Descarga/Pull:** `docker pull penthertz/rfswift_noble:sdr_full`
+   - **Documentación:** [PentHertz GitHub / RF-Swift](https://github.com/PentHertz/RF-Swift)
+2. **SAStudio4 y SDK de Harogic:**
+   - Software oficial de Harogic y SDK C-API para el analizador de espectro SAN-400.
+   - **Descarga:** [Página Oficial de Descargas de Harogic](http://www.harogic.eu/download/)
+   - *Nota: Solo es necesario si deseas utilizar la interfaz gráfica o compilar tus propios controladores en C. Spectre-Horizon utiliza los controladores SoapySDR integrados dentro del contenedor RF-Swift.*
+
+---
+
+## ⚡ Inicio Rápido
+
+### 1. Preparar el Entorno
+Asegúrate de que tu sensor Harogic esté conectado por USB e inicia el contenedor `RF-Swift` con permisos de bus USB:
+```bash
+rfswift run -i penthertz/rfswift_noble:sdr_full -s /dev/bus/usb -u 1
+```
+
+### 2. Clonar el Repositorio
+```bash
+git clone https://github.com/dielectronico314/Spectre-Horizon.git
+cd Spectre-Horizon
+```
+
+### 3. Iniciar el Sistema Completo (API + Dashboard)
+Lanza todo el stack unificado de análisis (backend y frontend) con un solo comando:
+```bash
+bash run_demo.sh
+```
+El dashboard estará disponible en `http://localhost:8000/dashboard/`.
+
+### 4. Iniciar una Captura de Espectro (Opcional)
+Capturar 3 minutos de Radio FM (106.5 MHz), dividiendo la salida en fragmentos SigMF de 60 segundos:
+```bash
+./scripts/capture.sh \
+    --freq 106.5e6 \
+    --rate 1.953125e6 \
+    --gain 0 \
+    --duration 180 \
+    --chunk-duration 60 \
+    --antenna "Dipole"
+```
+
+¿Necesitas más ejemplos? Revisa la carpeta `examples/` para scripts listos para usar.
 
 ---
 
 ## 🏗 Arquitectura del Sistema
 
-Spectre-Horizon está diseñado como un **pipeline de cuatro capas** donde cada capa está completamente desacoplada de las demás. Los datos fluyen hacia abajo desde el hardware hasta la inteligencia, mientras que la configuración fluye lateralmente a través de contratos JSON — lo que significa que **no se necesita modificar ni una sola línea de código Python** para apuntar a una nueva banda de frecuencia.
+Spectre-Horizon está diseñado como un **pipeline de cuatro capas** (cinco con la API) donde cada capa está completamente desacoplada de las demás. Los datos fluyen hacia abajo desde el hardware hasta la inteligencia, mientras que la configuración fluye lateralmente a través de contratos JSON — lo que significa que **no se necesita modificar ni una sola línea de código Python** para apuntar a una nueva banda de frecuencia.
 
 ```mermaid
 flowchart TB
@@ -56,6 +93,7 @@ flowchart TB
     classDef storage fill:#1b1b2f,stroke:#ff6b6b,stroke-width:2px,color:#e0e0e0
     classDef alert fill:#e94560,stroke:#ffffff,stroke-width:2px,color:#fff
     classDef bash fill:#2d6a4f,stroke:#95d5b2,stroke-width:2px,color:#fff
+    classDef web fill:#d4a373,stroke:#faedcd,stroke-width:2px,color:#000
 
     SENSOR["📡 Harogic SAN-400 (9kHz - 40GHz)"]:::hardware
 
@@ -136,12 +174,25 @@ flowchart TB
         RULES -.->|"Políticas"| ENGINE
     end
 
+    subgraph LAYER5["🖥️ CAPA 5 — API Unificada y Dashboard"]
+        direction TB
+        subgraph WEB["Servidor Web (Puerto 8000)"]
+            direction LR
+            API["FastAPI REST"]:::python
+            JINJA["Plantillas Jinja2"]:::python
+            DASH["Dashboard UI (HTML/JS/Plotly)"]:::web
+            API <--> JINJA
+            JINJA --> DASH
+        end
+    end
+
     subgraph PERSISTENCE["💾 Capa de Persistencia"]
         direction LR
         RAW[("📁 .iq / .sigmf-meta")]:::storage
         NPZ[("📊 Espectrograma (.npz)")]:::storage
         CSV[("📄 Características (.csv)")]:::storage
         EVENTS[("🚨 Eventos (.json)")]:::storage
+        SQLITE[("🗄️ Índice SQLite")]:::storage
     end
 
     SENSOR <-->|"USB 3.0"| LAYER1
@@ -153,6 +204,10 @@ flowchart TB
     SPECTRO ==>|"Matriz FFT"| NPZ
     CSV -.->|"Evaluación de reglas"| ENGINE
     FSM ==>|"Alertas Filtradas"| EVENTS
+    EVENTS -.->|"Indexador (build_index.py)"| SQLITE
+    RAW -.->|"Indexador (build_index.py)"| SQLITE
+    SQLITE <-->|"Consultas"| API
+    NPZ -.->|"Diezmado 3D JSON"| API
 ```
 
 ### Resumen Capa por Capa
@@ -163,12 +218,13 @@ flowchart TB
 | **2** | **Adquisición Contenedorizada** — Captura datos IQ crudos dentro de Docker con contratos de metadatos SigMF y hashes SHA256 de integridad. | `capture_iq.py`, `validate_meta.py`, `probe_device.py` | 1-8 |
 | **3** | **DSP y Extracción de Características** — Genera espectrogramas (FFT) y extrae métricas físicas (SNR, potencia, ancho de banda) por trama. | `stream_processor.py`, `extract_features.py`, `features_config_*.json` | 9-13 |
 | **4** | **Motor de Eventos Tácticos** — Una FSM determinista que convierte métricas crudas en alertas consolidadas con severidad, confianza y lógica anti-fragmentación. | `engine.py`, `run_event_engine.py`, `rules_config.json` | 14 |
+| **5** | **API Unificada y Dashboard Web** — Proporciona una interfaz REST en un solo puerto y un dashboard Jinja2 renderizado en el servidor para explorar sesiones, eventos y evidencia. | `app/api/main.py`, `app/dashboard/main.py`, `run_demo.sh` | 15-19 |
 
 ---
 
 ## 🛡️ Watchdog y Tolerancia a Fallos (Detalle)
 
-Uno de los subsistemas más críticos es el **Watchdog en Espacio de Usuario**, que opera fuera del contenedor Docker para garantizar resiliencia de hardware:
+Uno de los subsistemas más críticos es el **Watchdog en Espacio de Usuario**, que opera fuera del contenedor Docker para garantizar la resiliencia del hardware:
 
 ```
 ┌──────────────────────────────────────────────────┐
@@ -194,71 +250,13 @@ Uno de los subsistemas más críticos es el **Watchdog en Espacio de Usuario**, 
 
 ---
 
-## ⚙️ Requisitos de Hardware
-
-| Componente | Especificación | Rol |
-| :--- | :--- | :--- |
-| **Analizador SDR** | Harogic SAN-400 (9 kHz – 40 GHz) | Escaneo principal de espectro electromagnético. |
-| **Interfaz** | USB 3.0 / USB-C de Alta Velocidad | Transferencia de muestras IQ en tiempo real. |
-| **Host** | Ubuntu Linux (Físico o VM) | Contenedores, almacenamiento y Watchdog. |
-
----
-
-## 📥 Dependencias Externas y Descargas
-
-Este repositorio **no** contiene binarios de terceros ni software pesado del fabricante.
-
-1. **Contenedor RF-Swift (PentHertz):**
-   - **Pull:** `docker pull penthertz/rfswift_noble:sdr_full`
-   - **Documentación:** [PentHertz GitHub / RF-Swift](https://github.com/PentHertz/RF-Swift)
-2. **SAStudio4 y SDK de Harogic:**
-   - **Descarga:** [Página Oficial de Descargas de Harogic](http://www.harogic.eu/download/)
-   - *Nota: Solo necesario si deseas usar la interfaz gráfica original. Spectre-Horizon usa el driver SoapySDR embebido dentro del contenedor RF-Swift.*
-
----
-
-## 🚀 Instalación y Despliegue
-
-### 1. Preparar el Entorno
-```bash
-rfswift run -i penthertz/rfswift_noble:sdr_full -s /dev/bus/usb -u 1
-```
-
-### 2. Clonar el Repositorio
-```bash
-git clone https://github.com/dielectronico314/Spectre-Horizon.git
-cd Spectre-Horizon
-```
-
----
-
-## 🛠 Uso y Comandos
-
-### Captura Resiliente
-```bash
-./scripts/capture.sh --freq 106.5e6 --rate 1.953125e6 --gain 0 --duration 180 --chunk-duration 30
-```
-
-### Extracción de Características (DSP)
-```bash
-python3 scripts/extract_features.py captura.npz --config config/features_config_fm_106.5.json --out-dir results/
-```
-
-### Motor de Eventos (Alertas Tácticas)
-```bash
-python3 scripts/run_event_engine.py results/features_captura.csv --rules-config config/rules_config.json --out-dir results/
-```
-
----
-
 ## 📦 Estructura de Datos (SigMF)
 
-Por cada bloque de captura se generan dos archivos acoplados:
-
+Para garantizar estándares de investigación científica, por cada bloque se generan dos archivos acoplados:
 1. **Archivo Binario (.iq):** Volcado crudo de memoria con flotantes complejos (`CF32` o `CI16`).
 2. **Archivo de Metadatos (.sigmf-meta):** JSON universal con telemetría de hardware, hashes SHA256 de custodia de datos y parámetros de señal.
 
-Para la especificación completa del esquema SigMF v0.1, consulta `docs/CONTRATO_METADATA.md`.
+Para la especificación completa del esquema SigMF v0.1 y el diccionario de datos, lee `docs/CONTRATO_METADATA.md`.
 
 ---
 
@@ -316,11 +314,11 @@ Actualmente en **Fase 3** (Eventos e Inteligencia). Progreso:
 - [x] **Día 12:** Pipeline de Streaming FFT en Tiempo Real (Ring Buffer Lock-free).
 - [x] **Día 13:** Extracción de Características DSP (Potencia, SNR, Ancho de Banda por trama).
 - [x] **Día 14:** Motor de Eventos Lógico Determinista (FSM para alertas tácticas).
-- [ ] **Día 15:** Empaquetado de Evidencia con hashes de integridad.
-- [ ] **Día 16:** API REST para consulta de sesiones y eventos (FastAPI).
-- [ ] **Día 17:** Dashboard Web Mínimo (Waterfall + Tabla de Alertas).
-- [ ] **Día 18:** Generación Automatizada de Reportes de Sesión (HTML/PDF).
-- [ ] **Día 19:** Empaquetado del Sistema y Ensayo General.
+- [x] **Día 15:** Empaquetado de Evidencia con hashes de integridad.
+- [x] **Día 16:** API REST para consulta de sesiones y eventos (FastAPI).
+- [x] **Día 17:** Dashboard Web Mínimo (Waterfall + Tabla de Alertas).
+- [x] **Día 18:** Generación Automatizada de Reportes de Sesión (HTML/PDF).
+- [x] **Día 19:** Unificación del Sistema, Purga de Base de Datos y Ensayo General.
 - [ ] **Día 20:** Aceptación Formal, Demo en Vivo e Informe Final.
 
 ---
