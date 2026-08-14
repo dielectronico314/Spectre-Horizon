@@ -162,13 +162,13 @@ def system_log_tail(lines: int = 20):
     """
     log_path = PROJECT_ROOT / "services.log"
     if not log_path.exists():
-        return {"lines": ["Log de servicios no encontrado."]}
+        return {"available": False, "lines": ["Log de servicios no encontrado."]}
         
     try:
         res = subprocess.run(["tail", "-n", str(lines), str(log_path)], capture_output=True, text=True)
-        return {"lines": res.stdout.strip().split("\n")}
+        return {"available": True, "lines": res.stdout.strip().split("\n")}
     except Exception as e:
-        return {"lines": [f"Error al leer el log: {str(e)}"]}
+        return {"available": False, "lines": [f"Error al leer el log: {str(e)}"]}
 
 @api_router.get("/sessions", response_model=List[SessionResponse], tags=["Sesiones"])
 def list_sessions(
