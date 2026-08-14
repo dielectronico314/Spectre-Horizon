@@ -64,6 +64,48 @@ def health_check():
     except Exception as e:
         raise HTTPException(status_code=500, detail="Database connection failed")
 
+def _check_hardware_cached():
+    import time
+    import json
+    import os
+    
+    cache_file = "/tmp/harogic_hw_cache.json"
+    now = time.time()
+    
+    # Intenta leer el caché
+    if os.path.exists(cache_file):
+        try:
+            with open(cache_file, "r") as f:
+                data = json.load(f)
+            if now - data.get("timestamp", 0) < 5:
+                return data.get("sensor_conectado", False)
+        except Exception:
+            pass
+            
+    sensor_conectado = False
+    try:
+        res = subprocess.run(
+            ["python3", str(PROJECT_ROOT / "scripts" / "probe_device.py")],
+            capture_output=True, text=True, timeout=10
+        )
+        if res.returncode == 0:
+            stdout = res.stdout
+            json_start = stdout.find('{')
+            if json_start != -1:
+                parsed = json.loads(stdout[json_start:])
+                sensor_conectado = parsed.get("status") == "success"
+    except Exception:
+        pass
+        
+    # Escribe el caché
+    try:
+        with open(cache_file, "w") as f:
+            json.dump({"timestamp": now, "sensor_conectado": sensor_conectado}, f)
+    except Exception:
+        pass
+        
+    return sensor_conectado
+
 @api_router.get("/sensor/status", response_model=SensorStatusResponse, tags=["General"])
 def sensor_status():
     """
@@ -79,21 +121,8 @@ def sensor_status():
         ultima_captura_utc = row["start_datetime"] if row else None
         eventos_totales = count_row["c"] if count_row else 0
         
-        # Consultar la conectividad real del hardware mediante subprocess para aislar crashes de C++
-        sensor_conectado = False
-        try:
-            res = subprocess.run(
-                ["python3", str(PROJECT_ROOT / "scripts" / "probe_device.py")],
-                capture_output=True, text=True, timeout=10
-            )
-            if res.returncode == 0:
-                stdout = res.stdout
-                json_start = stdout.find('{')
-                if json_start != -1:
-                    data = json.loads(stdout[json_start:])
-                    sensor_conectado = data.get("status") == "success"
-        except Exception:
-            pass
+        # Consultar la conectividad real del hardware mediante subprocess con caché de 5s
+        sensor_conectado = _check_hardware_cached()
         
         return {
             "ultima_sesion": ultima_sesion,
