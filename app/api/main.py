@@ -124,12 +124,25 @@ def sensor_status():
         # Consultar la conectividad real del hardware mediante subprocess con caché de 5s
         sensor_conectado = _check_hardware_cached()
         
+        sensor_fresco = False
+        if ultima_captura_utc:
+            try:
+                from datetime import datetime, timezone
+                dt_str = ultima_captura_utc.replace("Z", "+00:00")
+                dt = datetime.fromisoformat(dt_str)
+                now_utc = datetime.now(timezone.utc)
+                delta_s = (now_utc - dt).total_seconds()
+                sensor_fresco = 0 <= delta_s < 300
+            except Exception:
+                pass
+                
         return {
             "ultima_sesion": ultima_sesion,
             "ultima_captura_utc": ultima_captura_utc,
             "en_vivo": False,
             "eventos_totales": eventos_totales,
-            "sensor_conectado": sensor_conectado
+            "sensor_conectado": sensor_conectado,
+            "sensor_fresco": sensor_fresco
         }
     finally:
         conn.close()
