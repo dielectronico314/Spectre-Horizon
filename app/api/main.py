@@ -155,6 +155,21 @@ async def sensor_health():
     res = await run_in_threadpool(probe)
     return res
 
+@api_router.get("/system/log-tail", tags=["System"])
+def system_log_tail(lines: int = 20):
+    """
+    Retorna las últimas N líneas del log de servicios del contenedor.
+    """
+    log_path = PROJECT_ROOT / "services.log"
+    if not log_path.exists():
+        return {"lines": ["Log de servicios no encontrado."]}
+        
+    try:
+        res = subprocess.run(["tail", "-n", str(lines), str(log_path)], capture_output=True, text=True)
+        return {"lines": res.stdout.strip().split("\n")}
+    except Exception as e:
+        return {"lines": [f"Error al leer el log: {str(e)}"]}
+
 @api_router.get("/sessions", response_model=List[SessionResponse], tags=["Sesiones"])
 def list_sessions(
     desde: Optional[date] = Query(None, description="Filtrar sesiones desde esta fecha (inclusive)"),
