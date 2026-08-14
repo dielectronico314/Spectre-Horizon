@@ -58,10 +58,15 @@
     </div>
 
     <div id="main-status-bar">
-    {% if status.sensor_conectado %}
+    {% if status.sensor_conectado and sensor_fresco %}
         <div class="status-bar" style="background-color: var(--success); color: #000;">
             <span class="status-label"><i data-lucide="circle-dot" style="color: var(--sev-low); vertical-align: -3px;"></i> Sensor Conectado y Listo</span>
             <span>(Hardware OK)</span>
+        </div>
+    {% elif status.sensor_conectado %}
+        <div class="status-bar warning" style="background-color: var(--sev-medium); color: #000;">
+            <span class="status-label"><i data-lucide="triangle-alert" style="color: #000; vertical-align: -3px;"></i> Sensor Inactivo (Hardware Conectado)</span>
+            <span>Sin datos recientes. Esperando captura.</span>
         </div>
     {% else %}
         <div class="status-bar error">
