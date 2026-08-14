@@ -2,3 +2,4 @@
 2. [Medio impacto] merge_gap_s por perfil de tráfico — validar con tráfico paquetizado real (WiFi/BT), el esquema de "profiles" ya existe en rules_config.json.
 3. [Fuera de alcance de mes 1, requiere decisión de producto] Demonio orquestador / tap de IQ en vivo para consumidores externos (TETRA-Demod) — su propio ciclo de diseño.
 4. [Requiere decisión de alcance, no solo ingeniería] "Radio cognitiva" con decisión/actuación autónoma sobre el espectro es una categoría de riesgo distinta a percepción pasiva — evaluar como proyecto propio si se prioriza.
+5. [Medio impacto] Arreglar `PALABRAS_PROHIBIDAS` en el linter de reportes (`lint_reporte`) para que sea consciente de contexto, no un substring ciego. Ya causó dos falsos positivos con la misma palabra 'clasifica' (por ejemplo, "esto se clasifica como severidad alta" vs "clasifica el tipo de señal").

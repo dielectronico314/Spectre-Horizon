@@ -58,7 +58,7 @@ def explain_evento(evento: dict) -> str:
             f"La potencia detectada en la banda {evento.get('band_name', '?')} "
             f"superó el umbral durante {duracion:.2f} segundos seguidos, "
             f"pero el margen de ruido exacto no está disponible para este evento antiguo. "
-            f"Esto se clasifica como {sev_label['descripcion'].lower()}."
+            f"Esto se considera como {sev_label['descripcion'].lower()}."
         )
 
     margen_db = evento.get("pico_dbfs", 0) - piso_ruido_dbfs
@@ -66,7 +66,7 @@ def explain_evento(evento: dict) -> str:
         f"La potencia detectada en la banda {evento.get('band_name', '?')} "
         f"superó el nivel de ruido esperado por aproximadamente {margen_db:.0f} dB "
         f"durante {duracion:.2f} segundos seguidos. "
-        f"Esto se clasifica como {sev_label['descripcion'].lower()}."
+        f"Esto se considera como {sev_label['descripcion'].lower()}."
     )
     
     # Documentar explícitamente el tono continuo sintético del Golden Dataset
