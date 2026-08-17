@@ -1,6 +1,6 @@
 [
   {
-    "event_id": "test_session_TestBand_evt_0001",
+    "event_id": "deadbeef_TestBand_0001",
     "session_id": "test_session",
     "band_name": "TestBand",
     "rule_name": "power_threshold",
@@ -10,13 +10,14 @@
     "duration_s": 0.4,
     "pico_dbfs": -23.0,
     "potencia_media_activa_dbfs": -25.0,
+    "piso_ruido_dbfs": -40.0,
     "severidad": "medium",
     "confianza": 0.9,
     "n_fusiones": 0,
     "closed_reason": "threshold_off"
   },
   {
-    "event_id": "test_session_TestBand_evt_0002",
+    "event_id": "deadbeef_TestBand_0002",
     "session_id": "test_session",
     "band_name": "TestBand",
     "rule_name": "power_threshold",
@@ -26,6 +27,7 @@
     "duration_s": 0.3999999999999999,
     "pico_dbfs": -23.0,
     "potencia_media_activa_dbfs": -25.0,
+    "piso_ruido_dbfs": -40.0,
     "severidad": "medium",
     "confianza": 0.9,
     "n_fusiones": 0,

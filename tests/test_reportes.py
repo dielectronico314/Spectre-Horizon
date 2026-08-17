@@ -47,12 +47,32 @@ def test_reporte_datos_coinciden(clean_session_id):
         assert str(evt["severidad"]) in html
         assert str(evt["duration_s"]) in html
 
+from unittest.mock import patch
+
 def test_reporte_menciona_interrupciones(interrupt_session_id):
     """
     Sesión con tuvo_interrupciones=true incluye el aviso explícito.
     """
-    html = generate_report_html(interrupt_session_id)
-    assert "interrupciones de hardware" in html.lower()
+    with patch('app.reports.generator.get_session_data') as mock_data:
+        mock_data.return_value = {
+            "session_id": interrupt_session_id,
+            "freq_mhz": 923.0,
+            "fs_hz": 1950000.0,
+            "start_datetime": "2026-08-04T16:00:12Z",
+            "duration_s": 72.84,
+            "dtype": "ci16_le",
+            "n_events": 0,
+            "tuvo_interrupciones": True,
+            "eventos": [],
+            "hashes": {},
+            "resumen": {
+                "potencia_media_dbfs": -85.2,
+                "snr_medio_db": 12.4,
+                "bw_medio_khz": 250
+            }
+        }
+        html = generate_report_html(interrupt_session_id)
+        assert "interrupciones de hardware" in html.lower()
 
 def test_reporte_lint_lenguaje(clean_session_id):
     """

@@ -125,12 +125,12 @@ for meta in meta_files:
     meta_path = os.path.join(session_path, meta)
     
     # Espectrograma
-    cmd1 = ["docker", "exec", "-w", "/workspace", "harogic_final", "python3", "scripts/generate_spectrogram.py", meta_path, "-o", session_path]
+    cmd1 = ["python3", "scripts/generate_spectrogram.py", meta_path, "-o", session_path]
     subprocess.run(cmd1, check=True, stdout=subprocess.DEVNULL)
     
     # Extraer features (la ruta del NPZ y CSV)
     npz_path = meta_path.replace(".sigmf-meta", "_espectrograma.npz")
-    cmd2 = ["docker", "exec", "-w", "/workspace", "harogic_final", "python3", "scripts/extract_features.py", npz_path, "--config", test_config, "--out-dir", session_path]
+    cmd2 = ["python3", "scripts/extract_features.py", npz_path, "--config", test_config, "--out-dir", session_path]
     subprocess.run(cmd2, check=True, stdout=subprocess.DEVNULL)
     
     # Validar JSON de features
