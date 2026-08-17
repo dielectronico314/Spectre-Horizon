@@ -52,6 +52,7 @@ from unittest.mock import patch
 def test_reporte_menciona_interrupciones(interrupt_session_id):
     """
     Sesión con tuvo_interrupciones=true incluye el aviso explícito.
+    (Nota: prueba solo el renderizado de plantilla, no la detección de interrupciones — ver test de integración del indexador para eso).
     """
     with patch('app.reports.generator.get_session_data') as mock_data:
         mock_data.return_value = {
