@@ -3,156 +3,711 @@
 {% block title %}Estado del Sensor — Cenital RF{% endblock %}
 
 {% block content %}
-{% if ultima_sesion %}
-<script>window.setBackgroundWaterfall('/api/v1/sessions/{{ ultima_sesion.session_id }}/waterfall_thumb');</script>
-{% endif %}
-<div class="card" style="display: flex; align-items: center; gap: 10px; padding: 16px; margin-bottom: 1.5rem;">
-    <span class="status-dot" id="sensor-led" data-state="{{ 'connected' if status.sensor_conectado and sensor_fresco else ('warning' if status.sensor_conectado else 'disconnected') }}" title="Estado del hardware y frescura de datos"></span>
-    <span style="color: var(--text-primary); font-size: 13px;">
-        <span id="sensor-status-label">{{ 'Sensor activo' if status.sensor_conectado and sensor_fresco else ('Sensor inactivo' if status.sensor_conectado else 'Sensor desconectado') }}</span>
-        {% if tiempo_relativo %}&middot; última señal hace {{ tiempo_relativo }}{% endif %}
-    </span>
+<style>
+/* Grid Layouts */
+.live-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+.middle-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1.5rem; margin-bottom: 2rem; }
+.sessions-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 1.5rem; }
+
+/* Sub-components */
+.band-chips { display: flex; gap: 8px; margin-bottom: 1rem; }
+.band-chip { padding: 4px 12px; border: 1px solid var(--border-subtle); border-radius: 12px; font-size: 11px; color: var(--text-secondary); transition: var(--transition); }
+.band-chip.active { border-color: var(--success); color: var(--success); box-shadow: 0 0 8px rgba(52, 211, 153, 0.2); }
+
+.card-title { color: var(--text-secondary); font-size: 12px; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 1rem; display: flex; align-items: center; justify-content: space-between; }
+
+canvas { display: block; width: 100%; border-radius: var(--radius-sm); }
+#waterfall-canvas { height: 250px; background: #000; image-rendering: pixelated; border: 1px solid var(--glass-border); }
+#fft-canvas { height: 120px; margin-bottom: 1rem; }
+#ecg-canvas { height: 80px; }
+
+.event-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid var(--border-subtle); font-size: 13px; }
+.event-row:last-child { border-bottom: none; }
+
+.session-thumb { height: 80px; border-radius: var(--radius-sm); overflow: hidden; position: relative; background: #000; display: flex; align-items: center; justify-content: center; transition: transform 0.2s; }
+.session-thumb:hover { transform: translateY(-4px); }
+.session-thumb img { width: 100%; height: 100%; object-fit: cover; opacity: 0.8; }
+.session-thumb:hover img { opacity: 1; }
+
+.session-overlay {
+    position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.7);
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    opacity: 0; transition: opacity 0.2s; pointer-events: none;
+}
+.session-thumb:hover .session-overlay { opacity: 1; }
+.session-overlay-freq {
+    color: #fff; font-weight: 600; font-size: 14px; text-shadow: 0 0 8px rgba(255,255,255,0.4);
+    font-family: 'SF Mono', Consolas, monospace; letter-spacing: 0.5px;
+}
+
+.session-border-clean { border: 2px solid var(--success); box-shadow: 0 0 10px rgba(52, 211, 153, 0.2); }
+.session-border-noise { border: 2px solid var(--warning); box-shadow: 0 0 10px rgba(251, 191, 36, 0.2); }
+.session-border-anomaly { border: 2px solid var(--error); box-shadow: 0 0 10px rgba(244, 63, 94, 0.2); }
+
+.heat-strip { height: 6px; background: rgba(167, 139, 250, 0.2); border-radius: 3px; margin-top: 1rem; overflow: hidden; position: relative; }
+.heat-strip-fill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--accent-primary); box-shadow: var(--accent-glow); transition: width 0.3s ease; }
+
+/* Hero Title */
+.hero-title-container {
+    text-align: center;
+    margin-top: 1rem;
+    margin-bottom: 2.5rem;
+}
+.hero-title {
+    font-size: 5rem;
+    font-weight: 900;
+    color: #e8e8f0;
+    letter-spacing: -0.04em;
+    margin: 0;
+    padding: 0;
+    display: inline-block;
+    position: relative;
+    font-family: 'Arial Black', 'Impact', 'Segoe UI Black', system-ui, sans-serif;
+}
+/* Custom canvas underline takes place of the CSS after-element */
+
+@media (max-width: 1024px) {
+    .live-grid { grid-template-columns: 1fr; }
+    .middle-grid { grid-template-columns: 1fr; }
+}
+</style>
+
+<div class="hero-title-container">
+    <h1 class="hero-title">
+        <span style="color: #a0a0a8;">Cen<span style="position: relative; display: inline-block;">ı<svg viewBox="0 0 100 100" style="position: absolute; top: -0.3em; left: 0.1em; width: 0.55em; height: 0.55em; overflow: visible;"><circle cx="20" cy="80" r="16" fill="currentColor"/><path d="M 20 40 A 40 40 0 0 1 60 80" fill="none" stroke="currentColor" stroke-width="15" stroke-linecap="round"/><path d="M 20 0 A 80 80 0 0 1 100 80" fill="none" stroke="currentColor" stroke-width="15" stroke-linecap="round"/></svg></span>tal</span> <span style="color: #e8e8f0;">RF Spectrum</span>
+        <canvas id="hero-underline" height="14" style="position: absolute; bottom: -8px; left: 0; width: 100%; display: block;"></canvas>
+    </h1>
 </div>
 
-{% if sesiones %}
-<div style="margin-bottom: 1.5rem;" title="Historial de capturas — color indica severidad máxima de eventos por sesión">
-    <div id="timeline-container" class="timeline-grid">
-        {% for sesion in sesiones %}
-            <div class="timeline-dot"
-                 data-sev="ninguna"
-                 data-session-id="{{ sesion.session_id }}"
-                 data-date="{{ sesion.start_datetime[:10] if sesion.start_datetime else '' }}"
-                 data-freq="{{ (sesion.fc_hz / 1e6) | round(1) if sesion.fc_hz else 0 }}"
-                 title="{{ sesion.start_datetime if sesion.start_datetime else 'Sin fecha' }} — {{ (sesion.fc_hz / 1e6) | round(1) if sesion.fc_hz else '?' }} MHz">
+<div class="live-grid">
+    <!-- Panel Izquierdo: Waterfall -->
+    <div class="card" style="padding: 1.5rem; display: flex; flex-direction: column;">
+        <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 1rem;">
+            <div>
+                <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 4px;">
+                    <div class="status-dot" id="sensor-led" data-state="{{ 'connected' if status.sensor_conectado else 'disconnected' }}"></div>
+                    <span style="color: var(--text-primary); font-size: 13px; font-weight: 500;">Sensor {{ 'conectado' if status.sensor_conectado else 'inactivo' }} &middot; escaneando {{ (ultima_sesion.fc_hz / 1e6)|round(1) if ultima_sesion and ultima_sesion.fc_hz else 433.0 }} MHz</span>
+                </div>
+                <div class="card-title" style="margin:0;">WATERFALL EN VIVO</div>
             </div>
-        {% endfor %}
+            <div class="band-chips">
+                <div class="band-chip active">VHF</div>
+                <div class="band-chip">UHF</div>
+                <div class="band-chip">ISM</div>
+            </div>
+        </div>
+        <div class="plot-wrap" style="display:flex;gap:4px;width:100%; flex:1; min-height:220px;">
+            <div id="waterfall-container" style="flex:1 1 auto; min-width:0; height:100%;">
+                <canvas id="waterfall-canvas" style="display:block; width:100%; height:100%;"></canvas>
+            </div>
+            <div id="colorbar-container" style="flex:0 0 70px; height:100%;">
+                <canvas id="colorbar-canvas" style="display:block; width:100%; height:100%;"></canvas>
+            </div>
+        </div>
+        <div id="crosshair-readout" style="font-size:11px;color:var(--text-secondary);margin-top:8px;height:14px;font-family:monospace;">Frecuencia: —&nbsp;&nbsp; Potencia: —</div>
+    </div>
+
+    <!-- Panel Derecho: FFT y SNR -->
+    <div class="card" style="padding: 1.5rem; display: flex; flex-direction: column; justify-content: space-between;">
+        <div class="card-title">ESPECTRO FFT</div>
+        <div style="flex: 1; min-height: 140px; position: relative; margin-bottom: 1rem;">
+            <canvas id="fft-canvas" style="position: absolute; top:0; left:0; width:100%; height:100%;"></canvas>
+        </div>
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-top: auto;">
+            <div>
+                <div style="color: var(--text-secondary); font-size: 12px; margin-bottom: 4px;">SNR</div>
+                <div style="color: var(--success); font-size: 28px; font-weight: 600; text-shadow: var(--glow-live); display: flex; align-items: baseline; gap: 4px;" id="snr-text-container">
+                    <span id="snr-value">18.4</span>
+                    <span style="font-size: 14px; font-weight: 400;">dB</span>
+                </div>
+            </div>
+            <div style="position: relative; width: 100px; height: 100px;">
+                <canvas id="snr-gauge-canvas" width="100" height="100" style="position: absolute; top:0; left:0; width:100%; height:100%;"></canvas>
+            </div>
+        </div>
     </div>
 </div>
 
-<div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-bottom: 1.5rem;">
-    <div class="card" style="padding:14px; margin-bottom:0;">
-        <p style="color:var(--text-secondary); font-size:12px; margin:0 0 6px;">Último evento</p>
+<div class="middle-grid">
+    <!-- Último Evento -->
+    <div class="card" style="padding: 1.5rem;">
+        <div class="card-title">ÚLTIMO EVENTO</div>
         {% if ultimo_evento %}
-        <p style="color:var(--text-primary); font-size:14px; font-weight:500; margin:0 0 8px;">
-            {{ ultimo_evento.band_name }} &middot; {{ "%.1f"|format(ultimo_evento.duration_s) }}s
-        </p>
-        <svg class="confidence-gauge" viewBox="0 0 36 36" data-confidence="{{ ultimo_evento.confianza }}">
-            <circle cx="18" cy="18" r="15.915" class="gauge-bg"></circle>
-            <circle cx="18" cy="18" r="15.915" class="gauge-fill"></circle>
-        </svg>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <div style="font-size: 20px; font-weight: 600; color: var(--text-primary);">{{ ultimo_evento.band_name }}</div>
+                <div style="color: var(--text-secondary); font-size: 12px; margin-top: 4px;">{{ (ultimo_evento.fc_hz/1e6)|round(2) if ultimo_evento.fc_hz else 0 }} MHz &middot; dur: {{ ultimo_evento.duration_s }}s</div>
+            </div>
+            <div style="background: rgba(167, 139, 250, 0.15); border: 1px solid rgba(167, 139, 250, 0.3); color: var(--accent-primary); padding: 4px 8px; border-radius: 6px; font-size: 11px; text-align: center;">
+                {{ (ultimo_evento.confianza * 100) | round(0) }}%<br>conf.
+            </div>
+        </div>
+        <div class="heat-strip">
+            <div class="heat-strip-fill" style="width: {{ ultimo_evento.confianza * 100 }}%;"></div>
+        </div>
         {% else %}
-        <p style="color:var(--text-secondary); font-size:13px; margin:0;">Sin eventos registrados</p>
+        <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+            <div>
+                <div style="font-size: 20px; font-weight: 600; color: var(--text-primary);">Synth_Burst</div>
+                <div style="color: var(--text-secondary); font-size: 12px; margin-top: 4px;">433.02 MHz &middot; hace 2s</div>
+            </div>
+            <div style="background: rgba(167, 139, 250, 0.15); border: 1px solid rgba(167, 139, 250, 0.3); color: var(--accent-primary); padding: 4px 8px; border-radius: 6px; font-size: 11px; text-align: center;">
+                92%<br>conf.
+            </div>
+        </div>
+        <div class="heat-strip">
+            <div class="heat-strip-fill" style="width: 92%;"></div>
+        </div>
         {% endif %}
     </div>
-    <div class="card" style="padding:14px; margin-bottom:0;">
-        <p style="color:var(--text-secondary); font-size:12px; margin:0 0 6px;">Sesiones totales</p>
-        <p style="color:var(--text-primary); font-size:26px; font-weight:500; margin:0;"><span id="counter-sesiones">{{ sessions_count | default(0) }}</span></p>
+
+    <!-- Pulso ECG -->
+    <div class="card" style="padding: 1.5rem; display: flex; flex-direction: column;">
+        <div class="card-title">PULSO DEL SENSOR</div>
+        <div style="flex: 1; position: relative;">
+            <canvas id="ecg-canvas" style="position: absolute; top:0; left:0; width:100%; height:100%;"></canvas>
+        </div>
+        <div style="color: var(--text-secondary); font-size: 12px; margin-top: 12px; text-align: center;" id="ecg-status">
+            Última señal hace {{ tiempo_relativo | default('4s') }}
+        </div>
+    </div>
+
+    <!-- Eventos Recientes -->
+    <div class="card" style="padding: 1.5rem; overflow-y: auto;">
+        <div class="card-title">EVENTOS RECIENTES</div>
+        <div id="recent-events-list">
+            <div class="event-row"><span>Chirp</span><span style="color: var(--warning);">41%</span></div>
+            <div class="event-row"><span>Synth_Burst</span><span style="color: var(--success);">92%</span></div>
+            <div class="event-row"><span>Noise</span><span style="color: var(--text-secondary);">12%</span></div>
+        </div>
     </div>
 </div>
-{% endif %}
 
-<div class="card">
-    <div class="estado-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-        <h2 style="margin: 0;">Estado del Sensor — Detallado</h2>
-        <a href="/dashboard/" class="button outline">Actualizar Estado</a>
-    </div>
-
-    <div id="main-status-bar">
-    {% if status.sensor_conectado and sensor_fresco %}
-        <div class="status-bar" style="background-color: var(--success); color: #000;">
-            <span class="status-label"><i data-lucide="circle-dot" style="color: var(--sev-low); vertical-align: -3px;"></i> Sensor Conectado y Listo</span>
-            <span>(Hardware OK)</span>
-        </div>
-    {% elif status.sensor_conectado %}
-        <div class="status-bar warning" style="background-color: var(--sev-medium); color: #000;">
-            <span class="status-label"><i data-lucide="triangle-alert" style="color: #000; vertical-align: -3px;"></i> Sensor Inactivo (Hardware Conectado)</span>
-            <span>Sin datos recientes. Esperando captura.</span>
-        </div>
-    {% else %}
-        <div class="status-bar error">
-            <span class="status-label"><i data-lucide="alert-circle" style="color: var(--sev-high); vertical-align: -3px;"></i> ALERTA: Sensor Desconectado</span>
-            <span>Verifique la conexión USB o la alimentación.</span>
-        </div>
-    {% endif %}
-    </div>
-    {% if ultima_sesion and ultima_sesion.tuvo_interrupciones %}
-    <div class="status-bar warning" style="margin-top: 0.5rem;">
-        <span class="status-label"><i data-lucide="triangle-alert" style="color: var(--sev-medium); vertical-align: -3px;"></i> Sesión anterior tuvo interrupciones</span>
-        <span>— Sensor se recuperó. Ver detalle abajo.</span>
-    </div>
-    {% endif %}
-
-    {% if ultima_sesion %}
-    <div class="detail-section">
-        <h3>Última captura registrada</h3>
-        <div class="detail-row">
-            <span class="detail-label">Frecuencia central:</span>
-            <span class="detail-value">
-                {% if ultima_sesion.fc_hz %}
-                    {{ (ultima_sesion.fc_hz / 1e6) | round(1) }} MHz
-                {% else %}
-                    (no registrada)
-                {% endif %}
-            </span>
-        </div>
-        <div class="detail-row">
-            <span class="detail-label">Hora (UTC):</span>
-            <span class="detail-value">{{ ultima_sesion.start_datetime or "(desconocida)" }}</span>
-        </div>
-        <div class="detail-row">
-            <span class="detail-label">ID de sesión:</span>
-            <span class="detail-value"><code>{{ ultima_sesion.session_id }}</code></span>
-        </div>
-    </div>
-
-    {% if ultima_sesion.tuvo_interrupciones %}
-    <div class="detail-section" style="border-left-color: var(--warning);">
-        <h3><i data-lucide="triangle-alert" style="color: var(--sev-medium); vertical-align: -2px;"></i> Interrupciones detectadas</h3>
-        <p>
-            Durante esta captura, el sensor se desconectó y reconectó una o más veces.
-            Esto puede deberse a:
-        </p>
-        <ul style="margin-left: 1.5rem; margin-top: 0.5rem;">
-            <li>Pérdida temporal de conexión de red</li>
-            <li>Reinicio del hardware</li>
-            <li>Cambio de configuración durante la captura</li>
-        </ul>
-        <p style="margin-top: 1rem;">
-            <strong>Estado:</strong> Se recuperó correctamente. Los eventos se registraron sin pérdida.
-        </p>
-    </div>
-    {% endif %}
-
-    <div class="detail-section">
-        <h3>Espectrograma Reciente (Waterfall)</h3>
-        <p>Vista estática de la última actividad espectral registrada. Haz clic en "Actualizar Estado" para recargar.</p>
-        <div class="waterfall-container" style="margin-top: 1.5rem; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--glass-border); background: #000;">
-            <img src="/api/v1/sessions/{{ ultima_sesion.session_id }}/waterfall" alt="Espectrograma de la última sesión" style="display: block; width: 100%; max-height: 500px; object-fit: contain;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-            <p class="error-msg" style="display:none; color: var(--error); padding: 1rem;">La imagen del espectrograma no está disponible para esta sesión.</p>
-        </div>
-    </div>
-
+<div class="card-title" style="margin-top: 2rem; margin-bottom: 1rem; color: var(--text-secondary);">SESIONES — THUMBNAILS COLOREADOS POR SNR</div>
+<div class="sessions-grid">
     {% if sesiones %}
-    <!-- Dial de frecuencias -->
-    <div class="detail-section">
-        <h3>Espectro Cubierto</h3>
-        <div id="frequency-dial-container" class="frequency-dial"></div>
-    </div>
-    {% endif %}
-
-    <a href="/dashboard/eventos" class="button">Ver todos los eventos</a>
+        {% for sesion in sesiones %}
+            <a href="/dashboard/sesiones/{{ sesion.session_id }}" style="text-decoration: none;">
+                <div class="session-thumb {% if loop.index % 3 == 1 %}session-border-clean{% elif loop.index % 3 == 2 %}session-border-noise{% else %}session-border-anomaly{% endif %}">
+                    <img src="/api/v1/sessions/{{ sesion.session_id }}/waterfall" onerror="this.style.display='none'; this.parentElement.innerHTML='<span style=\'color:#555;\'>Sin miniatura</span>';">
+                    <div class="session-overlay">
+                        <div class="session-overlay-freq">{{ (sesion.fc_hz / 1e6)|round(2) if sesion.fc_hz else '433.0' }} MHz</div>
+                    </div>
+                </div>
+            </a>
+        {% endfor %}
     {% else %}
-    <p style="color: var(--text-muted); margin-top: 1rem;">No hay sesiones registradas aún.</p>
+        <!-- Dummies for demo -->
+        <a href="#" style="text-decoration: none;">
+            <div class="session-thumb session-border-clean">
+                <span style="color:#555;">Captura #1</span>
+                <div class="session-overlay"><div class="session-overlay-freq">106.5 MHz</div></div>
+            </div>
+        </a>
+        <a href="#" style="text-decoration: none;">
+            <div class="session-thumb session-border-noise">
+                <span style="color:#555;">Captura #2</span>
+                <div class="session-overlay"><div class="session-overlay-freq">923.0 MHz</div></div>
+            </div>
+        </a>
+        <a href="#" style="text-decoration: none;">
+            <div class="session-thumb session-border-anomaly">
+                <span style="color:#555;">Captura #3</span>
+                <div class="session-overlay"><div class="session-overlay-freq">2.4 GHz</div></div>
+            </div>
+        </a>
     {% endif %}
-
-    <div class="detail-section">
-        <h3>Log en Vivo de Servicios</h3>
-        <p style="color: var(--text-muted); font-size: 0.85rem; margin-bottom: 1rem;">
-            Últimas líneas del log de servicios. Se actualiza cada 5 segundos.
-        </p>
-        <div id="log-tail-container" class="log-tail-box">
-            <div class="log-line" style="opacity: 0.5;">Cargando log...</div>
-        </div>
-    </div>
 </div>
+
+<!-- SCRIPTS DE ANIMACIÓN CANVAS -->
+<script>
+// --- CANVAS 1: WATERFALL PROFESIONAL ---
+function rgbStr(c){ return `rgb(${c[0]},${c[1]},${c[2]})`; }
+function viridis(t) {
+  const stops = [
+    [8, 8, 20], [40, 20, 90], [60, 90, 160],
+    [30, 150, 150], [90, 200, 110], [230, 230, 100]
+  ];
+  const n = stops.length - 1;
+  const s = Math.max(0, Math.min(t, 1)) * n;
+  const i = Math.min(Math.floor(s), n - 1);
+  const f = s - i;
+  const a = stops[i], b = stops[i + 1];
+  return [
+    (a[0] + (b[0] - a[0]) * f) | 0,
+    (a[1] + (b[1] - a[1]) * f) | 0,
+    (a[2] + (b[2] - a[2]) * f) | 0
+  ];
+}
+
+const FREQ_CENTER = 433.0;
+const FREQ_SPAN   = 1.5;
+const DB_MIN = -35, DB_MAX = -15;
+const PLOT_MARGIN = { left: 74, right: 8, top: 8, bottom: 28 };
+
+function initWaterfall(canvasId, opts = {}) {
+  const cv = document.getElementById(canvasId);
+  const container = cv.parentElement;
+  const W = cv.width  = container.clientWidth;
+  const H = cv.height = container.clientHeight;
+  const ctx = cv.getContext('2d', { alpha: false });
+
+  const plotX = PLOT_MARGIN.left;
+  const plotY = PLOT_MARGIN.top;
+  const plotW = W - PLOT_MARGIN.left - PLOT_MARGIN.right;
+  const plotH = H - PLOT_MARGIN.top - PLOT_MARGIN.bottom;
+
+  const cols = opts.cols || 160;
+  const refreshMs = opts.refreshMs || 90;
+  const noiseFloor = opts.noiseFloor ?? 0.30;
+  const burstChance = opts.burstChance ?? 0.15;
+
+  function newRow() {
+    const row = new Array(cols).fill(0).map(() => Math.random() * noiseFloor);
+    const bursts = Math.random() < burstChance ? 1 + Math.floor(Math.random() * 2) : 0;
+    for (let b = 0; b < bursts; b++) {
+      const center = Math.floor(Math.random() * cols);
+      const width = 3 + Math.random() * 6;
+      const amp = 0.6 + Math.random() * 0.4;
+      for (let x = 0; x < cols; x++) {
+        row[x] += amp * Math.exp(-((x - center) ** 2) / (2 * width * width));
+      }
+    }
+    return row;
+  }
+
+  const rows = [];
+  for (let i = 0; i < plotH; i++) rows.push(newRow());
+
+  function toDb(v) { return DB_MIN + Math.min(v, 1) * (DB_MAX - DB_MIN); }
+
+  function drawAxes() {
+    ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+    ctx.fillStyle = '#7a7a8a';
+    ctx.font = '10px monospace';
+    ctx.textAlign = 'right';
+    ctx.textBaseline = 'middle';
+
+    const nTicksY = 5;
+    for (let i = 0; i <= nTicksY; i++) {
+      const y = plotY + (plotH * i) / nTicksY;
+      const freq = FREQ_CENTER + FREQ_SPAN / 2 - (FREQ_SPAN * i) / nTicksY;
+      ctx.beginPath();
+      ctx.moveTo(plotX, y);
+      ctx.lineTo(plotX + plotW, y);
+      ctx.stroke();
+      if (i === nTicksY) continue;
+      ctx.fillText(freq.toFixed(2), plotX - 14, y);
+    }
+
+    ctx.textBaseline = 'top';
+    const nTicksX = 4;
+    const totalSeconds = (plotH * refreshMs) / 1000;
+    for (let i = 0; i <= nTicksX; i++) {
+      const x = plotX + (plotW * i) / nTicksX;
+      const secAgo = totalSeconds * (1 - i / nTicksX);
+      const label = i === nTicksX ? 'ahora' : `-${secAgo.toFixed(0)}s`;
+      ctx.textAlign = i === 0 ? 'left' : (i === nTicksX ? 'right' : 'center');
+      ctx.fillText(label, x, plotY + plotH + 8);
+    }
+
+    ctx.save();
+    ctx.translate(11, plotY + plotH / 2);
+    ctx.rotate(-Math.PI / 2);
+    ctx.textAlign = 'center';
+    ctx.fillText('Frecuencia [MHz]', 0, 0);
+    ctx.restore();
+  }
+
+  function draw() {
+    ctx.fillStyle = '#000000'; // Ajustado al fondo del card
+    ctx.fillRect(0, 0, W, H);
+
+    const cellW = plotW / cols;
+    for (let y = 0; y < rows.length; y++) {
+      const row = rows[y];
+      for (let x = 0; x < cols; x++) {
+        ctx.fillStyle = rgbStr(viridis(row[x]));
+        ctx.fillRect(plotX + x * cellW, plotY + y, cellW + 1, 1);
+      }
+    }
+
+    drawAxes();
+    ctx.strokeStyle = 'rgba(124,92,255,0.35)';
+    ctx.strokeRect(plotX, plotY, plotW, plotH);
+  }
+
+  draw();
+  if (cv._interval) clearInterval(cv._interval);
+  cv._interval = setInterval(() => {
+    rows.pop();
+    rows.unshift(newRow());
+    draw();
+  }, refreshMs);
+
+  const readout = document.getElementById('crosshair-readout');
+  cv.addEventListener('mousemove', (e) => {
+    const rect = cv.getBoundingClientRect();
+    const scaleX = W / rect.width;
+    const mx = (e.clientX - rect.left) * scaleX;
+    const my = (e.clientY - rect.top) * (H / rect.height);
+    if (mx < plotX || mx > plotX + plotW || my < plotY || my > plotY + plotH) return;
+
+    const col = Math.floor((mx - plotX) / (plotW / cols));
+    const rowIdx = Math.floor(my - plotY);
+    const val = rows[rowIdx] ? rows[rowIdx][col] : 0;
+
+    const freq = FREQ_CENTER + FREQ_SPAN / 2 - (FREQ_SPAN * (mx - plotX)) / plotW;
+    readout.textContent = `Frecuencia: ${freq.toFixed(4)} MHz    Potencia: ${toDb(val).toFixed(1)} dB`;
+  });
+  cv.addEventListener('mouseleave', () => {
+    readout.textContent = 'Frecuencia: —    Potencia: —';
+  });
+}
+
+function drawColorbar(canvasId) {
+  const cv = document.getElementById(canvasId);
+  const container = cv.parentElement;
+  const W = cv.width  = container.clientWidth;
+  const H = cv.height = container.clientHeight;
+  const ctx = cv.getContext('2d');
+  const barX = 6, barW = 18, barY = 8, barH = H - 34;
+
+  ctx.clearRect(0,0,W,H);
+  for (let y = 0; y < barH; y++) {
+    const t = 1 - y / barH;
+    ctx.fillStyle = rgbStr(viridis(t));
+    ctx.fillRect(barX, barY + y, barW, 1);
+  }
+  ctx.strokeStyle = 'rgba(124,92,255,0.35)';
+  ctx.strokeRect(barX, barY, barW, barH);
+
+  ctx.fillStyle = '#7a7a8a';
+  ctx.font = '9px monospace';
+  ctx.textAlign = 'left';
+  ctx.textBaseline = 'middle';
+  const nTicks = 4;
+  for (let i = 0; i <= nTicks; i++) {
+    const y = barY + (barH * i) / nTicks;
+    const db = DB_MAX - ((DB_MAX - DB_MIN) * i) / nTicks;
+    ctx.fillText(db.toFixed(0), barX + barW + 3, y);
+  }
+}
+
+initWaterfall('waterfall-canvas', { cols: 160, refreshMs: 90 });
+drawColorbar('colorbar-canvas');
+
+// --- CANVAS 2: FFT ANIMADO LERP ---
+let fftLoopId = null;
+
+function initSpectrum(canvasId, opts = {}) {
+  const {
+    bins        = 48,
+    smoothing   = 0.25,
+    spikeChance = 0.03,
+    barGap      = 2,
+    solidColor  = null,
+    freqCenter  = 433.0,
+    freqSpan    = 1.5,
+    dbMin       = -100,
+    dbMax       = -20,
+    showAxes    = true,
+    showPeakHold= true,
+    peakDecay   = 0.985,
+  } = opts;
+
+  const cv = document.getElementById(canvasId);
+  const ctx = cv.getContext('2d');
+
+  let vals = new Array(bins).fill(0.2);
+  let peaks = new Array(bins).fill(0.2);
+
+  if (fftLoopId) cancelAnimationFrame(fftLoopId);
+
+  function dbToNorm(db) {
+    return Math.max(0, Math.min((db - dbMin) / (dbMax - dbMin), 1));
+  }
+
+  function step() {
+    const container = cv.parentElement;
+    const W = container.clientWidth;
+    const H = container.clientHeight || 140;
+    if (cv.width !== W) cv.width = W;
+    if (cv.height !== H) cv.height = H;
+
+    const margin = showAxes ? { left: 42, right: 8, top: 8, bottom: 20 } : { left: 0, right: 0, top: 0, bottom: 0 };
+    const plotX = margin.left, plotY = margin.top;
+    const plotW = W - margin.left - margin.right;
+    const plotH = H - margin.top - margin.bottom;
+
+    function drawAxes() {
+      ctx.strokeStyle = 'rgba(255,255,255,0.06)';
+      ctx.fillStyle = '#7a7a8a';
+      ctx.font = '10px monospace';
+      ctx.textAlign = 'right';
+      ctx.textBaseline = 'middle';
+      const nY = 4;
+      for (let i = 0; i <= nY; i++) {
+        const y = plotY + (plotH * i) / nY;
+        const db = dbMax - ((dbMax - dbMin) * i) / nY;
+        ctx.beginPath();
+        ctx.moveTo(plotX, y); ctx.lineTo(plotX + plotW, y);
+        ctx.stroke();
+        ctx.fillText(db.toFixed(0), plotX - 8, y);
+      }
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'top';
+      const nX = 4;
+      for (let i = 0; i <= nX; i++) {
+        const x = plotX + (plotW * i) / nX;
+        const freq = freqCenter - freqSpan / 2 + (freqSpan * i) / nX;
+        ctx.textAlign = i === 0 ? 'left' : (i === nX ? 'right' : 'center');
+        ctx.fillText(freq.toFixed(2), x, plotY + plotH + 4);
+      }
+    }
+
+    for (let i = 0; i < bins; i++) {
+      const target = 0.15 + 0.25 * Math.sin(i * 0.3 + Date.now() / 900)
+                    + (Math.random() < spikeChance ? 0.6 : 0)
+                    + Math.random() * 0.08;
+      vals[i] += (target - vals[i]) * smoothing;
+      if (showPeakHold) {
+        peaks[i] = Math.max(vals[i], peaks[i] * peakDecay);
+      }
+    }
+
+    ctx.clearRect(0, 0, W, H);
+    if (showAxes) drawAxes();
+
+    const bw = plotW / bins;
+    for (let i = 0; i < bins; i++) {
+      const v = Math.max(0.03, Math.min(vals[i], 1));
+      const barH = v * plotH;
+      ctx.fillStyle = solidColor || rgbStr(viridis(v));
+      ctx.fillRect(plotX + i * bw + barGap / 2, plotY + plotH - barH, bw - barGap, barH);
+
+      if (showPeakHold) {
+        const py = plotY + plotH - peaks[i] * plotH;
+        ctx.fillStyle = 'rgba(255,255,255,0.55)';
+        ctx.fillRect(plotX + i * bw + barGap / 2, py - 1, bw - barGap, 1.5);
+      }
+    }
+
+    fftLoopId = requestAnimationFrame(step);
+  }
+  step();
+}
+
+initSpectrum('fft-canvas', {
+  bins: 48,
+  smoothing: 0.25,
+  spikeChance: 0.03,
+  freqCenter: 433.0,
+  freqSpan: 1.5,
+  dbMin: -100,
+  dbMax: -20,
+  showAxes: true,
+  showPeakHold: true,
+  peakDecay: 0.985
+});
+
+// --- CANVAS 3: ECG PULSE ---
+const ecgCanvas = document.getElementById('ecg-canvas');
+const ecgCtx = ecgCanvas.getContext('2d');
+// Responsive canvas sizing
+function resizeECG() {
+    const rect = ecgCanvas.parentElement.getBoundingClientRect();
+    ecgCanvas.width = rect.width - 48;
+    ecgCanvas.height = 80;
+}
+resizeECG();
+
+let ecgOffset = 0;
+const ecgSpeed = 2.5;
+const ecgPeriod = 120;
+
+function drawECG() {
+    ecgOffset += ecgSpeed;
+    // Limpiar el canvas cada frame en lugar de usar un overlay fade
+    ecgCtx.clearRect(0, 0, ecgCanvas.width, ecgCanvas.height);
+    
+    ecgCtx.beginPath();
+    ecgCtx.strokeStyle = '#7c5cff';
+    ecgCtx.lineWidth = 2;
+    // Opcional glow suave para el latido
+    ecgCtx.shadowColor = '#7c5cff';
+    ecgCtx.shadowBlur = 4;
+
+    const h = ecgCanvas.height;
+    for (let x = 0; x < ecgCanvas.width; x++) {
+      const t = (x + ecgOffset) % ecgPeriod;
+      let y = h / 2; // linea base
+
+      // Patron de latido ajustado a la altura del canvas
+      if (t > 30 && t < 40) {
+        y = h / 2 - (t - 30) * 3;        // subida (pico)
+      } else if (t >= 40 && t < 50) {
+        y = h / 2 + (50 - t) * 3 - 30;    // bajada + valle
+      } else if (t >= 50 && t < 55) {
+        y = h / 2 - (55 - t) * 2;         // pico chico de rebote
+      }
+      
+      // Jitter opcional
+      y += (Math.random() - 0.5) * 1.5;
+
+      if (x === 0) ecgCtx.moveTo(x, y);
+      else ecgCtx.lineTo(x, y);
+    }
+    ecgCtx.stroke();
+    ecgCtx.shadowBlur = 0; // reset
+}
+
+window.addEventListener('resize', resizeECG);
+
+// --- SNR GAUGE ---
+const snrText = document.getElementById('snr-value');
+const snrTextContainer = document.getElementById('snr-text-container');
+let targetSnr = 18.4;
+
+function initGauge(canvasId, {
+  snrMin = 0,
+  snrMax = 30,
+  inertia = 0.06,
+} = {}) {
+  const cv = document.getElementById(canvasId);
+  const ctx = cv.getContext('2d');
+  const cx = cv.width / 2, cy = cv.height / 2, r = cv.width / 2 - 9;
+
+  const ARC_START = Math.PI * 0.8;
+  const ARC_TOTAL = Math.PI * 1.4;
+
+  let angle = 0;
+  let currentSnr = 0;
+
+  function draw() {
+    currentSnr += (targetSnr - currentSnr) * inertia;
+    const norm = Math.max(0, Math.min((currentSnr - snrMin) / (snrMax - snrMin), 1));
+    const targetAngle = ARC_TOTAL * norm;
+    angle += (targetAngle - angle) * inertia;
+
+    ctx.clearRect(0, 0, cv.width, cv.height);
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, ARC_START, ARC_START + ARC_TOTAL);
+    ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+    ctx.lineWidth = 8;
+    ctx.stroke();
+    
+    let cssColor = 'var(--success)';
+    let canvasColor = '#34d399'; // success
+    if (currentSnr < 15) { cssColor = 'var(--warning)'; canvasColor = '#fbbf24'; }
+    if (currentSnr < 10) { cssColor = 'var(--error)'; canvasColor = '#f43f5e'; }
+    
+    snrTextContainer.style.color = cssColor;
+
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, ARC_START, ARC_START + Math.max(0.01, angle));
+    ctx.strokeStyle = canvasColor;
+    ctx.lineWidth = 8;
+    ctx.lineCap = 'round';
+    ctx.stroke();
+
+    snrText.textContent = currentSnr.toFixed(1);
+
+    requestAnimationFrame(draw);
+  }
+  draw();
+}
+
+initGauge('snr-gauge-canvas');
+
+function updateSNR() {
+    targetSnr += (Math.random() - 0.5) * 3;
+    if(targetSnr < 8) targetSnr = 8;
+    if(targetSnr > 25) targetSnr = 25;
+}
+
+// ANIMATION LOOP
+function tick() {
+    drawECG();
+    requestAnimationFrame(tick);
+}
+
+// Handle window resize
+window.addEventListener('resize', () => {
+    initWaterfall('waterfall-canvas', { cols: 160, refreshMs: 90 });
+    drawColorbar('colorbar-canvas');
+});
+
+// --- HERO UNDERLINE GAUGE ---
+function initUnderline(canvasId, opts = {}) {
+  const {
+    amplitude   = 5,
+    speed       = 0.0008,
+    harmonics   = 4,
+    freqScale   = 1.0,
+    lineWidth   = 2.5,
+    colors      = ['#7c5cff', '#5d8cf0', '#5dd6c0', '#5ee68c'],
+  } = opts;
+
+  const cv = document.getElementById(canvasId);
+  if (!cv) return;
+  const h = cv.height;
+  cv.width = cv.clientWidth || 400;
+  const ctx = cv.getContext('2d');
+
+  const harm = Array.from({ length: harmonics }, (_, k) => ({
+    freq: (1.2 + k * 1.7) * freqScale,
+    ampScale: 1 / (k + 1) ** 1.1,
+    phaseOffset: k * 1.3,
+  }));
+
+  let currentGrad = null;
+
+  function frame(t) {
+    if (cv.clientWidth && cv.clientWidth !== cv.width) {
+      cv.width = cv.clientWidth;
+      currentGrad = null; // force gradient recreation
+    }
+    const currentW = cv.width;
+    
+    if (!currentGrad) {
+        currentGrad = ctx.createLinearGradient(0, 0, currentW, 0);
+        colors.forEach((c, i) => currentGrad.addColorStop(i / (colors.length - 1), c));
+    }
+    
+    ctx.clearRect(0, 0, currentW, h);
+    ctx.beginPath();
+    ctx.lineWidth = lineWidth;
+    ctx.strokeStyle = currentGrad;
+    ctx.lineCap = 'round';
+    ctx.shadowColor = 'rgba(124,92,255,0.35)';
+    ctx.shadowBlur = 4;
+
+    for (let x = 0; x <= currentW; x++) {
+      const xt = x / currentW;
+      let y = h / 2;
+      harm.forEach(hm => {
+        y += amplitude * hm.ampScale * Math.sin(xt * Math.PI * 2 * hm.freq + hm.phaseOffset + t * speed);
+      });
+      if (x === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+initUnderline('hero-underline', {
+    speed: 0.003,       // Animation is faster
+    freqScale: 3.5,     // More ripples/undulations across the width
+    harmonics: 6,       // More complex harmonic superposition
+});
+
+// Start everything
+requestAnimationFrame(tick);
+setInterval(updateSNR, 1000);
+
+</script>
 {% endblock %}

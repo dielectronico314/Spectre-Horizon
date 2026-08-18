@@ -169,6 +169,12 @@ document.addEventListener("DOMContentLoaded", function() {
             
             if (!espectro) {
                 valid = true;
+            } else if (espectro === "VLF" && mhz < 0.03) {
+                valid = true;
+            } else if (espectro === "LF" && mhz >= 0.03 && mhz < 0.3) {
+                valid = true;
+            } else if (espectro === "MF" && mhz >= 0.3 && mhz < 3) {
+                valid = true;
             } else if (espectro === "HF" && mhz >= 3 && mhz < 30) {
                 valid = true;
             } else if (espectro === "VHF" && mhz >= 30 && mhz < 300) {
@@ -176,6 +182,8 @@ document.addEventListener("DOMContentLoaded", function() {
             } else if (espectro === "UHF" && mhz >= 300 && mhz < 3000) {
                 valid = true;
             } else if (espectro === "SHF" && mhz >= 3000 && mhz < 30000) {
+                valid = true;
+            } else if (espectro === "EHF" && mhz >= 30000 && mhz <= 40000) {
                 valid = true;
             }
             

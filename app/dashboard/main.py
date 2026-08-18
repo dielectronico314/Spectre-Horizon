@@ -129,6 +129,16 @@ async def dashboard_estado(request: Request):
     )
 
 
+@router.get("/nueva-captura", name="dashboard_nueva_captura")
+async def dashboard_nueva_captura(request: Request):
+    """Mockup puramente visual para la demo (Cero lógica de captura real)"""
+    return templates.TemplateResponse(
+        request=request,
+        name="nueva_captura.html",
+        context={"section": "nueva_captura"}
+    )
+
+
 @router.get("/sesiones", name="dashboard_sesiones")
 async def dashboard_sesiones(request: Request):
     """Explorador de Sesiones (todas las capturas)."""
@@ -212,7 +222,7 @@ async def dashboard_eventos(
             frecuencias.add(mhz)
     frecuencias = sorted(frecuencias)
     
-    espectros_disponibles = ["HF", "VHF", "UHF", "SHF"]
+    espectros_disponibles = ["VLF", "LF", "MF", "HF", "VHF", "UHF", "SHF", "EHF"]
 
     # Filtrar destacados: excluir LO Leakage (offset == 0 o cercano) y deduplicar bloque espectral solapado
     destacados_crudos = [e for e in eventos if e.get("severidad") == "high"]

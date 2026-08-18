@@ -79,16 +79,25 @@ def get_spectrum_category(fc_hz: float) -> str:
     """Clasifica una frecuencia central en su banda de espectro oficial."""
     if not fc_hz:
         return "Desconocido"
-    # Bandas ITU
-    if 3e6 <= fc_hz < 30e6:
+    
+    mhz = fc_hz / 1e6
+    if mhz < 0.03:
+        return "VLF"
+    elif 0.03 <= mhz < 0.3:
+        return "LF"
+    elif 0.3 <= mhz < 3:
+        return "MF"
+    elif 3 <= mhz < 30:
         return "HF"
-    elif 30e6 <= fc_hz < 300e6:
+    elif 30 <= mhz < 300:
         return "VHF"
-    elif 300e6 <= fc_hz < 3000e6:
+    elif 300 <= mhz < 3000:
         return "UHF"
-    elif 3000e6 <= fc_hz < 30000e6:
+    elif 3000 <= mhz < 30000:
         return "SHF"
-    return "Otro"
+    elif 30000 <= mhz <= 40000:
+        return "EHF"
+    return "Fuera de Rango"
 
 def format_freq_mhz(fc_hz: float) -> str:
     """Convierte Hz a MHz humanizados con 1 o 2 decimales."""

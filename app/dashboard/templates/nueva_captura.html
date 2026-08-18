@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+
+{% block title %}Nueva Captura — Cenital RF{% endblock %}
+
+{% block content %}
+<div class="card" style="padding: 1.5rem; max-width: 480px;">
+  <h2 style="margin-top:0;">Nueva captura</h2>
+  <p style="color: var(--text-secondary); font-size: 13px; margin-bottom: 1.25rem;">
+    Vista previa del flujo — disponible en la próxima actualización.
+  </p>
+
+  <div class="form-group">
+    <label><i data-lucide="radio" style="width:14px; vertical-align:-2px;"></i> Frecuencia central (MHz)</label>
+    <input type="number" id="freq-input" value="106.5" step="0.1" min="0.008" max="40000" oninput="actualizarBandaVisual()">
+    <span id="banda-badge" class="banda-pill">VHF</span>
+  </div>
+
+  <div class="form-group">
+    <label><i data-lucide="clock" style="width:14px; vertical-align:-2px;"></i> Duración (segundos)</label>
+    <input type="number" id="duracion-input" value="60">
+  </div>
+
+  <div class="form-group">
+    <label><i data-lucide="gauge" style="width:14px; vertical-align:-2px;"></i> Ganancia</label>
+    <input type="number" value="40">
+  </div>
+
+  <div style="display:flex; align-items:center; gap:10px; margin-top: 1.25rem;">
+    <button id="btn-captura" onclick="iniciarCaptura()">Iniciar captura</button>
+  </div>
+
+  <div id="progreso" style="display:none; margin-top:1rem;">
+    <div class="skeleton" style="height: 8px;"></div>
+    <p id="paso-actual" style="font-size:13px; color: var(--text-secondary);"></p>
+  </div>
+</div>
+
+<style>
+.form-group { display: flex; flex-direction: column; margin-bottom: 1.2rem; position: relative; gap: 6px; }
+.form-group label {
+  display: block; font-size: 13px; color: var(--text-secondary); margin-bottom: 0;
+}
+.form-group input {
+  width: 100%; background: var(--bg-card); border: 1px solid var(--glass-border);
+  border-radius: 6px; padding: 8px 12px; color: var(--text-main); font-family: monospace;
+  -moz-appearance: textfield;
+}
+.form-group input::-webkit-outer-spin-button,
+.form-group input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+.banda-pill {
+  position: absolute; right: 12px; top: 32px; font-size: 11px; font-weight: 500;
+  padding: 2px 8px; border-radius: 4px; background: var(--accent-primary); color: #14141f;
+}
+#btn-captura { background: var(--accent-primary); color: #14141f; border: none;
+  padding: 9px 18px; border-radius: 6px; font-weight: 500; cursor: pointer; }
+#btn-captura:disabled { opacity: 0.5; cursor: not-allowed; }
+</style>
+
+<script>
+lucide.createIcons();
+function actualizarBandaVisual() {
+  const mhz = parseFloat(document.getElementById('freq-input').value);
+  let banda = 'OUT OF RANGE';
+  if (isNaN(mhz)) banda = '--';
+  else if (mhz < 0.03) banda = 'VLF';
+  else if (mhz >= 0.03 && mhz < 0.3) banda = 'LF';
+  else if (mhz >= 0.3 && mhz < 3) banda = 'MF';
+  else if (mhz >= 3 && mhz < 30) banda = 'HF';
+  else if (mhz >= 30 && mhz < 300) banda = 'VHF';
+  else if (mhz >= 300 && mhz < 3000) banda = 'UHF';
+  else if (mhz >= 3000 && mhz < 30000) banda = 'SHF';
+  else if (mhz >= 30000 && mhz <= 40000) banda = 'EHF';
+  document.getElementById('banda-badge').textContent = banda;
+}
+
+let intervaloActivo = null;
+
+async function iniciarCaptura() {
+  const freq = document.getElementById('freq-input').value;
+  const duracion = document.getElementById('duracion-input').value;
+  const btn = document.getElementById('btn-captura');
+  btn.disabled = true;
+  document.getElementById('progreso').style.display = 'block';
+  document.getElementById('paso-actual').textContent = 'Solicitando captura...';
+
+  if (intervaloActivo) clearInterval(intervaloActivo);
+
+  try {
+    const res = await fetch('/api/v1/captures', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({freq_hz: parseFloat(freq) * 1e6, duration_s: parseFloat(duracion)})
+    });
+    
+    if (!res.ok) {
+        throw new Error("Error en petición");
+    }
+    
+    const {job_id} = await res.json();
+
+    intervaloActivo = setInterval(async () => {
+      try {
+        const resEstado = await fetch(`/api/v1/captures/${job_id}`);
+        if (!resEstado.ok) throw new Error("Error obteniendo estado");
+        
+        const estado = await resEstado.json();
+        
+        if (estado.status === 'failed') {
+            document.getElementById('paso-actual').textContent = `❌ Error: ${estado.error}`;
+        } else {
+            document.getElementById('paso-actual').textContent = `[${estado.status}] ${estado.progress_detail}`;
+        }
+        
+        if (estado.status === 'completed' || estado.status === 'failed') {
+          clearInterval(intervaloActivo);
+          intervaloActivo = null;
+          btn.disabled = false;
+        }
+      } catch (err) {
+        document.getElementById('paso-actual').textContent = `❌ ${err.message}`;
+        clearInterval(intervaloActivo);
+        intervaloActivo = null;
+        btn.disabled = false;
+      }
+    }, 2000);
+  } catch (err) {
+    document.getElementById('paso-actual').textContent = `❌ Error de red al iniciar la captura.`;
+    btn.disabled = false;
+  }
+}
+</script>
+{% endblock %}

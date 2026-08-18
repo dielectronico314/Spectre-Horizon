@@ -25,38 +25,44 @@
     </div>
 
     <!-- Metadatos de la Sesión -->
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; padding: 1.5rem; background: var(--bg-card-hover); border-radius: var(--radius-md); margin-bottom: 2rem; border: 1px solid var(--glass-border);">
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem; padding: 1.5rem; background: var(--bg-card-hover); border-radius: var(--radius-md); margin-bottom: 2rem; border: 1px solid var(--glass-border); box-shadow: inset 0 2px 20px rgba(0,0,0,0.5);">
         <div>
             <div style="color: var(--text-muted); font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem;">Frecuencia Central</div>
-            <div style="font-size: 1.2em; font-weight: bold; color: var(--primary);">
-                {{ format_freq_mhz(session.fc_hz) if session.fc_hz else 'Desconocida' }}
+            <div class="frequency-dial" style="height: 60px; justify-content: center;">
+                <div class="frequency-tick">
+                    <div class="frequency-tick-dot" style="box-shadow: 0 0 15px var(--accent-primary);"></div>
+                    <div class="frequency-tick-label" style="font-size: 1.1em; color: var(--text-primary); font-weight: bold;">
+                        {{ format_freq_mhz(session.fc_hz) if session.fc_hz else 'Desconocida' }}
+                    </div>
+                </div>
             </div>
         </div>
         <div>
-            <div style="color: var(--text-muted); font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem;">Categoría de Espectro</div>
+            <div style="color: var(--text-muted); font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem;">Eventos Detectados</div>
+            <div style="font-size: 2.2em; font-weight: bold; color: var(--sev-medium); text-shadow: 0 0 15px rgba(251, 191, 36, 0.4);" data-countup="{{ session.n_events }}">
+                0
+            </div>
+        </div>
+        <div>
+            <div style="color: var(--text-muted); font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem;">Categoría / Duración</div>
             <div style="font-size: 1.1em;">
-                {{ get_spectrum_category(session.fc_hz) if session.fc_hz else 'N/A' }}
+                {{ get_spectrum_category(session.fc_hz) if session.fc_hz else 'N/A' }}<br>
+                <span style="color: var(--text-secondary); font-size: 0.9em;">{{ session.duration_s | default(0) }}s de captura</span>
             </div>
         </div>
         <div>
             <div style="color: var(--text-muted); font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem;">Inicio (UTC)</div>
-            <div style="font-size: 1.1em;">
+            <div style="font-size: 1.1em; font-family: var(--font-mono); color: var(--accent-primary);">
                 {{ session.start_datetime | default("Desconocido") }}
-            </div>
-        </div>
-        <div>
-            <div style="color: var(--text-muted); font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem;">Duración</div>
-            <div style="font-size: 1.1em;">
-                {{ session.duration_s | default(0) }}s
             </div>
         </div>
         <div>
             <div style="color: var(--text-muted); font-size: 0.85em; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 0.3rem;">Estado de Hardware</div>
             <div style="font-size: 1.1em;">
                 {% if session.tuvo_interrupciones %}
-                    <span style="color: var(--warning);"><i data-lucide="triangle-alert" style="vertical-align: -2px;"></i> Interrupciones Registradas</span>
+                    <span style="color: var(--warning); display: flex; align-items: center; gap: 6px;"><div class="status-dot" data-state="warning"></div> Interrupciones Registradas</span>
                 {% else %}
-                    <span style="color: var(--success);"><i data-lucide="circle-check" style="vertical-align: -2px;"></i> Estable</span>
+                    <span style="color: var(--success); display: flex; align-items: center; gap: 6px;"><div class="status-dot" data-state="connected"></div> Estable</span>
                 {% endif %}
             </div>
         </div>

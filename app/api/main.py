@@ -1,4 +1,4 @@
-from fastapi import FastAPI, HTTPException, Query, APIRouter, Request
+from fastapi import FastAPI, HTTPException, Query, APIRouter, Request, BackgroundTasks
 from fastapi.responses import FileResponse, JSONResponse, RedirectResponse, Response
 from typing import List, Optional
 from datetime import date
@@ -16,13 +16,14 @@ import json
 WORKSPACE_DIR = Path("/workspace") if Path("/workspace").exists() else PROJECT_ROOT
 
 from app.api.db import get_db_connection, init_db
-from app.api.models import HealthResponse, SensorStatusResponse, SessionResponse, SessionDetailResponse, EventoResponse, EvidenceLinks
+from app.api.models import HealthResponse, SensorStatusResponse, SessionResponse, SessionDetailResponse, EventoResponse, EvidenceLinks, CaptureRequest, CaptureJobStatus
 from app.api.security import get_evidence_path
 from app.dashboard.main import mount_dashboard
 from app.reports.generator import generate_report_html
 
 tags_metadata = [
     {"name": "General", "description": "Endpoints de salud y estado del sistema."},
+    {"name": "Daemon", "description": "Orquestador de capturas (Background Worker)."},
     {"name": "Sesiones", "description": "Capturas indexadas, con filtro por fecha."},
     {"name": "Eventos", "description": "Detecciones del motor de reglas (Día 14)."},
     {"name": "Evidencia", "description": "Referencias seguras a paquetes forenses (Día 15)."},
@@ -35,6 +36,9 @@ app = FastAPI(
     contact={"name": "Cenital", "url": "https://github.com/cenital"},
     openapi_tags=tags_metadata
 )
+
+# Almacén en memoria para el estado de los jobs (limitación: se pierde si uvicorn reinicia)
+JOBS = {}
 
 @app.exception_handler(HTTPException)
 async def error_handler(request: Request, exc: HTTPException):
@@ -52,6 +56,139 @@ def root():
     return RedirectResponse(url="/docs")
 
 api_router = APIRouter(prefix="/api/v1")
+
+import uuid
+import datetime
+
+def run_capture_pipeline(job_id: str, freq_hz: float, duration_s: float):
+    import time
+    
+    # 1. Determinar rate_hz y config en base a la frecuencia
+    # Misma lógica que demo_autopilot.sh
+    rate_hz = 1953125.0
+    config_file = "features_config_fm_106.5.json"
+    if freq_hz == 923e6:
+        rate_hz = 2000000.0
+        config_file = "features_config.json"
+    elif freq_hz == 2400e6:
+        rate_hz = 20000000.0
+        config_file = "features_config_wifi_2.4.json"
+    elif freq_hz == 5000e6:
+        rate_hz = 20000000.0
+        config_file = "features_config.json"
+
+    # Generar un ID de sesion unico para esta captura
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    session_name = f"captura_{(freq_hz/1e6):.1f}MHz_{timestamp}"
+    outdir = str(WORKSPACE_DIR / "rf-spectrum" / "data" / "samples" / session_name)
+    
+    # Asegurar que el directorio existe
+    subprocess.run(["mkdir", "-p", outdir], capture_output=True)
+
+    # Matriz de pasos a ejecutar estrictamente
+    # Cada tupla es (estado, detalle, cmd, error_msg_custom)
+    pasos = [
+        ("capturing", "Ejecutando captura en hardware SDR", [
+            "python3", str(WORKSPACE_DIR / "scripts" / "capture_iq.py"),
+            "--freq", str(freq_hz),
+            "--rate", str(rate_hz),
+            "--duration", str(duration_s),
+            "--outdir", outdir
+        ], "Hardware no disponible — verifica que no haya otro software (como SAStudio4) usando el puerto USB."),
+        ("processing", "Generando espectrograma base", None, None), # El cmd se inyecta dinamicamente
+        ("processing", "Extrayendo features mediante IA", None, None),
+        ("processing", "Analizando eventos con motor de reglas", None, None),
+        ("processing", "Empaquetando evidencia criptográfica", None, None),
+        ("processing", "Actualizando índice del dashboard", ["python3", str(WORKSPACE_DIR / "scripts" / "build_index.py")], "Fallo al reconstruir la base de datos sqlite.")
+    ]
+
+    for paso_idx, (estado, detalle, cmd, err_msg_custom) in enumerate(pasos):
+        JOBS[job_id]["status"] = estado
+        JOBS[job_id]["progress_detail"] = detalle
+        
+        # Inyección dinámica de comandos que dependen de archivos creados en el paso anterior
+        if paso_idx == 1: # Spectrogram
+            # Buscar el sigmf-meta generado (puede estar en subcarpetas)
+            metas = list(Path(outdir).rglob("*.sigmf-meta"))
+            if not metas:
+                JOBS[job_id]["status"] = "failed"
+                JOBS[job_id]["error"] = "No se generó el archivo .sigmf-meta. El sensor probablemente devolvió un buffer vacío."
+                return
+            meta_path = str(metas[0])
+            subdir = str(metas[0].parent)
+            cmd = ["python3", str(WORKSPACE_DIR / "scripts" / "generate_spectrogram.py"), meta_path, "--outdir", subdir]
+            
+        elif paso_idx == 2: # Features
+            npzs = list(Path(outdir).rglob("*.npz"))
+            if not npzs:
+                JOBS[job_id]["status"] = "failed"
+                JOBS[job_id]["error"] = "Fallo en generación de espectrograma, archivo .npz no encontrado."
+                return
+            npz_path = str(npzs[0])
+            subdir = str(npzs[0].parent)
+            cmd = ["python3", str(WORKSPACE_DIR / "scripts" / "extract_features.py"), npz_path, "--config", str(WORKSPACE_DIR / "config" / config_file), "--out-dir", subdir]
+            
+        elif paso_idx == 3: # Eventos
+            csvs = list(Path(outdir).rglob("features_*.csv"))
+            if not csvs:
+                JOBS[job_id]["status"] = "failed"
+                JOBS[job_id]["error"] = "Fallo en extracción de features, archivo .csv no encontrado."
+                return
+            csv_path = str(csvs[0])
+            subdir = str(csvs[0].parent)
+            cmd = ["python3", str(WORKSPACE_DIR / "scripts" / "run_event_engine.py"), csv_path, "--out-dir", subdir]
+            
+        elif paso_idx == 4: # Evidencia
+            jsons = list(Path(outdir).rglob("eventos_*.json"))
+            if not jsons:
+                # Si no hubo eventos, no falla, pero no hay evidencia
+                continue
+            json_path = str(jsons[0])
+            subdir = str(jsons[0].parent)
+            cmd = ["python3", str(WORKSPACE_DIR / "scripts" / "batch_evidence_builder.py"), json_path, subdir]
+
+        if not cmd:
+            continue
+            
+        # Ejecutar y verificar codigo de salida ESTRICTAMENTE
+        resultado = subprocess.run(cmd, capture_output=True, text=True)
+        if resultado.returncode != 0:
+            JOBS[job_id]["status"] = "failed"
+            error_texto = err_msg_custom if err_msg_custom else f"Falló en {detalle}: {resultado.stderr[-500:]}"
+            JOBS[job_id]["error"] = error_texto
+            return # Detener pipeline inmediatamente
+
+    JOBS[job_id]["status"] = "completed"
+    JOBS[job_id]["progress_detail"] = "Pipeline completado con éxito."
+
+FRECUENCIAS_CALIBRADAS = {106500000.0, 923000000.0, 2400000000.0, 5000000000.0}
+
+@api_router.post("/captures", status_code=202, response_model=CaptureJobStatus, tags=["Daemon"])
+def start_capture_job(request: CaptureRequest, background_tasks: BackgroundTasks):
+    if request.freq_hz not in FRECUENCIAS_CALIBRADAS:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Frecuencia {request.freq_hz/1e6}MHz no calibrada. "
+                   f"Frecuencias soportadas: {sorted(f/1e6 for f in FRECUENCIAS_CALIBRADAS)} MHz."
+        )
+        
+    job_id = f"job_{datetime.datetime.now().strftime('%Y%m%d%H%M%S')}_{uuid.uuid4().hex[:6]}"
+    
+    JOBS[job_id] = {
+        "job_id": job_id,
+        "status": "pending",
+        "progress_detail": "Encolado en worker...",
+        "error": None
+    }
+    
+    background_tasks.add_task(run_capture_pipeline, job_id, request.freq_hz, request.duration_s)
+    return JOBS[job_id]
+
+@api_router.get("/captures/{job_id}", response_model=CaptureJobStatus, tags=["Daemon"])
+def get_capture_job(job_id: str):
+    if job_id not in JOBS:
+        raise HTTPException(status_code=404, detail="Job no encontrado (o el servidor se reinició borrando el estado de memoria)")
+    return JOBS[job_id]
 
 @api_router.get("/health", response_model=HealthResponse, tags=["General"])
 def health_check():
@@ -150,10 +287,60 @@ def sensor_status():
 @api_router.get("/sensor/health", tags=["General"])
 async def sensor_health():
     """
-    Retorna el estado en tiempo real del hardware conectándose mediante SoapySDR.
+    Retorna el estado en tiempo real del hardware conectándose mediante SoapySDR
+    en un proceso aislado. Utiliza un caché de 5s para evitar abrumar el bus USB.
     """
-    res = await run_in_threadpool(probe)
-    return res
+    import subprocess
+    import json
+    import time
+    import os
+    
+    cache_file = "/tmp/sensor_health_cache.json"
+    now = time.time()
+    
+    if os.path.exists(cache_file):
+        try:
+            with open(cache_file, "r") as f:
+                data = json.load(f)
+            if now - data.get("timestamp", 0) < 5:
+                return data.get("response")
+        except Exception:
+            pass
+            
+    try:
+        res = await run_in_threadpool(
+            subprocess.run,
+            ["python3", str(PROJECT_ROOT / "scripts" / "probe_device.py")],
+            capture_output=True, text=True, timeout=10
+        )
+        
+        response_data = None
+        if res.returncode == 0:
+            stdout = res.stdout
+            json_start = stdout.find('{')
+            if json_start != -1:
+                response_data = json.loads(stdout[json_start:])
+        
+        if not response_data:
+            response_data = {
+                "status": "error",
+                "error_state": "Subprocess Error",
+                "message": f"Falló al ejecutar el probe aislado. Code: {res.returncode}"
+            }
+            
+        try:
+            with open(cache_file, "w") as f:
+                json.dump({"timestamp": now, "response": response_data}, f)
+        except Exception:
+            pass
+            
+        return response_data
+    except Exception as e:
+        return {
+            "status": "error",
+            "error_state": "Exception",
+            "message": str(e)
+        }
 
 @api_router.get("/system/log-tail", tags=["System"])
 def system_log_tail(lines: int = 20):

@@ -2,6 +2,15 @@ from pydantic import BaseModel, Field, HttpUrl
 from typing import List, Optional, Literal
 from datetime import date, datetime
 
+class CaptureRequest(BaseModel):
+    freq_hz: float = Field(..., description="Frecuencia central en Hz", example=106500000.0)
+    duration_s: float = Field(..., description="Duración de la captura en segundos", example=5.0)
+
+class CaptureJobStatus(BaseModel):
+    job_id: str
+    status: Literal["pending", "capturing", "processing", "completed", "failed"]
+    progress_detail: str
+    error: Optional[str] = None
 class HealthResponse(BaseModel):
     status: str = Field(..., example="ok")
     version: str = Field(..., example="0.1.0")

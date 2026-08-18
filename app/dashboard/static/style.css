@@ -42,6 +42,21 @@
     --radius-lg: 16px;
 
     --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    
+    --bg-overlay: linear-gradient(rgba(10, 10, 15, 0.4), rgba(10, 10, 15, 0.7));
+}
+
+.light-theme {
+    color-scheme: light;
+    --bg-void: #f4f4f8;
+    --bg-panel: rgba(255, 255, 255, 0.85);
+    --bg-panel-hover: rgba(240, 240, 245, 0.95);
+    --border-subtle: #d1d1e0;
+    --text-primary: #1a1a24;
+    --text-secondary: #5a5a6e;
+    --accent-primary: #6d28d9;
+    --primary-dim: rgba(109, 40, 217, 0.15);
+    --bg-overlay: linear-gradient(rgba(244, 244, 248, 0.3), rgba(244, 244, 248, 0.6));
 }
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -49,7 +64,7 @@
 /* --- Fondo Sólido (sin especulaciones visuales) --- */
 body {
     font-family: var(--font-sans);
-    background: var(--bg-void);
+    background: var(--bg-overlay), url('/dashboard/static/hero_wave_background.png') center/cover no-repeat fixed;
     color: var(--text-primary);
     line-height: 1.6;
     min-height: 100vh;

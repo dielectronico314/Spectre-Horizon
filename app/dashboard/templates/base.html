@@ -4,18 +4,43 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{% block title %}Cenital RF Dashboard{% endblock %}</title>
-    <link rel="stylesheet" href="/dashboard/static/style.css?v=8">
+    <link rel="stylesheet" href="/dashboard/static/style.css?v=11">
     <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
-    <header>
-        <span>Cenital RF Spectrum</span>
-        <nav>
-            <a href="/dashboard/" {% if section == 'estado' %}class="active"{% endif %}>Estado</a>
-            <a href="/dashboard/eventos" {% if section == 'eventos' %}class="active"{% endif %}>Eventos</a>
-            <a href="/dashboard/sesiones" {% if section == 'sesiones' %}class="active"{% endif %}>Sesiones</a>
+    <header style="backdrop-filter: blur(12px) saturate(180%); -webkit-backdrop-filter: blur(12px) saturate(180%); background: rgba(10,10,15,0.7); border-bottom: 1px solid rgba(255,255,255,0.05); box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);">
+        <div style="display: flex; align-items: center; gap: 12px;">
+            <img src="/dashboard/static/logo.avif" alt="Cenital Space" style="height: 28px; filter: invert(1) brightness(1.5) drop-shadow(0 0 8px rgba(167, 139, 250, 0.8));">
+            <span style="font-weight: 600; font-size: 16px; letter-spacing: 0.5px;">Cenital RF Spectrum</span>
+        </div>
+        <nav style="display: flex; gap: 8px; align-items: center;">
+            <a href="/dashboard/" class="nav-btn {% if section == 'estado' %}active{% endif %}">Estado</a>
+            <a href="/dashboard/eventos" class="nav-btn {% if section == 'eventos' %}active{% endif %}">Eventos</a>
+            <a href="/dashboard/sesiones" class="nav-btn {% if section == 'sesiones' %}active{% endif %}">Sesiones</a>
+            <a href="/dashboard/nueva-captura" class="nav-btn outline {% if section == 'nueva_captura' %}active{% endif %}">Nueva Captura</a>
+            <button id="theme-toggle" class="nav-btn outline" style="margin-left: 8px; padding: 6px; display: flex; align-items: center; justify-content: center; cursor: pointer; border-radius: 50%;" title="Cambiar Tema">
+                <i data-lucide="sun" id="theme-icon" style="width: 16px; height: 16px;"></i>
+            </button>
         </nav>
     </header>
+    <style>
+      .nav-btn {
+        padding: 6px 14px; border-radius: 8px; font-size: 13px; font-weight: 500;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        border: 1px solid transparent;
+      }
+      .nav-btn:hover {
+        background: rgba(167, 139, 250, 0.1); border-color: rgba(167, 139, 250, 0.3);
+        box-shadow: 0 0 12px rgba(167, 139, 250, 0.2); color: #fff;
+      }
+      .nav-btn.active {
+        background: rgba(167, 139, 250, 0.15); border-color: var(--accent-primary);
+        color: var(--accent-primary); text-shadow: 0 0 8px rgba(167, 139, 250, 0.4);
+      }
+      .nav-btn.outline {
+        border: 1px dashed var(--border-subtle);
+      }
+    </style>
     <main>
         {% block content %}{% endblock %}
     </main>
@@ -23,6 +48,104 @@
         <p>Dashboard mínimo — Día 17. Datos vía API REST del Día 16.</p>
     </footer>
 
+    <!-- Command Palette HTML -->
+    <div id="cmd-palette" class="command-palette">
+        <div class="command-palette-content">
+            <div class="command-palette-input">
+                <input type="text" id="cmd-input" placeholder="Buscar vistas o comandos (Ctrl+K)...">
+            </div>
+            <div class="command-palette-results">
+                <div class="command-item" onclick="window.location.href='/dashboard/'">
+                    <div class="command-item-title">Ir a Estado General</div>
+                    <div class="command-item-hint">Vista principal de sensores</div>
+                </div>
+                <div class="command-item" onclick="window.location.href='/dashboard/sesiones'">
+                    <div class="command-item-title">Explorar Sesiones</div>
+                    <div class="command-item-hint">Capturas de espectro</div>
+                </div>
+                <div class="command-item" onclick="window.location.href='/dashboard/nueva-captura'">
+                    <div class="command-item-title">Nueva Captura</div>
+                    <div class="command-item-hint">Iniciar orquestador RF</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <script src="/dashboard/static/background.js?v=9" defer></script>
+    <script>
+        // Command Palette Logic
+        document.addEventListener('keydown', (e) => {
+            if ((e.ctrlKey || e.metaKey) && e.key === 'k') {
+                e.preventDefault();
+                const palette = document.getElementById('cmd-palette');
+                if (palette.classList.contains('open')) {
+                    palette.classList.remove('open');
+                } else {
+                    palette.classList.add('open');
+                    document.getElementById('cmd-input').focus();
+                }
+            }
+            if (e.key === 'Escape') {
+                document.getElementById('cmd-palette').classList.remove('open');
+            }
+        });
+        document.getElementById('cmd-palette').addEventListener('click', (e) => {
+            if (e.target.id === 'cmd-palette') e.target.classList.remove('open');
+        });
+
+        // Global CountUp logic
+        function animateValue(obj, start, end, duration) {
+            let startTimestamp = null;
+            const step = (timestamp) => {
+                if (!startTimestamp) startTimestamp = timestamp;
+                const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+                const current = Math.floor(progress * (end - start) + start);
+                obj.innerHTML = current.toLocaleString();
+                if (progress < 1) {
+                    window.requestAnimationFrame(step);
+                } else {
+                    obj.innerHTML = end.toLocaleString();
+                }
+            };
+            window.requestAnimationFrame(step);
+        }
+        
+        // Auto-init for elements with data-countup
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('[data-countup]').forEach(el => {
+                const endVal = parseInt(el.getAttribute('data-countup'), 10);
+                if (!isNaN(endVal)) {
+                    animateValue(el, 0, endVal, 1500);
+                }
+            });
+            
+            // Theme Toggle Logic
+            const themeToggle = document.getElementById('theme-toggle');
+            
+            function applyTheme(isLight) {
+                if (isLight) {
+                    document.body.classList.add('light-theme');
+                    if (themeToggle) themeToggle.innerHTML = '<i data-lucide="moon" style="width: 16px; height: 16px;"></i>';
+                } else {
+                    document.body.classList.remove('light-theme');
+                    if (themeToggle) themeToggle.innerHTML = '<i data-lucide="sun" style="width: 16px; height: 16px;"></i>';
+                }
+                if (window.lucide) window.lucide.createIcons();
+            }
+
+            // Load saved theme
+            const savedTheme = localStorage.getItem('theme');
+            applyTheme(savedTheme === 'light');
+
+            if (themeToggle) {
+                themeToggle.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const isLight = !document.body.classList.contains('light-theme');
+                    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+                    applyTheme(isLight);
+                });
+            }
+        });
+    </script>
 </body>
 </html>
